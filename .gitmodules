@@ -1,6 +1,7 @@
 [submodule "SalernOS-Kernel"]
 	path = SalernOS-Kernel
 	url = https://github.com/Alessandro-Salerno/SalernOS-Kernel
+	branch = master
 [submodule "SalernOS-EFI-Bootloader"]
 	path = SalernOS-EFI-Bootloader
 	url = https://github.com/Alessandro-Salerno/SalernOS-EFI-Bootloader
