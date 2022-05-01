@@ -5,9 +5,12 @@
 [submodule "SalernOS-EFI-Bootloader"]
 	path = SalernOS-EFI-Bootloader
 	url = https://github.com/Alessandro-Salerno/SalernOS-EFI-Bootloader
-[submodule "SalernOS-Buildenv"]
-	path = SalernOS-Buildenv
-	url = https://github.com/Alessandro-Salerno/SalernOS-Buildenv
+	branch = master
 [submodule "SalernOS-Emenv"]
 	path = SalernOS-Emenv
 	url = https://github.com/Alessandro-Salerno/SalernOS-Emenv
+	branch = master
+[submodule "SalernOS-Buildenv"]
+	path = SalernOS-Buildenv
+	url = https://github.com/Alessandro-Salerno/SalernOS-Buildenv
+	branch = master
