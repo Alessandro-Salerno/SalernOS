@@ -29,11 +29,13 @@ $(eval $(call DEFAULT_VAR,HOST_LDFLAGS,$(DEFAULT_HOST_LDFLAGS)))
 override DEFAULT_HOST_LIBS :=
 $(eval $(call DEFAULT_VAR,HOST_LIBS,$(DEFAULT_HOST_LIBS)))
 
-buildall: $(IMAGE_NAME).iso
+build:
 	cd $(KERN_DIR)/; \
 	$(MAKE) $(KERN_TARGET) CROSS_COMPILE=$(CROSS_COMPILER_SUITE)
 
-run-uefi: ovmf buildall
+buildall: build $(IMAGE_NAME).iso ovmf
+	
+run-uefi:
 	qemu-system-x86_64 -M q35 -m 2G -bios ovmf/OVMF.fd -cdrom $(IMAGE_NAME).iso -boot d
 
 ovmf:
@@ -48,7 +50,7 @@ limine:
 		CPPFLAGS="$(HOST_CPPFLAGS)" \
 		LDFLAGS="$(HOST_LDFLAGS)" \
 		LIBS="$(HOST_LIBS)"
-	mv liimne/liimne.exe limine/limine
+	mv ./liimne/limine.exe ./limine/limine
 
 $(IMAGE_NAME).iso: ovmf
 	rm -rf iso_root
@@ -72,3 +74,8 @@ docker:
 enter-env:
 	$(DOCKER) run $(DOCKER_GLOBAL_ARGS) $(DOCKER_OUTPUT)
  
+clean:
+	rm $(IMAGE_NAME).iso
+	cd SalernOS-Kernel; \
+		make clean
+
