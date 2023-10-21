@@ -3,7 +3,7 @@ WORKING_DIRECTORY    = "$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))
 IMAGE_NAME=SalernOS
 KERN_DIR             = SalernOS-Kernel
 KERN_URL             = "https://github.com/Alessandro-Salerno/$(KERN_DIR)"
-KERN_TARGET          = kernel
+KERN_TARGET          = all
 
 ARCH                 = x86_64
 CROSS_COMPILER_SUITE = $(ARCH)-linux-gnu-
@@ -17,16 +17,26 @@ DOCKER_PLATFORM	     = linux/$(ARCH)
 DOCKER_PLATFORM_ARGS = --platform $(DOCKER_PLATFORM)
 DOCKER_GLOBAL_ARGS   = --rm -it -v $(WORKING_DIRECTORY):/root/env
 
-# Toolchain for building the 'limine' executable for the host.
-override DEFAULT_HOST_CC := cc
-$(eval $(call DEFAULT_VAR,HOST_CC,$(DEFAULT_HOST_CC)))
-override DEFAULT_HOST_CFLAGS := -g -O2 -pipe
-$(eval $(call DEFAULT_VAR,HOST_CFLAGS,$(DEFAULT_HOST_CFLAGS)))
-override DEFAULT_HOST_CPPFLAGS :=
-$(eval $(call DEFAULT_VAR,HOST_CPPFLAGS,$(DEFAULT_HOST_CPPFLAGS)))
-override DEFAULT_HOST_LDFLAGS :=
-$(eval $(call DEFAULT_VAR,HOST_LDFLAGS,$(DEFAULT_HOST_LDFLAGS)))
-override DEFAULT_HOST_LIBS :=
+# Toolchain for building the 'limine' executable for the host.
+
+override DEFAULT_HOST_CC := cc
+
+$(eval $(call DEFAULT_VAR,HOST_CC,$(DEFAULT_HOST_CC)))
+
+override DEFAULT_HOST_CFLAGS := -g -O2 -pipe
+
+$(eval $(call DEFAULT_VAR,HOST_CFLAGS,$(DEFAULT_HOST_CFLAGS)))
+
+override DEFAULT_HOST_CPPFLAGS :=
+
+$(eval $(call DEFAULT_VAR,HOST_CPPFLAGS,$(DEFAULT_HOST_CPPFLAGS)))
+
+override DEFAULT_HOST_LDFLAGS :=
+
+$(eval $(call DEFAULT_VAR,HOST_LDFLAGS,$(DEFAULT_HOST_LDFLAGS)))
+
+override DEFAULT_HOST_LIBS :=
+
 $(eval $(call DEFAULT_VAR,HOST_LIBS,$(DEFAULT_HOST_LIBS)))
 
 build:
