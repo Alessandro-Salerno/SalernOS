@@ -35,7 +35,7 @@ setup: limine
 	echo $(COMPONENT_REPOSITORIES) | xargs -n1 | xargs -I{} git clone {}
 
 build-each: setup
-	for dir in ./*; do (cd "$dir" && $(MAKE) && cp -r ./bin ../../iso_root/$dir); done
+	for dir in ./*; do (cd "$$dir" && $(MAKE) && cp -r ./bin ../../iso_root/$$dir); done
 
 run: $(IMAGE_NAME).iso ovmf
 	qemu-system-x86_64 -M q35 -m 2G -bios ovmf/OVMF.fd -cdrom $(IMAGE_NAME).iso -boot d
@@ -79,7 +79,7 @@ env:
  
 clean:
 	rm $(IMAGE_NAME).iso
-	for dir in ./SalernOS/*; do (cd "$dir" && $(MAKE) clean); done
+	for dir in ./SalernOS/*; do (cd "$$dir" && $(MAKE) clean); done
 
 purge:
 	rm $(IMAGE_NAME).iso
