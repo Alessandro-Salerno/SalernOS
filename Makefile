@@ -58,8 +58,7 @@ $(IMAGE_NAME).iso: iso
 iso:
 	rm -rf iso_root
 	mkdir -p iso_root
-	cp -v SalernOS-kernel/bin/kern \
-		limine.cfg limine/limine-bios.sys limine/limine-bios-cd.bin limine/limine-uefi-cd.bin iso_root/
+	cp -v limine.cfg limine/limine-bios.sys limine/limine-bios-cd.bin limine/limine-uefi-cd.bin iso_root/
 	mkdir -p iso_root/EFI/BOOT
 	cp -v limine/BOOTX64.EFI iso_root/EFI/BOOT/
 	cp -v limine/BOOTIA32.EFI iso_root/EFI/BOOT/
