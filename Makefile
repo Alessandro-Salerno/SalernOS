@@ -14,7 +14,7 @@ DOCKER_PLATFORM=linux/$(ARCH)
 DOCKER_PLATFORM_ARGS=--platform $(DOCKER_PLATFORM)
 DOCKER_GLOBAL_ARGS=--rm -it -v $(WORKING_DIRECTORY):/root/env
 
-COMPONENT_REPOSITORIES=https://github.com/Alessandro-Salerno/SalernOS-Kernel
+COMPONENT_REPOSITORIES=https://github.com/Alessandro-Salerno/SalernOS-Kernel,hellow
 
 # Toolchain for building the 'limine' executable for the host.
 override DEFAULT_HOST_CC := cc
