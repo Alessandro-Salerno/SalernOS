@@ -78,7 +78,7 @@ $(IMAGE_NAME).iso: ovmf
 	./limine/limine bios-install $(IMAGE_NAME).iso
 	rm -rf iso_root
 
-docker:
+env:
 	$(DOCKER) build $(DOCKER_INPUT) -t $(DOCKER_OUTPUT)
 
 enter-env:
