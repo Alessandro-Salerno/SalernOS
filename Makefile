@@ -52,7 +52,7 @@ limine:
 		CPPFLAGS="$(HOST_CPPFLAGS)" \
 		LDFLAGS="$(HOST_LDFLAGS)" \
 		LIBS="$(HOST_LIBS)" && \
-	mv ./liimne/limine.exe ./limine/limine
+	mv ./limine/limine.exe ./limine/limine
 
 $(IMAGE_NAME).iso: iso
 iso:
