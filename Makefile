@@ -1,51 +1,43 @@
-WORKING_DIRECTORY    = "$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))"
+WORKING_DIRECTORY="$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))"
 
 IMAGE_NAME=SalernOS
-KERN_DIR             = SalernOS-Kernel
-KERN_URL             = "https://github.com/Alessandro-Salerno/$(KERN_DIR)"
-KERN_TARGET          = all
 
-ARCH                 = x86_64
-CROSS_COMPILER_SUITE = $(ARCH)-linux-gnu-
+ARCH=x86_64
+CROSS_COMPILER_SUITE=$(ARCH)-linux-gnu-
 
-MAKE                 = make
-GIT                  = git
-DOCKER               = docker
-DOCKER_INPUT         = Docker
-DOCKER_OUTPUT        = salernos-buildenv
-DOCKER_PLATFORM	     = linux/$(ARCH)
-DOCKER_PLATFORM_ARGS = --platform $(DOCKER_PLATFORM)
-DOCKER_GLOBAL_ARGS   = --rm -it -v $(WORKING_DIRECTORY):/root/env
+MAKE=make
+GIT=git
+DOCKER=docker
+DOCKER_INPUT=Docker
+DOCKER_OUTPUT=salernos-buildenv
+DOCKER_PLATFORM=linux/$(ARCH)
+DOCKER_PLATFORM_ARGS=--platform $(DOCKER_PLATFORM)
+DOCKER_GLOBAL_ARGS=--rm -it -v $(WORKING_DIRECTORY):/root/env
+
+COMPONENT_REPOSITORIES=https://github.com/Alessandro-Salerno/SalernOS-Kernel
 
 # Toolchain for building the 'limine' executable for the host.
-
 override DEFAULT_HOST_CC := cc
-
 $(eval $(call DEFAULT_VAR,HOST_CC,$(DEFAULT_HOST_CC)))
-
 override DEFAULT_HOST_CFLAGS := -g -O2 -pipe
-
 $(eval $(call DEFAULT_VAR,HOST_CFLAGS,$(DEFAULT_HOST_CFLAGS)))
-
 override DEFAULT_HOST_CPPFLAGS :=
-
 $(eval $(call DEFAULT_VAR,HOST_CPPFLAGS,$(DEFAULT_HOST_CPPFLAGS)))
-
 override DEFAULT_HOST_LDFLAGS :=
-
 $(eval $(call DEFAULT_VAR,HOST_LDFLAGS,$(DEFAULT_HOST_LDFLAGS)))
-
 override DEFAULT_HOST_LIBS :=
-
 $(eval $(call DEFAULT_VAR,HOST_LIBS,$(DEFAULT_HOST_LIBS)))
 
-build:
-	cd $(KERN_DIR)/; \
-	$(MAKE) $(KERN_TARGET) CROSS_COMPILE=$(CROSS_COMPILER_SUITE)
+buildall: build-each build iso
 
-buildall: build $(IMAGE_NAME).iso ovmf
-	
-run-uefi:
+setup: limine
+	mkdir -p SalernOS
+	echo $(COMPONENT_REPOSITORIES) | xargs -n1 | xargs -I{} git clone {}
+
+build-each: setup
+	for dir in ./*; do (cd "$dir" && $(MAKE) && cp -r ./bin ../../iso_root/$dir); done
+
+run: $(IMAGE_NAME).iso ovmf
 	qemu-system-x86_64 -M q35 -m 2G -bios ovmf/OVMF.fd -cdrom $(IMAGE_NAME).iso -boot d
 
 ovmf:
@@ -53,16 +45,17 @@ ovmf:
 	cd ovmf && curl -Lo OVMF.fd https://retrage.github.io/edk2-nightly/bin/RELEASEX64_OVMF.fd
 
 limine:
-	git clone https://github.com/limine-bootloader/limine.git --branch=v5.x-branch-binary --depth=1
+	$(GIT) clone https://github.com/limine-bootloader/limine.git --branch=v5.x-branch-binary --depth=1 && \
 	$(MAKE) -C limine \
 		CC="$(HOST_CC)" \
 		CFLAGS="$(HOST_CFLAGS)" \
 		CPPFLAGS="$(HOST_CPPFLAGS)" \
 		LDFLAGS="$(HOST_LDFLAGS)" \
-		LIBS="$(HOST_LIBS)"
+		LIBS="$(HOST_LIBS)" && \
 	mv ./liimne/limine.exe ./limine/limine
 
-$(IMAGE_NAME).iso: ovmf
+$(IMAGE_NAME).iso: iso
+iso:
 	rm -rf iso_root
 	mkdir -p iso_root
 	cp -v SalernOS-kernel/bin/kern \
@@ -78,14 +71,16 @@ $(IMAGE_NAME).iso: ovmf
 	./limine/limine bios-install $(IMAGE_NAME).iso
 	rm -rf iso_root
 
-env:
+mkenv:
 	$(DOCKER) build $(DOCKER_INPUT) -t $(DOCKER_OUTPUT)
 
-enter-env:
+env:
 	$(DOCKER) run $(DOCKER_GLOBAL_ARGS) $(DOCKER_OUTPUT)
  
 clean:
 	rm $(IMAGE_NAME).iso
-	cd SalernOS-Kernel; \
-		make clean
+	for dir in ./SalernOS/*; do (cd "$dir" && $(MAKE) clean); done
 
+purge:
+	rm $(IMAGE_NAME).iso
+	rm -rf SalernOS
