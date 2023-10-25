@@ -14,6 +14,8 @@ DOCKER_PLATFORM=linux/$(ARCH)
 DOCKER_PLATFORM_ARGS=--platform $(DOCKER_PLATFORM)
 DOCKER_GLOBAL_ARGS=--rm -it -v $(WORKING_DIRECTORY):/root/env
 
+# Other repos
+#URL,branch
 COMPONENT_REPOSITORIES=https://github.com/Alessandro-Salerno/SalernOS-Kernel,hellow
 
 # Toolchain for building the 'limine' executable for the host.
@@ -35,7 +37,7 @@ setup: limine
 	echo $(COMPONENT_REPOSITORIES) | xargs -n1 | xargs -d, | xargs sh ./clone.sh
 
 build-each: setup
-	for dir in ./SalernOS/*; do (cd "$$dir" && $(MAKE) all && rsync -a ./bin ../../iso_root/); done
+	for dir in ./SalernOS/*; do (cd "$$dir" && $(MAKE) && rsync -a ./bin ../../iso_root/); done
 
 run: $(IMAGE_NAME).iso ovmf
 	qemu-system-x86_64 -M q35 -m 2G -bios ovmf/OVMF.fd -cdrom $(IMAGE_NAME).iso -boot d
