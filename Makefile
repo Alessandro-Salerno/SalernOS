@@ -14,7 +14,7 @@ DOCKER_PLATFORM=linux/$(ARCH)
 DOCKER_PLATFORM_ARGS=--platform $(DOCKER_PLATFORM)
 DOCKER_GLOBAL_ARGS=--rm -it -v $(WORKING_DIRECTORY):/root/env
 
-COMPONENT_REPOSITORIES=https://github.com/Alessandro-Salerno/SalernOS-Kernel --branch=hellow
+COMPONENT_REPOSITORIES=https://github.com/Alessandro-Salerno/SalernOS-Kernel
 
 # Toolchain for building the 'limine' executable for the host.
 override DEFAULT_HOST_CC := cc
@@ -32,7 +32,7 @@ buildall: build-each build iso
 
 setup: limine
 	mkdir -p SalernOS
-	echo $(COMPONENT_REPOSITORIES) | xargs -n1 | xargs -I{} git clone {}
+	echo $(COMPONENT_REPOSITORIES) | xargs -n1 | xargs -d, | xargs sh ./clone.sh
 
 build-each: setup
 	for dir in ./*; do (cd "$$dir" && $(MAKE) && cp -r ./bin ../../iso_root/$$dir); done
