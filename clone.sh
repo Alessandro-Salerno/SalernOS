@@ -1,1 +1,1 @@
-git clone $1 --branch=$2 ./SalernOS/$1
+cd ./SalernOS && git clone $1 --branch=$2
