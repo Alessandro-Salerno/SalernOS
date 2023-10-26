@@ -34,11 +34,13 @@ $(eval $(call DEFAULT_VAR,HOST_LIBS,$(DEFAULT_HOST_LIBS)))
 buildall: build-each iso
 
 SalernOS: limine
+	rm -rf iso_root
 	mkdir -p SalernOS
+	mkdir -p iso_root
 	echo $(COMPONENT_REPOSITORIES) | xargs -n1 | xargs -d, | xargs sh ./clone.sh
 
 build-each: SalernOS
-	for dir in ./SalernOS/*; do (cd "$$dir" && $(MAKE) && rsync -a ./bin ../../iso_root/); done
+	for dir in ./SalernOS/*; do (cd "$$dir" && $(MAKE) && rsync -a ./bin/* ../../iso_root/); done
 
 run: $(IMAGE_NAME).iso ovmf
 	qemu-system-x86_64 -M q35 -m 2G -bios ovmf/OVMF.fd -cdrom $(IMAGE_NAME).iso -boot d
@@ -57,10 +59,7 @@ limine:
 		LIBS="$(HOST_LIBS)" && \
 	mv ./limine/limine.exe ./limine/limine
 
-$(IMAGE_NAME).iso: iso
-iso:
-	rm -rf iso_root
-	mkdir -p iso_root
+$(IMAGE_NAME).iso:
 	cp -v limine.cfg limine/limine-bios.sys limine/limine-bios-cd.bin limine/limine-uefi-cd.bin iso_root/
 	mkdir -p iso_root/EFI/BOOT
 	cp -v limine/BOOTX64.EFI iso_root/EFI/BOOT/
@@ -71,7 +70,20 @@ iso:
 		-efi-boot-part --efi-boot-image --protective-msdos-label \
 		iso_root -o $(IMAGE_NAME).iso
 	./limine/limine bios-install $(IMAGE_NAME).iso
-	rm -rf iso_root
+
+# Duplicate for now
+iso:
+	cp -v limine.cfg limine/limine-bios.sys limine/limine-bios-cd.bin limine/limine-uefi-cd.bin iso_root/
+	mkdir -p iso_root/EFI/BOOT
+	cp -v limine/BOOTX64.EFI iso_root/EFI/BOOT/
+	cp -v limine/BOOTIA32.EFI iso_root/EFI/BOOT/
+	xorriso -as mkisofs -b limine-bios-cd.bin \
+		-no-emul-boot -boot-load-size 4 -boot-info-table \
+		--efi-boot limine-uefi-cd.bin \
+		-efi-boot-part --efi-boot-image --protective-msdos-label \
+		iso_root -o $(IMAGE_NAME).iso
+	./limine/limine bios-install $(IMAGE_NAME).iso
+
 
 mkenv:
 	$(DOCKER) build $(DOCKER_INPUT) -t $(DOCKER_OUTPUT)
@@ -86,3 +98,4 @@ clean:
 purge:
 	rm $(IMAGE_NAME).iso
 	rm -rf SalernOS
+	rm -rf iso_root
