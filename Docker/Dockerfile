@@ -6,7 +6,7 @@ RUN apt-get install -y nasm
 RUN apt-get install -y binutils-x86-64-linux-gnu
 RUN apt-get install -y build-essential
 RUN apt-get install -y gcc-x86-64-linux-gnu
-RUN apt-get install -y mtools
+RUN apt-get install -y xorriso
 
 VOLUME /root/env
 WORKDIR /root/env
