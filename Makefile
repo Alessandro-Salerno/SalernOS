@@ -30,13 +30,14 @@ $(eval $(call DEFAULT_VAR,HOST_LDFLAGS,$(DEFAULT_HOST_LDFLAGS)))
 override DEFAULT_HOST_LIBS :=
 $(eval $(call DEFAULT_VAR,HOST_LIBS,$(DEFAULT_HOST_LIBS)))
 
+.PHONY buildall
 buildall: build-each iso
 
-setup: limine
+SalernOS: limine
 	mkdir -p SalernOS
 	echo $(COMPONENT_REPOSITORIES) | xargs -n1 | xargs -d, | xargs sh ./clone.sh
 
-build-each: setup
+build-each: SalernOS
 	for dir in ./SalernOS/*; do (cd "$$dir" && $(MAKE) && rsync -a ./bin ../../iso_root/); done
 
 run: $(IMAGE_NAME).iso ovmf
