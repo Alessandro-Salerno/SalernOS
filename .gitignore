@@ -1,0 +1,5 @@
+*.iso
+SalernOS/
+ovmf/
+iso_root/
+limine/
