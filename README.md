@@ -1,3 +1,6 @@
+> [!WARNING]
+> This branch is for historical purposes only. It is used as a monument to the year 2022, and may be used as a "nostalgia kit" to build older SalernOS versions from that year. Note that updates were made to this repository during the 2023 "hellow" rewrite of the kernel, so the Docker/Make files may not be suitable to build source code from 2022. A fourth, and hopefully decent, rewrite will soon commence.
+
 # SalernOS
 SalernOS is a small, work-in-progress, one-man project to learn Operating System development by building one from scratch.
 
