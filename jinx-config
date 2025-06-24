@@ -1,0 +1,4 @@
+#!/bin/sh
+
+JINX_MAJOR_VER=0.5
+JINX_ARCH=x86_64
