@@ -2,7 +2,7 @@ builds
 host-builds
 sources
 host-pkgs
-kernel
+/kernel
 pkgs
 iso_root
 limine/
