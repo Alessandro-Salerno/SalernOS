@@ -7,6 +7,5 @@ tarball_sha512="68e038f339a8c21faa19a57bbc447a51c817f47c2e06d740847c6e9cc3396c02
 hostdeps="autoconf-2.69 automake"
 
 prepare() {
-    autotools_recursive_regen
-    cd ld && automake
+        (cd ld && automake)
 }
