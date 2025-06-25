@@ -3,7 +3,7 @@
 name=mlibc
 from_source=mlibc
 imagedeps="meson ninja-build"
-hostdeps="pkg-config libgcc-binaries"
+hostdeps="gcc pkg-config libgcc-binaries"
 builddeps="freestnd-c-hdrs freestnd-cxx-hdrs frigg"
 deps="mlibc-headers"
 

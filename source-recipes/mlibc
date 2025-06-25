@@ -6,7 +6,9 @@ tarball_url="https://github.com/managarm/mlibc/archive/${version}.tar.gz"
 tarball_sha512="df6fccb461ca84f4628568f0555e3f09f3234ea39766df3c09f39e0e9f3277356473d3cd9d67f09e9aacc69e607f3e0db63331321bb83a375e20ab3b37c61451"
 
 prepare() {
-	p -r /base_dir/mlibc-salernos/sysdeps "${source_dir}/sysdeps/salernos"
-	cp -r /base_dir/mlibc-salernos/abi "${source_dir}/abis/salernos"
-    ln -s "${source_dir}/abis/salernos/*" "${source_dir}/sysdeps/salernos/include/abi-bits"
+    cp -r /base_dir/mlibc-salernos/sysdeps "${source_dir}/sysdeps/salernos"
+    cp -r /base_dir/mlibc-salernos/abi "${source_dir}/abis/salernos"
+    for file in /base_dir/sources/mlibc/abis/salernos/*; do
+        ln -s "$file" "${source_dir}/sysdeps/salernos/include/abi-bits"
+    done
 }
