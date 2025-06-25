@@ -1,0 +1,16 @@
+diff -urN --no-dereference mlibc-clean/meson.build mlibc-workdir/meson.build
+--- mlibc-clean/meson.build	2024-10-13 20:20:19.000000000 +0200
++++ mlibc-workdir/meson.build	2024-10-13 20:20:19.000000000 +0200
+@@ -269,6 +269,12 @@
+ 	internal_conf.set10('MLIBC_MAP_DSO_SEGMENTS', true)
+ 	internal_conf.set10('MLIBC_MAP_FILE_WINDOWS', true)
+ 	subdir('sysdeps/astral')
++elif host_machine.system() == 'salernos'
++	rtld_include_dirs += include_directories('sysdeps/salernos/include')
++	libc_include_dirs += include_directories('sysdeps/salernos/include')
++	internal_conf.set10('MLIBC_MAP_DSO_SEGMENTS', true)
++	internal_conf.set10('MLIBC_MAP_FILE_WINDOWS', true)
++	subdir('sysdeps/salernos')
+ else
+ 	error('No sysdeps defined for OS: ' + host_machine.system())
+ endif

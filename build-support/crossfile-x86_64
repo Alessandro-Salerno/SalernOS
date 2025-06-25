@@ -1,0 +1,12 @@
+[host_machine]
+system = 'salernos'
+cpu_family = 'x86_64'
+cpu = 'x86_64'
+endian = 'little'
+[binaries]
+c = 'x86_64-salernos-gcc'
+cpp = 'x86_64-salernos-g++'
+ar = 'x86_64-salernos-ar'
+strip = 'x86_64-salernos-strip'
+ld = 'x86_64-salernos-ld'
+pkgconfig = 'x86_64-salernos-pkg-config'

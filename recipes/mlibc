@@ -1,0 +1,28 @@
+#! /bin/sh
+
+name=mlibc
+from_source=mlibc
+imagedeps="meson ninja-build"
+hostdeps="pkg-config libgcc-binaries"
+builddeps="freestnd-c-hdrs freestnd-cxx-hdrs frigg"
+deps="mlibc-headers"
+
+configure() {
+        CFLAGS="$TARGET_CFLAGS" \
+        CXXFLAGS="$TARGET_CXXFLAGS" \
+        LDFLAGS="$TARGET_LDFLAGS -Wl,/usr/local/libgcc-binaries/libgcc-$ARCHITECTURE.a" \
+    meson_configure_noflags \
+        --buildtype=release \
+        -Dno_headers=true \
+        -Ddefault_library=both \
+        -Dlibgcc_dependency=false \
+        -Duse_freestnd_hdrs=enabled
+}
+
+build() {
+    ninja -j${parallelism}
+}
+
+package() {
+    DESTDIR="${dest_dir}" ninja install
+}
