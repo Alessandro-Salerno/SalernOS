@@ -1,4 +1,5 @@
 #include <bits/ensure.h>
+#include <climits>
 #include <mlibc/debug.hpp>
 #include <mlibc/all-sysdeps.hpp>
 #include <errno.h>
