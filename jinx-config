@@ -3,6 +3,8 @@
 JINX_MAJOR_VER=0.5
 JINX_ARCH=x86_64
 
+export PATH=$PATH:host-pkgs/gcc/usr/local/bin:host-pkgs/binutils/usr/local/bin/
+
 CFLAGS="-O2 -pipe -fstack-clash-protection"
 HOST_CXXFLAGS="${HOST_CFLAGS} -Wp,-D_GLIBCXX_ASSERTIONS"
 HOST_LDFLAGS="-Wl,-O1 -Wl,--sort-common -Wl,--as-needed -Wl,-z,relro -Wl,-z,now"

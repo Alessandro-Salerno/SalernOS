@@ -1,7 +1,7 @@
 diff -urN --no-dereference mlibc-clean/meson.build mlibc-workdir/meson.build
 --- mlibc-clean/meson.build	2024-10-13 20:20:19.000000000 +0200
 +++ mlibc-workdir/meson.build	2024-10-13 20:20:19.000000000 +0200
-@@ -269,6 +269,12 @@
+@@ -266,6 +266,12 @@
  	internal_conf.set10('MLIBC_MAP_DSO_SEGMENTS', true)
  	internal_conf.set10('MLIBC_MAP_FILE_WINDOWS', true)
  	subdir('sysdeps/astral')
@@ -11,6 +11,6 @@ diff -urN --no-dereference mlibc-clean/meson.build mlibc-workdir/meson.build
 +	internal_conf.set10('MLIBC_MAP_DSO_SEGMENTS', true)
 +	internal_conf.set10('MLIBC_MAP_FILE_WINDOWS', true)
 +	subdir('sysdeps/salernos')
- else
- 	error('No sysdeps defined for OS: ' + host_machine.system())
- endif
+ elif host_machine.system() == 'menix'
+	rtld_include_dirs += include_directories('sysdeps/menix/include')
+	libc_include_dirs += include_directories('sysdeps/menix/include')

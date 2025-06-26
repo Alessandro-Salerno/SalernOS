@@ -1,8 +1,7 @@
-diff --git gcc-host-clean/fixincludes/mkfixinc.sh gcc-host-workdir/fixincludes/mkfixinc.sh
-index df90720..c7df202 100755
+diff -urN --no-dereference gcc-host-clean/fixincludes/mkfixinc.sh gcc-host-workdir/fixincludes/mkfixinc.sh
 --- gcc-host-clean/fixincludes/mkfixinc.sh
 +++ gcc-host-workdir/fixincludes/mkfixinc.sh
-@@ -12,6 +12,7 @@ target=fixinc.sh
+@@ -12,6 +12,7 @@
  # Check for special fix rules for particular targets
  case $machine in
      i?86-*-cygwin* | \
@@ -10,10 +9,8 @@ index df90720..c7df202 100755
      i?86-*-mingw32* | \
      x86_64-*-mingw32* | \
      powerpc-*-eabisim* | \
-diff --git gcc-host-workdir/gcc/config/i386/salernos.h gcc-host-workdir/gcc/config/i386/salernos.h
-new file mode 100644
-index 0000000..e0e4a79
---- /dev/null
+diff -urN --no-dereference gcc-host-clean/gcc/config/i386/salernos.h gcc-host-workdir/gcc/config/i386/salernos.h
+--- gcc-host-clean/gcc/config/i386/salernos.h	1970-01-01 01:00:00.000000000 +0100
 +++ gcc-host-workdir/gcc/config/i386/salernos.h
 @@ -0,0 +1,29 @@
 +#undef TARGET_SALERNOS
@@ -45,10 +42,8 @@ index 0000000..e0e4a79
 +    builtin_assert ("system=unix");      \
 +    builtin_assert ("system=posix");     \
 +  } while (0);
-diff --git gcc-host-workdir/gcc/config/riscv/salernos.h gcc-host-workdir/gcc/config/riscv/salernos.h
-new file mode 100644
-index 0000000..b7a3ba6
---- /dev/null
+diff -urN --no-dereference gcc-host-clean/gcc/config/riscv/salernos.h gcc-host-workdir/gcc/config/riscv/salernos.h
+--- gcc-host-clean/gcc/config/riscv/salernos.h	1970-01-01 01:00:00.000000000 +0100
 +++ gcc-host-workdir/gcc/config/riscv/salernos.h
 @@ -0,0 +1,45 @@
 +#undef TARGET_SALERNOS
@@ -96,11 +91,10 @@ index 0000000..b7a3ba6
 +    builtin_assert ("system=unix");      \
 +    builtin_assert ("system=posix");     \
 +  } while (0);
-diff --git gcc-host-clean/gcc/config.gcc gcc-host-workdir/gcc/config.gcc
-index 95c91ee..5cdc83a 100644
+diff -urN --no-dereference gcc-host-clean/gcc/config.gcc gcc-host-workdir/gcc/config.gcc
 --- gcc-host-clean/gcc/config.gcc
 +++ gcc-host-workdir/gcc/config.gcc
-@@ -878,6 +878,15 @@ case ${target} in
+@@ -878,6 +878,15 @@
    rust_target_objs="${rust_target_objs} freebsd-rust.o"
    target_has_targetrustm=yes
    ;;
@@ -116,7 +110,7 @@ index 95c91ee..5cdc83a 100644
  *-*-fuchsia*)
    native_system_header_dir=/include
    tmake_file="t-fuchsia"
-@@ -2284,6 +2293,9 @@ i[34567]86-*-mingw* | x86_64-*-mingw*)
+@@ -2284,6 +2293,9 @@
  			;;
  	esac
  	;;
@@ -126,7 +120,7 @@ index 95c91ee..5cdc83a 100644
  x86_64-*-fuchsia*)
  	tmake_file="${tmake_file} i386/t-x86_64-elf"
  	tm_file="${tm_file} i386/unix.h i386/att.h elfos.h newlib-stdint.h i386/i386elf.h i386/x86-64.h fuchsia.h"
-@@ -2483,6 +2495,13 @@ microblaze*-*-elf)
+@@ -2483,6 +2495,13 @@
  	cxx_target_objs="${cxx_target_objs} microblaze-c.o"
  	tmake_file="${tmake_file} microblaze/t-microblaze"
          ;;
@@ -140,11 +134,35 @@ index 95c91ee..5cdc83a 100644
  riscv*-*-linux*)
  	tm_file="elfos.h gnu-user.h linux.h glibc-stdint.h ${tm_file} riscv/linux.h"
  	case "x${enable_multilib}" in
-diff --git gcc-host-clean/libgcc/config.host gcc-host-workdir/libgcc/config.host
-index e75a7af..a839ad8 100644
+diff -urN --no-dereference gcc-host-clean/libcpp/Makefile.in gcc-host-workdir/libcpp/Makefile.in
+--- gcc-host-clean/libcpp/Makefile.in
++++ gcc-host-workdir/libcpp/Makefile.in
+@@ -32,10 +32,10 @@
+ AUTOHEADER = @AUTOHEADER@
+ CATALOGS = $(patsubst %,po/%,@CATALOGS@)
+ CC = @CC@
+-CFLAGS = @CFLAGS@
++override CFLAGS := @CFLAGS@
+ WARN_CFLAGS = @warn@ @c_warn@ @WARN_PEDANTIC@ @WERROR@
+ CXX = @CXX@
+-CXXFLAGS = @CXXFLAGS@
++override CXXFLAGS := @CXXFLAGS@
+ WARN_CXXFLAGS = @warn@ @WARN_PEDANTIC@ @WERROR@
+ CPP = @CPP@
+ CPPFLAGS = @CPPFLAGS@
+@@ -45,7 +45,7 @@
+ INSTALL_DATA = @INSTALL_DATA@
+ INSTALL_PROGRAM = @INSTALL_PROGRAM@
+ INSTALL_SCRIPT = @INSTALL_SCRIPT@
+-LDFLAGS = @LDFLAGS@
++override LDFLAGS := @LDFLAGS@
+ LIBICONV = @LIBICONV@
+ LIBINTL = @LIBINTL@
+ PACKAGE = @PACKAGE@
+diff -urN --no-dereference gcc-host-clean/libgcc/config.host gcc-host-workdir/libgcc/config.host
 --- gcc-host-clean/libgcc/config.host
 +++ gcc-host-workdir/libgcc/config.host
-@@ -304,6 +304,11 @@ case ${host} in
+@@ -304,6 +304,11 @@
    tmake_file="$tmake_file t-crtstuff-pic t-libgcc-pic t-eh-dw2-dip t-slibgcc t-slibgcc-fuchsia"
    extra_parts="crtbegin.o crtend.o"
    ;;
@@ -156,7 +174,7 @@ index e75a7af..a839ad8 100644
  *-*-linux* | frv-*-*linux* | *-*-kfreebsd*-gnu | *-*-gnu* | *-*-kopensolaris*-gnu | *-*-uclinuxfdpiceabi)
    tmake_file="$tmake_file t-crtstuff-pic t-libgcc-pic t-eh-dw2-dip t-slibgcc t-slibgcc-gld t-slibgcc-elf-ver t-linux"
    extra_parts="crtbegin.o crtbeginS.o crtbeginT.o crtend.o crtendS.o"
-@@ -752,6 +757,10 @@ x86_64-*-elf* | x86_64-*-rtems*)
+@@ -752,6 +757,10 @@
  x86_64-*-fuchsia*)
  	tmake_file="$tmake_file t-libgcc-pic"
  	;;
@@ -167,7 +185,7 @@ index e75a7af..a839ad8 100644
  i[34567]86-*-dragonfly*)
  	tmake_file="${tmake_file} i386/t-dragonfly i386/t-crtstuff"
  	md_unwind_header=i386/dragonfly-unwind.h
-@@ -1347,6 +1356,10 @@ pru-*-*)
+@@ -1347,6 +1356,10 @@
  	tmake_file="${tmake_file} t-softfp-sfdf t-softfp-excl t-softfp t-gnu-prefix pru/t-pru"
  	tm_file="$tm_file pru/pru-abi.h"
  	;;
@@ -178,11 +196,10 @@ index e75a7af..a839ad8 100644
  riscv*-*-linux*)
  	tmake_file="${tmake_file} riscv/t-crtstuff riscv/t-softfp${host_address} t-softfp riscv/t-elf riscv/t-elf${host_address} t-slibgcc-libgcc"
  	extra_parts="$extra_parts crtbegin.o crtend.o crti.o crtn.o crtendS.o crtbeginT.o"
-diff --git gcc-host-clean/libgcc/configure.ac gcc-host-workdir/libgcc/configure.ac
-index 4e8c036..d298fe5 100644
+diff -urN --no-dereference gcc-host-clean/libgcc/configure.ac gcc-host-workdir/libgcc/configure.ac
 --- gcc-host-clean/libgcc/configure.ac
 +++ gcc-host-workdir/libgcc/configure.ac
-@@ -46,7 +46,7 @@ else
+@@ -46,7 +46,7 @@
    libgcc_topdir="${srcdir}/.."
  fi
  AC_SUBST(libgcc_topdir)
@@ -191,11 +208,10 @@ index 4e8c036..d298fe5 100644
  AC_CONFIG_HEADER(auto-target.h:config.in)
  
  AC_ARG_ENABLE(shared,
-diff --git gcc-host-clean/libiberty/configure.ac gcc-host-workdir/libiberty/configure.ac
-index 0888e63..10161a1 100644
+diff -urN --no-dereference gcc-host-clean/libiberty/configure.ac gcc-host-workdir/libiberty/configure.ac
 --- gcc-host-clean/libiberty/configure.ac
 +++ gcc-host-workdir/libiberty/configure.ac
-@@ -37,7 +37,7 @@ else
+@@ -37,7 +37,7 @@
    libiberty_topdir="${srcdir}/.."
  fi
  AC_SUBST(libiberty_topdir)
@@ -204,11 +220,10 @@ index 0888e63..10161a1 100644
  
  dnl Very limited version of automake's enable-maintainer-mode
  
-diff --git gcc-host-clean/libstdc++-v3/crossconfig.m4 gcc-host-workdir/libstdc++-v3/crossconfig.m4
-index b3269cb..f2d4d13 100644
+diff -urN --no-dereference gcc-host-clean/libstdc++-v3/crossconfig.m4 gcc-host-workdir/libstdc++-v3/crossconfig.m4
 --- gcc-host-clean/libstdc++-v3/crossconfig.m4
 +++ gcc-host-workdir/libstdc++-v3/crossconfig.m4
-@@ -136,6 +136,18 @@ case "${host}" in
+@@ -136,6 +136,18 @@
      AC_CHECK_FUNCS(uselocale)
      ;;
  
@@ -227,29 +242,3 @@ index b3269cb..f2d4d13 100644
    *-fuchsia*)
      SECTION_FLAGS='-ffunction-sections -fdata-sections'
      AC_SUBST(SECTION_FLAGS)
-diff --git gcc-host-clean/libcpp/Makefile.in gcc-host-workdir/libcpp/Makefile.in
-index ebbca37..ea97ba4 100644
---- gcc-clean/libcpp/Makefile.in
-+++ gcc-workdir/libcpp/Makefile.in
-@@ -32,10 +32,10 @@ AUTOCONF = @AUTOCONF@
- AUTOHEADER = @AUTOHEADER@
- CATALOGS = $(patsubst %,po/%,@CATALOGS@)
- CC = @CC@
--CFLAGS = @CFLAGS@
-+override CFLAGS := @CFLAGS@
- WARN_CFLAGS = @warn@ @c_warn@ @WARN_PEDANTIC@ @WERROR@
- CXX = @CXX@
--CXXFLAGS = @CXXFLAGS@
-+override CXXFLAGS := @CXXFLAGS@
- WARN_CXXFLAGS = @warn@ @WARN_PEDANTIC@ @WERROR@
- CPP = @CPP@
- CPPFLAGS = @CPPFLAGS@
-@@ -45,7 +45,7 @@ INCINTL = @INCINTL@
- INSTALL_DATA = @INSTALL_DATA@
- INSTALL_PROGRAM = @INSTALL_PROGRAM@
- INSTALL_SCRIPT = @INSTALL_SCRIPT@
--LDFLAGS = @LDFLAGS@
-+override LDFLAGS := @LDFLAGS@
- LIBICONV = @LIBICONV@
- LIBINTL = @LIBINTL@
- PACKAGE = @PACKAGE@
