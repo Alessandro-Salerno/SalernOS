@@ -9,9 +9,9 @@ diff -urN --no-dereference gcc-host-clean/fixincludes/mkfixinc.sh gcc-host-workd
      i?86-*-mingw32* | \
      x86_64-*-mingw32* | \
      powerpc-*-eabisim* | \
-diff -urN --no-dereference gcc-host-clean/gcc/config/i386/placeholder.h gcc-host-workdir/gcc/config/i386/placeholder.h
---- gcc-host-clean/gcc/config/i386/placeholder.h	1970-01-01 01:00:00.000000000 +0100
-+++ gcc-host-workdir/gcc/config/i386/placeholder.h
+diff -urN --no-dereference gcc-host-clean/gcc/config/i386/salernos.h gcc-host-workdir/gcc/config/i386/salernos.h
+--- gcc-host-clean/gcc/config/i386/salernos.h	1970-01-01 01:00:00.000000000 +0100
++++ gcc-host-workdir/gcc/config/i386/salernos.h
 @@ -0,0 +1,29 @@
 +#undef TARGET_PLACEHOLDER
 +#define TARGET_PLACEHOLDER 1
@@ -36,15 +36,15 @@ diff -urN --no-dereference gcc-host-clean/gcc/config/i386/placeholder.h gcc-host
 +#undef TARGET_OS_CPP_BUILTINS
 +#define TARGET_OS_CPP_BUILTINS()         \
 +  do {                                   \
-+    builtin_define ("__placeholder__");    \
++    builtin_define ("__salernos__");    \
 +    builtin_define ("__unix__");         \
-+    builtin_assert ("system=placeholder"); \
++    builtin_assert ("system=salernos"); \
 +    builtin_assert ("system=unix");      \
 +    builtin_assert ("system=posix");     \
 +  } while (0);
-diff -urN --no-dereference gcc-host-clean/gcc/config/riscv/placeholder.h gcc-host-workdir/gcc/config/riscv/placeholder.h
---- gcc-host-clean/gcc/config/riscv/placeholder.h	1970-01-01 01:00:00.000000000 +0100
-+++ gcc-host-workdir/gcc/config/riscv/placeholder.h
+diff -urN --no-dereference gcc-host-clean/gcc/config/riscv/salernos.h gcc-host-workdir/gcc/config/riscv/salernos.h
+--- gcc-host-clean/gcc/config/riscv/salernos.h	1970-01-01 01:00:00.000000000 +0100
++++ gcc-host-workdir/gcc/config/riscv/salernos.h
 @@ -0,0 +1,45 @@
 +#undef TARGET_PLACEHOLDER
 +#define TARGET_PLACEHOLDER 1
@@ -85,9 +85,9 @@ diff -urN --no-dereference gcc-host-clean/gcc/config/riscv/placeholder.h gcc-hos
 +#undef TARGET_OS_CPP_BUILTINS
 +#define TARGET_OS_CPP_BUILTINS()         \
 +  do {                                   \
-+    builtin_define ("__placeholder__");    \
++    builtin_define ("__salernos__");    \
 +    builtin_define ("__unix__");         \
-+    builtin_assert ("system=placeholder"); \
++    builtin_assert ("system=salernos"); \
 +    builtin_assert ("system=unix");      \
 +    builtin_assert ("system=posix");     \
 +  } while (0);
@@ -114,8 +114,8 @@ diff -urN --no-dereference gcc-host-clean/gcc/config.gcc gcc-host-workdir/gcc/co
  			;;
  	esac
  	;;
-+x86_64-*-placeholder*)
-+	tm_file="${tm_file} i386/unix.h i386/att.h elfos.h gnu-user.h glibc-stdint.h i386/x86-64.h i386/gnu-user-common.h i386/gnu-user64.h i386/placeholder.h"
++x86_64-*-salernos*)
++	tm_file="${tm_file} i386/unix.h i386/att.h elfos.h gnu-user.h glibc-stdint.h i386/x86-64.h i386/gnu-user-common.h i386/gnu-user64.h i386/salernos.h"
 +	;;
  x86_64-*-fuchsia*)
  	tmake_file="${tmake_file} i386/t-x86_64-elf"
@@ -124,8 +124,8 @@ diff -urN --no-dereference gcc-host-clean/gcc/config.gcc gcc-host-workdir/gcc/co
  	cxx_target_objs="${cxx_target_objs} microblaze-c.o"
  	tmake_file="${tmake_file} microblaze/t-microblaze"
          ;;
-+riscv*-*-placeholder*)
-+	tm_file="${tm_file} elfos.h gnu-user.h glibc-stdint.h riscv/placeholder.h"
++riscv*-*-salernos*)
++	tm_file="${tm_file} elfos.h gnu-user.h glibc-stdint.h riscv/salernos.h"
 +	tmake_file="${tmake_file} riscv/t-riscv"
 +	gnu_ld=yes
 +	gas=yes
