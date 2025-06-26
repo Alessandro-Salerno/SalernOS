@@ -1,17 +1,42 @@
+#!/bin/sh
 name=binutils
-revision=1
 from_source=binutils
-imagedeps="build-essential gcc"
-hostdeps="automake autoconf-2.69"
+revision=1
+imagedeps="build-essential"
+hostdeps="autoconf-2.69 automake libtool pkg-config"
 
 configure() {
-	${source_dir}/configure --target=$JINX_ARCH-salernos --prefix=${prefix} --with-sysroot=${sysroot_dir} --disable-werror
+    # --enable-separate-code makes libxcb fail to load my mlibc, please
+    # dig why this happens! Its probably kernel side.
+
+        CFLAGS="$HOST_CFLAGS" \
+        CXXFLAGS="$HOST_CXXFLAGS" \
+        LDFLAGS="$HOST_LDFLAGS" \
+    "${source_dir}"/configure \
+        --prefix="${prefix}" \
+        --target=${OS_TRIPLET} \
+        --with-sysroot="${sysroot_dir}" \
+        --enable-cet \
+        --enable-default-execstack=no \
+        --enable-deterministic-archives \
+        --enable-gold \
+        --enable-ld=default \
+        --enable-new-dtags \
+        --enable-plugins \
+        --enable-relro \
+        --enable-threads \
+        --disable-nls \
+        --disable-werror \
+        --with-pic
 }
 
 build() {
-	make -j${parallelism}
+    make -j${parallelism}
 }
 
 package() {
-	make install DESTDIR="${dest_dir}"
+    DESTDIR="${dest_dir}" make install
+
+        strip_command=strip \
+    post_package_strip
 }

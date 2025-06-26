@@ -11,7 +11,7 @@ TARGET_CFLAGS="$HOST_CFLAGS"
 TARGET_CXXFLAGS="$HOST_CXXFLAGS"
 TARGET_LDFLAGS="$HOST_LDFLAGS"
 
-OS_TRIPLET=$JINX_ARCH-placeholder-mlibc
+OS_TRIPLET=$JINX_ARCH-salernos-mlibc
 
 case "$JINX_ARCH" in
     x86_64)
@@ -20,6 +20,53 @@ case "$JINX_ARCH" in
         TARGET_LDFLAGS="$TARGET_LDFLAGS -Wl,-z,pack-relative-relocs"
         ;;
 esac
+
+
+post_package_strip() {
+    if [ -z "$strip_command" ]; then
+        strip_command="${OS_TRIPLET}-strip"
+    fi
+
+    for f in $(find "${dest_dir}"); do
+        if file "$f" | grep 'not stripped' >/dev/null; then
+            echo "* stripping '$f'..."
+            stripped_file="$(mktemp)"
+            ${strip_command} "$f" -o "$stripped_file"
+            chmod --reference="$f" "$stripped_file"
+            mv -f "$stripped_file" "$f"
+        fi
+    done
+}
+
+autotools_configure() {
+        CFLAGS="$TARGET_CFLAGS" \
+        CXXFLAGS="$TARGET_CXXFLAGS" \
+        LDFLAGS="$TARGET_LDFLAGS" \
+    autotools_configure_noflags "$@"
+}
+
+autotools_configure_noflags() {
+    if [ -z "${configure_script_path}" ]; then
+        configure_script_path="${source_dir}/configure"
+    fi
+
+        ac_cv_func_malloc_0_nonnull=yes \
+        ac_cv_func_calloc_0_nonnull=yes \
+        ac_cv_func_realloc_0_nonnull=yes \
+    ${configure_script_path} \
+        --host=${OS_TRIPLET} \
+        --with-sysroot=${sysroot_dir} \
+        --prefix=${prefix} \
+        --sysconfdir=/etc \
+        --localstatedir=/var \
+        --bindir=${prefix}/bin \
+        --sbindir=${prefix}/bin \
+        --libdir=${prefix}/lib \
+        --disable-static \
+        --enable-shared \
+        --disable-malloc0returnsnull \
+        "$@"
+}
 
 autotools_recursive_regen() {
     ACLOCAL_INCLUDE=""
@@ -70,7 +117,7 @@ cmake_configure_noflags() {
     fi
 
     cmake "${cmake_source_dir}" \
-        -DCMAKE_TOOLCHAIN_FILE="${base_dir}/build-support/CMakeToolchain-$ARCHITECTURE.txt" \
+        -DCMAKE_TOOLCHAIN_FILE="${base_dir}/build-support/CMakeToolchain-$JINX_ARCH.txt" \
         -DCMAKE_INSTALL_PREFIX=${prefix} \
         -DCMAKE_INSTALL_SYSCONFDIR=/etc \
         -DCMAKE_INSTALL_LOCALSTATEDIR=/var \

@@ -19,6 +19,6 @@ build() {
 package() {
     DESTDIR="${dest_dir}" make install
 
-    cp -pv /usr/local/share/autoconf/build-aux/config.sub "${dest_dir}${prefix}"/share/automake-1.15/
-    cp -pv /usr/local/share/autoconf/build-aux/config.guess "${dest_dir}${prefix}"/share/automake-1.15/
+    cp -pv /usr/local/share/autoconf/build-aux/config.sub "${dest_dir}${prefix}"/share/automake-1.16/
+    cp -pv /usr/local/share/autoconf/build-aux/config.guess "${dest_dir}${prefix}"/share/automake-1.16/
 }
