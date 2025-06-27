@@ -2,11 +2,12 @@
 name=freestnd-c-hdrs
 version=87956bbcad0e1934e708223913be53131311342d
 revision=1
+imagedeps="rsync"
 git_url="https://codeberg.org/osdev/freestnd-c-hdrs"
 commit=${version}
 
 build() {
-    cp -rp "${source_dir}"/. ./
+    rsync -av --exclude='.git' "${source_dir}"/. .
 }
 
 package() {

@@ -1,6 +1,6 @@
 #!/bin/sh
 name=binutils
-from_source=binutils
+from_source=binutils-host
 revision=1
 imagedeps="build-essential"
 hostdeps="autoconf-2.69 automake libtool pkg-config"
