@@ -15,6 +15,6 @@ build() {
 }
 
 package() {
-    mkdir -p "${dest_dir}/initrd_root"
-    cp ./bin/* "${dest_dir}/initrd_root"
+    mkdir -p "${dest_dir}"
+    cp ./bin/* "${dest_dir}"
 }

@@ -17,10 +17,9 @@ kernel:
 	git clone https://github.com/Alessandro-Salerno/SalernOS-Kernel kernel
 
 iso_root/initrd:
-	mkdir -p iso_root/initrd_root && \
-	cd iso_root/initrd_root && \
-	tar -cf ../initrd . && \
-	rm -rf ../initrd_root
+	cd iso_root/ && \
+		tar -cf ../initrd . && \
+		mv ../initrd ./initrd
 
 limine:
 	git clone https://github.com/limine-bootloader/limine.git --branch=v8.x-binary --depth=1 && \
@@ -43,5 +42,9 @@ salernos.iso: limine iso_root/initrd
 clean:
 	rm -rf builds host-builds sources host-pkgs kernel pkgs iso_root limine *.iso
 
-run: all
+run: salernos.iso
 	qemu-system-x86_64 -M q35 -m 256m -enable-kvm -smp cpus=1 -no-shutdown -no-reboot -debugcon file:/dev/stdout -serial file:/dev/stdout -netdev user,id=net0 -device virtio-net,netdev=net0 -object filter-dump,id=f1,netdev=net0,file=netdump.dat -cdrom salernos.iso
+
+debug: salernos.iso
+	-qemu-system-x86_64 -M q35 -m 256m -enable-kvm -smp cpus=1 -no-shutdown -no-reboot -debugcon file:/dev/stdout -serial file:/dev/stdout -netdev user,id=net0 -device virtio-net,netdev=net0 -object filter-dump,id=f1,netdev=net0,file=netdump.dat -cdrom salernos.iso -S -s
+
