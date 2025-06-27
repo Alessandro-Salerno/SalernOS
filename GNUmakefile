@@ -22,7 +22,7 @@ iso_root/initrd:
 
 limine:
 	git clone https://github.com/limine-bootloader/limine.git --branch=v8.x-binary --depth=1 && \
-	make -C limine > /dev/null 2> /dev/null && \
+	make -C limine > /dev/null 2> /dev/null
 
 iso_root/boot/limine: limine
 	mkdir -p iso_root/boot/limine && \

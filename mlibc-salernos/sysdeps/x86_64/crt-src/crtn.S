@@ -6,4 +6,3 @@
 	pop %rax
 	ret
 .section .note.GNU-stack,"",%progbits
-

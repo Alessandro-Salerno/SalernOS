@@ -1,0 +1,7 @@
+-Iinclude/
+-I../../sources/mlibc/options/linux/include
+-I../../sources/mlibc/options/posix/include
+-I../../sources/mlibc/options/elf/include
+-I../../sources/mlibc/options/bsd/include
+-I../../sources/mlibc/options/internal/include
+-I../../sources/mlibc/
