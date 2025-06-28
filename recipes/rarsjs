@@ -1,0 +1,24 @@
+#!/bin/sh
+
+name=rarsjs
+version=0.0.1
+skip_pkg_check=yes
+revision=1
+git_url="https://github.com/ldlaur/rarsjs"
+allow_network="yes"
+commit="d699fb3abecc89612f3ab189733a1e2a9dbda527"
+imagedeps="git build-essential"
+hostdeps="gcc binutils libgcc-binaries"
+deps="mlibc-headers mlibc freestnd-c-hdrs freestnd-cxx-hdrs libgcc"
+
+build() {
+    cp -pr "${source_dir}"/* .
+    rm -rf src/exec/ezld
+    git clone https://github.com/Alessandro-Salerno/ezld src/exec/ezld
+    make -j${parallelism} CC="x86_64-salernos-mlibc-gcc" AR="x86_64-salernos-mlibc-ar"
+}
+
+package() {
+    mkdir -p "${dest_dir}"
+    cp ./rarsjs "${dest_dir}"
+}
