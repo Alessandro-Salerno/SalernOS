@@ -12,6 +12,8 @@
 #define __SALERNOS_SYSCALL_IOCTL    8
 #define __SALERNOS_SYSCALL_OPEN     9
 #define __SALERNOS_SYSCALL_MMAP     10
+#define __SALERNOS_SYSCALL_SET_TLS  11
+#define __SALERNOS_SYSCALL_SEEK     12
 
 struct __syscall_ret {
     uint64_t ret;

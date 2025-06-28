@@ -130,7 +130,7 @@ int sys_ioctl(int fd, unsigned long request, void *arg, int *result) {
 #endif
 
 int sys_open(const char *path, int flags, mode_t mode, int *fd) {
-    // TODO: have mode:w
+    // TODO: have modes
     (void)mode;
     struct __syscall_ret ret =
         __syscall(__SALERNOS_SYSCALL_OPEN, path, strlen(path), flags);
@@ -172,6 +172,23 @@ int sys_anon_allocate(size_t size, void **pointer) {
                       -1,
                       0,
                       pointer);
+}
+
+int sys_tcb_set(void *pointer) {
+    __syscall(__SALERNOS_SYSCALL_SET_TLS, pointer);
+    return 0;
+}
+
+int sys_seek(int fd, off_t offset, int whence, off_t *new_offset) {
+    struct __syscall_ret ret =
+        __syscall(__SALERNOS_SYSCALL_SEEK, fd, offset, whence);
+
+    if (0 != ret.errno) {
+        return ret.errno;
+    }
+
+    *new_offset = ret.ret;
+    return 0;
 }
 
 } // namespace mlibc

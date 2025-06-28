@@ -21,6 +21,13 @@
         return ENOSYS;                                                  \
     }
 
+#define STUB_OK                                                         \
+    {                                                                   \
+        mlibc::infoLogger() << "mlibc: " << __func__ << " is a stub!\n" \
+                            << frg::endlog;                             \
+        return 0;                                                       \
+    }
+
 #define STUB_NULL                                                       \
     {                                                                   \
         mlibc::infoLogger() << "mlibc: " << __func__ << " is a stub!\n" \
@@ -69,10 +76,6 @@ int sys_tcsetattr(int fd, int optional_action, const struct termios *attr) {
 
 #endif
 
-int sys_tcb_set(void *pointer) {
-    STUB_ENOSYS
-}
-
 #ifndef MLIBC_BUILDING_RTLD
 
 int sys_ppoll(struct pollfd         *fds,
@@ -114,7 +117,13 @@ int sys_futex_wake(int *pointer) {
 #ifndef MLIBC_BUILDING_RTLD
 
 int sys_isatty(int fd) {
-    STUB_ENOSYS
+    mlibc::infoLogger() << "mlibc: " << __func__ << " is a test!\n"
+                        << frg::endlog;
+    if (fd < 3) {
+        return 0;
+    }
+
+    return ENOTTY;
 }
 
 typedef struct {
@@ -151,11 +160,7 @@ int sys_read_entries(int     fd,
 #endif
 
 int sys_close(int fd) {
-    STUB_ENOSYS
-}
-
-int sys_seek(int fd, off_t offset, int whence, off_t *new_offset) {
-    STUB_ENOSYS
+    STUB_OK
 }
 
 #ifndef MLIBC_BUILDING_RTLD
@@ -197,13 +202,9 @@ int sys_vm_unmap(void *pointer, size_t size) {
     STUB_ENOSYS
 }
 
-#ifndef MLIBC_BUILDING_RTLD
-
 int sys_vm_protect(void *pointer, size_t size, int prot) {
-    STUB_ENOSYS
+    STUB_OK
 }
-
-#endif
 
 // TODO: kinda a stub
 int sys_anon_free(void *pointer, size_t size) {
