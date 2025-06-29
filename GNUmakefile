@@ -8,8 +8,13 @@ MAKEFLAGS += -rR
 .PHONY: all
 all: iso_root salernos.iso
 
-iso_root: kernel
-	./jinx build '*' && \
+host:
+	./jinx host-build '*'
+
+target: 
+	./jinx build '*'
+
+iso_root: kernel target
 	./jinx install iso_root/ '*'
 
 kernel:
@@ -41,6 +46,14 @@ salernos.iso: iso_root/boot/limine iso_root/EFI/BOOT iso_root/initrd
         -efi-boot-part --efi-boot-image --protective-msdos-label \
         iso_root -o salernos.iso && \
 	./limine/limine bios-install salernos.iso > /dev/null 2> /dev/null
+
+rebuild:
+	rm salernos.iso && \
+		rm -rf iso_root/ && \
+		./jinx regen kernel && \
+		./jinx rebuild kernel && \
+		./jinx install iso_root/ '*' && \
+		$(MAKE) salernos.iso
 
 clean:
 	rm -rf *.iso iso_root builds
