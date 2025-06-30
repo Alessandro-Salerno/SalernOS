@@ -66,14 +66,6 @@ int sys_kill(pid_t pid, int signal) {
     STUB_ENOSYS
 }
 
-int sys_tcgetattr(int fd, struct termios *attr) {
-    STUB_ENOSYS
-}
-
-int sys_tcsetattr(int fd, int optional_action, const struct termios *attr) {
-    STUB_ENOSYS
-}
-
 #endif
 
 #ifndef MLIBC_BUILDING_RTLD

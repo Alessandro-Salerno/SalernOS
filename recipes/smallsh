@@ -1,0 +1,21 @@
+#!/bin/sh
+
+name=smallsh
+version=0.0.1
+skip_pkg_check=yes
+revision=1
+git_url="https://github.com/AndroidonEarth/Small-C-Shell"
+commit="587c75516737734b13917d82be14fa041117228a"
+imagedeps="git build-essential"
+hostdeps="gcc binutils libgcc-binaries"
+deps="mlibc-headers mlibc freestnd-c-hdrs freestnd-cxx-hdrs libgcc"
+
+build() {
+    cp -pr "${source_dir}"/* .
+    x86_64-salernos-mlibc-gcc smallsh.c -g -o smallsh
+}
+
+package() {
+    mkdir -p "${dest_dir}"
+    cp ./smallsh "${dest_dir}"
+}

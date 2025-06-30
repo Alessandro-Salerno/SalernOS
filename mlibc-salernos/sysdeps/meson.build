@@ -72,6 +72,12 @@ if not no_headers
 		follow_symlinks: true
 	)
 
+    install_headers(
+		'include/asm/ioctl.h',
+		'include/asm/ioctls.h',
+		subdir: 'asm',
+	)
+
 endif
 
 if not headers_only

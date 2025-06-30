@@ -5,7 +5,7 @@ version=0.0.2
 skip_pkg_check=yes
 revision=1
 git_url="https://github.com/Alessandro-Salerno/fresh"
-commit="ef1ba339869b0c1873dca12dc19c97d77406cf89"
+commit="173c46fa05251afd5ebe36899f8d5dc78a03f3b9"
 imagedeps="build-essential curl nasm"
 hostdeps="gcc"
 

@@ -1,3 +1,5 @@
+#include <asm/ioctl.h>
+#include <asm/ioctls.h>
 #include <bits/ensure.h>
 #include <cstdlib>
 #include <dirent.h>
@@ -196,6 +198,16 @@ int sys_seek(int fd, off_t offset, int whence, off_t *new_offset) {
 int sys_isatty(int fd) {
     struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_ISATTY, fd);
     return ret.errno;
+}
+
+int sys_tcgetattr(int fd, struct termios *attr) {
+    int unused;
+    return sys_ioctl(fd, TCGETS, attr, &unused);
+}
+
+int sys_tcsetattr(int fd, int optional_action, const struct termios *attr) {
+    int unused;
+    return sys_ioctl(fd, TCSETS, (void *)attr, &unused);
 }
 
 #endif

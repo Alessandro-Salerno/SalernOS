@@ -23,8 +23,9 @@ iso_root: kernel target
 kernel:
 	git clone https://github.com/Alessandro-Salerno/SalernOS-Kernel kernel
 
-iso_root/initrd: install_sysroot
-	cd iso_root/ && \
+iso_root/initrd:
+	$(MAKE) install_sysroot && \
+		cd iso_root/ && \
 		tar -cf ../initrd . && \
 		mv ../initrd ./initrd
 
