@@ -191,4 +191,13 @@ int sys_seek(int fd, off_t offset, int whence, off_t *new_offset) {
     return 0;
 }
 
+#ifndef MLIBC_BUILDING_RTLD
+
+int sys_isatty(int fd) {
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_ISATTY, fd);
+    return ret.errno;
+}
+
+#endif
+
 } // namespace mlibc

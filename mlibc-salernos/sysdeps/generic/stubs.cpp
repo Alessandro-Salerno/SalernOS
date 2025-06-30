@@ -116,16 +116,6 @@ int sys_futex_wake(int *pointer) {
 
 #ifndef MLIBC_BUILDING_RTLD
 
-int sys_isatty(int fd) {
-    mlibc::infoLogger() << "mlibc: " << __func__ << " is a test!\n"
-                        << frg::endlog;
-    if (fd < 3) {
-        return 0;
-    }
-
-    return ENOTTY;
-}
-
 typedef struct {
     ino_t          d_ino;
     off_t          d_off;
