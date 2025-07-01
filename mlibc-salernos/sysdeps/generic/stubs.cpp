@@ -14,32 +14,33 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#define STUB_ENOSYS                                                     \
-    {                                                                   \
-        mlibc::infoLogger() << "mlibc: " << __func__ << " is a stub!\n" \
-                            << frg::endlog;                             \
-        return ENOSYS;                                                  \
+#define STUB_ENOSYS                                              \
+    {                                                            \
+        mlibc::infoLogger()                                      \
+            << "mlibc: " << __func__ << " is a stub! (ENOSYS)\n" \
+            << frg::endlog;                                      \
+        return ENOSYS;                                           \
     }
 
-#define STUB_OK                                                         \
-    {                                                                   \
-        mlibc::infoLogger() << "mlibc: " << __func__ << " is a stub!\n" \
-                            << frg::endlog;                             \
-        return 0;                                                       \
+#define STUB_OK                                                              \
+    {                                                                        \
+        mlibc::infoLogger() << "mlibc: " << __func__ << " is a stub! (OK)\n" \
+                            << frg::endlog;                                  \
+        return 0;                                                            \
     }
 
-#define STUB_NULL                                                       \
-    {                                                                   \
-        mlibc::infoLogger() << "mlibc: " << __func__ << " is a stub!\n" \
-                            << frg::endlog;                             \
-        return NULL;                                                    \
+#define STUB_NULL                                                              \
+    {                                                                          \
+        mlibc::infoLogger() << "mlibc: " << __func__ << " is a stub! (NULL)\n" \
+                            << frg::endlog;                                    \
+        return NULL;                                                           \
     }
 
-#define STUB_VOID                                                       \
-    {                                                                   \
-        mlibc::infoLogger() << "mlibc: " << __func__ << " is a stub!\n" \
-                            << frg::endlog;                             \
-        return;                                                         \
+#define STUB_VOID                                                              \
+    {                                                                          \
+        mlibc::infoLogger() << "mlibc: " << __func__ << " is a stub! (void)\n" \
+                            << frg::endlog;                                    \
+        return;                                                                \
     }
 
 #define STUB_NORETURN                               \
@@ -230,7 +231,9 @@ int sys_ttyname(int fd, char *buf, size_t size) {
 }
 
 int sys_clock_get(int clock, time_t *secs, long *nanos) {
-    STUB_ENOSYS
+    *secs  = 0;
+    *nanos = 0;
+    STUB_OK
 }
 
 int sys_stat(fsfd_target  fsfdt,

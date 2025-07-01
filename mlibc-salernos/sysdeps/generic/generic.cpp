@@ -212,4 +212,14 @@ int sys_tcsetattr(int fd, int optional_action, const struct termios *attr) {
 
 #endif
 
+int sys_ftruncate(int fd, size_t size) {
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_TRUNCATE, fd, size);
+
+    if (0 != ret.errno) {
+        return ret.errno;
+    }
+
+    return 0;
+}
+
 } // namespace mlibc
