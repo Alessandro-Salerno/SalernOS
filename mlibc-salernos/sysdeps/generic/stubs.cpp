@@ -84,7 +84,8 @@ int sys_pause() {
 }
 
 int sys_poll(struct pollfd *fds, nfds_t count, int timeout, int *num_events) {
-    STUB_ENOSYS
+    *num_events = 1;
+    STUB_OK
 }
 
 int sys_pselect(int                    nfds,
@@ -250,10 +251,6 @@ int sys_faccessat(int dirfd, const char *pathname, int mode, int flags) {
 
 int sys_access(const char *path, int mode) {
     return sys_faccessat(AT_FDCWD, path, mode, 0);
-}
-
-int sys_pipe(int *fds, int flags) {
-    STUB_ENOSYS
 }
 
 int sys_chdir(const char *path) {

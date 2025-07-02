@@ -1,0 +1,20 @@
+#!/bin/sh
+
+name=benchmarks
+version=0.0.1
+skip_pkg_check=yes
+revision=1
+source_dir="benchmarks"
+imagedeps="git build-essential"
+hostdeps="gcc binutils libgcc-binaries"
+deps="mlibc-headers mlibc freestnd-c-hdrs freestnd-cxx-hdrs libgcc"
+
+build() {
+    cp -pr "${source_dir}"/* .
+    x86_64-salernos-mlibc-gcc runmany.c -o runmany
+}
+
+package() {
+    mkdir -p "${dest_dir}"
+    cp ./runmany "${dest_dir}"
+}

@@ -222,4 +222,19 @@ int sys_ftruncate(int fd, size_t size) {
     return 0;
 }
 
+#ifndef MLIBC_BUILDING_RTLD
+
+int sys_pipe(int *fds, int flags) {
+    (void)flags;
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_PIPE, fds);
+
+    if (0 != ret.errno) {
+        return ret.errno;
+    }
+
+    return 0;
+}
+
+#endif
+
 } // namespace mlibc
