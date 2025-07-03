@@ -235,6 +235,10 @@ int sys_pipe(int *fds, int flags) {
     return 0;
 }
 
+pid_t sys_getpid() {
+    return __syscall(__SALERNOS_SYSCALL_GETPID).ret;
+}
+
 #endif
 
 } // namespace mlibc

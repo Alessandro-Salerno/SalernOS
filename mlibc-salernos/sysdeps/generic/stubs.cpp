@@ -197,8 +197,6 @@ int sys_anon_free(void *pointer, size_t size) {
 
 #ifndef MLIBC_BUILDING_RTLD
 
-pid_t sys_getpid(){STUB_ENOSYS}
-
 pid_t sys_getppid(){STUB_ENOSYS}
 
 uid_t sys_getuid(){STUB_ENOSYS}

@@ -18,6 +18,7 @@
 #define __SALERNOS_SYSCALL_STAT     14
 #define __SALERNOS_SYSCALL_TRUNCATE 15
 #define __SALERNOS_SYSCALL_PIPE     16
+#define __SALERNOS_SYSCALL_GETPID   17
 
 struct __syscall_ret {
     uint64_t ret;
