@@ -13,10 +13,12 @@ build() {
     cp -pr "${source_dir}"/* .
     x86_64-salernos-mlibc-gcc runmany.c -o runmany
     x86_64-salernos-mlibc-gcc testpipe.c -o testpipe
+    x86_64-salernos-mlibc-gcc loop.c -o loop
 }
 
 package() {
     mkdir -p "${dest_dir}"
     cp ./runmany "${dest_dir}"
     cp ./testpipe "${dest_dir}"
+    cp ./loop "${dest_dir}"
 }
