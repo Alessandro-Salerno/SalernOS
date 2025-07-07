@@ -53,16 +53,6 @@ namespace mlibc {
 
 #ifndef MLIBC_BUILDING_RTLD
 
-[[noreturn]] void sys_thread_exit() {
-    STUB_NORETURN
-}
-
-extern "C" void __mlibc_thread_entry();
-
-int sys_clone(void *tcb, pid_t *pid_out, void *stack) {
-    STUB_ENOSYS
-}
-
 int sys_kill(pid_t pid, int signal) {
     STUB_ENOSYS
 }
@@ -99,14 +89,6 @@ int sys_pselect(int                    nfds,
 }
 
 #endif
-
-int sys_futex_wait(int *pointer, int expected, const struct timespec *time) {
-    STUB_ENOSYS
-}
-
-int sys_futex_wake(int *pointer) {
-    STUB_ENOSYS
-}
 
 #ifndef MLIBC_BUILDING_RTLD
 

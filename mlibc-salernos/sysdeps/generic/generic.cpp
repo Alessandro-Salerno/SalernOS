@@ -10,6 +10,8 @@
 #include <mlibc/debug.hpp>
 #include <poll.h>
 #include <salernos/syscall.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -239,6 +241,54 @@ pid_t sys_getpid() {
     return __syscall(__SALERNOS_SYSCALL_GETPID).ret;
 }
 
+extern "C" void __mlibc_thread_entry();
+
+int sys_clone(void *tcb, pid_t *pid_out, void *stack) {
+    (void)tcb;
+
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_CLONE,
+                                         (uintptr_t)__mlibc_thread_entry,
+                                         (uintptr_t)stack);
+
+    if (0 != ret.errno) {
+        return ret.errno;
+    }
+
+    *pid_out = (pid_t)ret.ret;
+    return 0;
+}
+
+[[noreturn]] void sys_thread_exit() {
+    __syscall(__SALERNOS_SYSCALL_EXIT_THREAD);
+    __builtin_unreachable();
+}
+
 #endif
+
+int sys_futex_wait(int *pointer, int expected, const struct timespec *time) {
+    (void)time;
+
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_FUTEX,
+                                         pointer,
+                                         0, /* FUTEX_WAIT */
+                                         expected);
+    if (0 != ret.errno) {
+        return ret.errno;
+    }
+
+    return ret.ret;
+}
+
+int sys_futex_wake(int *pointer) {
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_FUTEX,
+                                         pointer,
+                                         1, /* FUTEX_WAKE */
+                                         1);
+    if (0 != ret.errno) {
+        return ret.errno;
+    }
+
+    return ret.ret;
+}
 
 } // namespace mlibc
