@@ -66,8 +66,8 @@ purge:
 	rm -rf builds host-builds sources host-pkgs kernel pkgs iso_root limine *.iso
 
 run: salernos.iso
-	qemu-system-x86_64 -M q35 -m 26000m -enable-kvm -smp cpus=8 -no-shutdown -no-reboot -debugcon file:./log.txt -serial file:/dev/stdout -netdev user,id=net0 -device virtio-net,netdev=net0 -object filter-dump,id=f1,netdev=net0,file=netdump.dat -cdrom salernos.iso
+	qemu-system-x86_64 -M q35 -m 24000m -enable-kvm -smp cpus=8 -no-shutdown -no-reboot -debugcon file:/dev/stdout -serial file:/dev/stdout -netdev user,id=net0 -device virtio-net,netdev=net0 -object filter-dump,id=f1,netdev=net0,file=netdump.dat -cdrom salernos.iso
 
 debug: salernos.iso
-	qemu-system-x86_64 -M q35 -m 26000m -enable-kvm -smp cpus=8 -no-shutdown -no-reboot -debugcon file:/dev/stdout -serial file:/dev/stdout -netdev user,id=net0 -device virtio-net,netdev=net0 -object filter-dump,id=f1,netdev=net0,file=netdump.dat -cdrom salernos.iso -S -s
+	qemu-system-x86_64 -M q35 -m 24000m -enable-kvm -smp cpus=8 -no-shutdown -no-reboot -debugcon file:/dev/stdout -serial file:/dev/stdout -netdev user,id=net0 -device virtio-net,netdev=net0 -object filter-dump,id=f1,netdev=net0,file=netdump.dat -cdrom salernos.iso -S -s
 
