@@ -276,19 +276,19 @@ int sys_futex_wait(int *pointer, int expected, const struct timespec *time) {
         return ret.errno;
     }
 
-    return ret.ret;
+    return 0;
 }
 
 int sys_futex_wake(int *pointer) {
     struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_FUTEX,
                                          pointer,
                                          1, /* FUTEX_WAKE */
-                                         1);
+                                         INT_MAX);
     if (0 != ret.errno) {
         return ret.errno;
     }
 
-    return ret.ret;
+    return 0;
 }
 
 } // namespace mlibc

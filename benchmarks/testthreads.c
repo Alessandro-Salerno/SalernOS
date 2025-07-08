@@ -6,13 +6,30 @@ struct thread_args {
     int thread_num;
 };
 
+static inline void *get_rsp(void) {
+    void *rsp;
+    __asm__ volatile("mov %%rsp, %0" : "=r"(rsp));
+    return rsp;
+}
+
+static inline void *get_rip(void) {
+    void *rip;
+    __asm__ volatile("leaq (%%rip), %0" : "=r"(rip));
+    return rip;
+}
+
 static void *thread_entry(void *arg) {
     struct thread_args *real_arg = arg;
-    printf("Entering and exiting new thread %d\n", real_arg->thread_num);
+    printf("Entering and exiting new thread with num=%d, rsp=%p, arg=%p\n",
+           real_arg->thread_num,
+           get_rsp(),
+           arg);
     return NULL;
 }
 
 int main(int argc, char *argv[]) {
+    fprintf(stderr, "=======> STARTING TEST THREADS\n");
+
     if (argc < 2) {
         fprintf(stderr, "Usage: %s <num threds>\n", argv[0]);
         return -1;
@@ -25,9 +42,9 @@ int main(int argc, char *argv[]) {
         return -2;
     }
 
-    pthread_t          *threads = malloc(sizeof(pthread_t) * num_threads);
+    pthread_t          *threads = calloc(sizeof(pthread_t), num_threads);
     struct thread_args *all_args =
-        malloc(sizeof(struct thread_args) * num_threads);
+        calloc(sizeof(struct thread_args), num_threads);
     if (NULL == threads || NULL == all_args) {
         fprintf(stderr, "ERROR: out of memory\n");
         return -3;
@@ -55,6 +72,8 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    printf("all went well");
+    free(threads);
+    free(all_args);
+    fprintf(stderr, "=======> EXITING TEST THREADS\n");
     return 0;
 }

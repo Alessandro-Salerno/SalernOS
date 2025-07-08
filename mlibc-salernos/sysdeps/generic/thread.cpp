@@ -11,13 +11,29 @@ __mlibc_thread_trampoline(void *(*fn)(void *), Tcb *tcb, void *arg) {
         __ensure(!"failed to set tcb for new thread");
     }
 
+    mlibc::infoLogger() << "mlibc: tidAddr=" << &tcb->tid
+                        << ", didExitAddr=" << &tcb->didExit << "\n"
+                        << frg::endlog;
+
+    mlibc::infoLogger() << "mlibc: waiting for thread to be initialized, tid="
+                        << tcb->tid << "\n"
+                        << frg::endlog;
     while (__atomic_load_n(&tcb->tid, __ATOMIC_RELAXED) == 0) {
         mlibc::sys_futex_wait(&tcb->tid, 0, nullptr);
     }
+    mlibc::infoLogger() << "mlibc: thread initialized with tid=" << tcb->tid
+                        << "\n"
+                        << frg::endlog;
 
     tcb->invokeThreadFunc(reinterpret_cast<void *>(fn), arg);
 
+    mlibc::infoLogger() << "mlibc: got out of thread tid=" << tcb->tid
+                        << ", here didExit=" << tcb->didExit << "\n"
+                        << frg::endlog;
     __atomic_store_n(&tcb->didExit, 1, __ATOMIC_RELEASE);
+    mlibc::infoLogger() << "mlibc: set didExit=" << tcb->didExit
+                        << "for thread tid=" << tcb->tid << "\n"
+                        << frg::endlog;
     mlibc::sys_futex_wake(&tcb->didExit);
 
     mlibc::sys_thread_exit();
