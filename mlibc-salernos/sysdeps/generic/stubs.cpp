@@ -165,7 +165,7 @@ int sys_fsync(int) {
 #endif
 
 int sys_vm_unmap(void *pointer, size_t size) {
-    STUB_ENOSYS
+    STUB_OK
 }
 
 int sys_vm_protect(void *pointer, size_t size, int prot) {
