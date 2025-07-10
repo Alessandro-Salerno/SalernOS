@@ -22,6 +22,11 @@
 #define __SALERNOS_SYSCALL_CLONE       18
 #define __SALERNOS_SYSCALL_EXIT_THREAD 19
 #define __SALERNOS_SYSCALL_FUTEX       20
+#define __SALERNOS_SYSCALL_GETPPID     21
+#define __SALERNOS_SYSCALL_GETPGID     22
+#define __SALERNOS_SYSCALL_GETSID      23
+#define __SALERNOS_SYSCALL_SETPGID     24
+#define __SALERNOS_SYSCALL_SETSID      25
 
 struct __syscall_ret {
     uint64_t ret;

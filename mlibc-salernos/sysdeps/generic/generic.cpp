@@ -291,4 +291,52 @@ int sys_futex_wake(int *pointer) {
     return 0;
 }
 
+#ifndef MLIBC_BUILDING_RTLD
+
+pid_t sys_getppid() {
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_GETPPID);
+    return ret.ret;
+}
+
+int sys_getpgid(pid_t pid, pid_t *pgid) {
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_GETPGID, pid);
+    if (0 != ret.errno) {
+        return ret.errno;
+    }
+
+    *pgid = ret.ret;
+    return 0;
+}
+
+int sys_getsid(pid_t pid, pid_t *sid) {
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_GETSID, pid);
+    if (0 != ret.errno) {
+        return ret.errno;
+    }
+
+    *sid = ret.ret;
+    return 0;
+}
+
+int sys_setpgid(pid_t pid, pid_t pgid) {
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_SETPGID, pid, pgid);
+    if (0 != ret.errno) {
+        return ret.errno;
+    }
+
+    return 0;
+}
+
+int sys_setsid(pid_t *sid) {
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_SETSID);
+    if (0 != ret.errno) {
+        return ret.errno;
+    }
+
+    *sid = ret.ret;
+    return 0;
+}
+
+#endif
+
 } // namespace mlibc

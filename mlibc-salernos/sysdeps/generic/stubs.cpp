@@ -179,8 +179,6 @@ int sys_anon_free(void *pointer, size_t size) {
 
 #ifndef MLIBC_BUILDING_RTLD
 
-pid_t sys_getppid(){STUB_ENOSYS}
-
 uid_t sys_getuid(){STUB_ENOSYS}
 
 uid_t sys_geteuid(){STUB_ENOSYS}
@@ -189,21 +187,9 @@ gid_t sys_getgid() {
     STUB_ENOSYS
 }
 
-int sys_setgid(gid_t gid) {
-    STUB_ENOSYS
-}
-
-int sys_getpgid(pid_t pid, pid_t *pgid){STUB_ENOSYS}
+int sys_setgid(gid_t gid){STUB_ENOSYS}
 
 gid_t sys_getegid() {
-    STUB_ENOSYS
-}
-
-int sys_setpgid(pid_t pid, pid_t pgid) {
-    STUB_ENOSYS
-}
-
-int sys_setsid(pid_t *sid) {
     STUB_ENOSYS
 }
 
@@ -337,7 +323,7 @@ extern "C" void __mlibc_restorer();
 int sys_sigaction(int                     signum,
                   const struct sigaction *act,
                   struct sigaction       *oldact) {
-    STUB_ENOSYS
+    STUB_OK
 }
 
 int sys_signalfd_create(sigset_t mask, int flags, int *fd) {

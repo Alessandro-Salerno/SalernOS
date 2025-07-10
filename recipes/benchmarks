@@ -17,6 +17,7 @@ build() {
     x86_64-salernos-mlibc-gcc testclone.c -o testclone
     x86_64-salernos-mlibc-gcc testthreads.c -o testthreads
     x86_64-salernos-mlibc-gcc testjoin.c -o testjoin
+    x86_64-salernos-mlibc-gcc testprocs.c -o testprocs
 }
 
 package() {
@@ -27,4 +28,5 @@ package() {
     cp ./testclone "${dest_dir}"
     cp ./testthreads "${dest_dir}"
     cp ./testjoin "${dest_dir}"
+    cp ./testprocs "${dest_dir}"
 }
