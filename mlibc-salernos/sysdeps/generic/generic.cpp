@@ -28,7 +28,8 @@
 namespace mlibc {
 
 void sys_libc_log(const char *message) {
-    __syscall(__SALERNOS_SYSCALL_TEST, message);
+    (void)message;
+    // __syscall(__SALERNOS_SYSCALL_TEST, message);
 }
 
 void sys_libc_panic() {

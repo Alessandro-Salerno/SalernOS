@@ -43,6 +43,8 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    fprintf(stderr, "=======> FINISHED CREATING THREADS\n");
+
     for (int i = 0; i < num_threads; i++) {
         if (0 != pthread_join(threads[i], NULL)) {
             fprintf(stderr, "ERROR: unable to join thread %d", i);

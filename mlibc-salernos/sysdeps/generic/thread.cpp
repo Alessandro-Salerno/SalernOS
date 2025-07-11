@@ -35,8 +35,9 @@ int sys_prepare_stack(void  **stack,
                       void  **stack_base) {
     // TODO guard
 
-    mlibc::infoLogger() << "mlibc: sys_prepare_stack() does not setup a guard!"
-                        << frg::endlog;
+    /*mlibc::infoLogger() << "mlibc: sys_prepare_stack() does not setup a
+       guard!"
+                        << frg::endlog;*/
 
     *guard_size = 0;
 
