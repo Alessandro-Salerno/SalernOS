@@ -16,6 +16,7 @@ libc_sources += files(
 	'generic/stubs.cpp',
 	'generic/thread.cpp',
 	'generic/thread.S',
+	'x86_64/sigrestorer.S',
 )
 
 if not no_headers

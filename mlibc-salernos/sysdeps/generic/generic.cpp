@@ -29,7 +29,7 @@ namespace mlibc {
 
 void sys_libc_log(const char *message) {
     (void)message;
-    // __syscall(__SALERNOS_SYSCALL_TEST, message);
+    __syscall(__SALERNOS_SYSCALL_TEST, message);
 }
 
 void sys_libc_panic() {
@@ -338,6 +338,67 @@ int sys_setsid(pid_t *sid) {
     return 0;
 }
 
+int sys_sigprocmask(int how,
+                    const sigset_t *__restrict set,
+                    sigset_t *__restrict retrieve) {
+    struct __syscall_ret ret =
+        __syscall(__SALERNOS_SYSCALL_SIGPROCMASK, how, set, retrieve);
+
+    if (0 != ret.errno) {
+        return ret.errno;
+    }
+
+    return 0;
+}
+
+int sys_sigpending(sigset_t *set) {
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_SIGPENDING, set);
+
+    if (0 != ret.errno) {
+        return ret.errno;
+    }
+
+    return 0;
+}
+
+extern "C" void __mlibc_restorer();
+
+int sys_sigaction(int                     signum,
+                  const struct sigaction *act,
+                  struct sigaction       *oldact) {
+    struct sigaction        new_action;
+    const struct sigaction *call_action = act;
+
+    if (NULL != act) {
+        memcpy(&new_action, act, sizeof(struct sigaction));
+        call_action = &new_action;
+    }
+
+    if (NULL != act && 0 == (new_action.sa_flags & SA_RESTORER)) {
+        new_action.sa_restorer = __mlibc_restorer;
+        new_action.sa_flags |= SA_RESTORER;
+    }
+
+    struct __syscall_ret ret =
+        __syscall(__SALERNOS_SYSCALL_SIGACTION, signum, call_action, oldact);
+
+    if (0 != ret.errno) {
+        return ret.errno;
+    }
+
+    return 0;
+}
+
 #endif
+
+int sys_kill(pid_t pid, int signal) {
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_KILL, pid, signal);
+
+    if (0 != ret.errno) {
+        return ret.errno;
+    }
+
+    return 0;
+}
 
 } // namespace mlibc

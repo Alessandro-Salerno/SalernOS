@@ -19,6 +19,8 @@ build() {
     x86_64-salernos-mlibc-gcc testjoin.c -O2 -o testjoin
     x86_64-salernos-mlibc-gcc testprocs.c -O2 -o testprocs
     x86_64-salernos-mlibc-gcc testalloc.c -O2 -o testalloc
+    x86_64-salernos-mlibc-gcc -fno-delete-null-pointer-checks testnull.c -O2 -o testnull
+    x86_64-salernos-mlibc-gcc testsig.c -O2 -o testsig
 }
 
 package() {
@@ -31,4 +33,6 @@ package() {
     cp ./testjoin "${dest_dir}"
     cp ./testprocs "${dest_dir}"
     cp ./testalloc "${dest_dir}"
+    cp ./testnull "${dest_dir}"
+    cp ./testsig "${dest_dir}"
 }

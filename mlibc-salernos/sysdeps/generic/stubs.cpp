@@ -55,10 +55,6 @@ namespace mlibc {
 
 #ifndef MLIBC_BUILDING_RTLD
 
-int sys_kill(pid_t pid, int signal) {
-    STUB_ENOSYS
-}
-
 #endif
 
 #ifndef MLIBC_BUILDING_RTLD
@@ -314,19 +310,7 @@ int sys_dup2(int fd, int flags, int newfd) {
     STUB_ENOSYS
 }
 
-int sys_sigprocmask(int how,
-                    const sigset_t *__restrict set,
-                    sigset_t *__restrict retrieve) {
-    STUB_ENOSYS
-}
-
 extern "C" void __mlibc_restorer();
-
-int sys_sigaction(int                     signum,
-                  const struct sigaction *act,
-                  struct sigaction       *oldact) {
-    STUB_OK
-}
 
 int sys_signalfd_create(sigset_t mask, int flags, int *fd) {
     STUB_ENOSYS

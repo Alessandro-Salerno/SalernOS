@@ -52,10 +52,10 @@ salernos.iso: iso_root/boot/limine iso_root/EFI/BOOT iso_root/initrd
 	./limine/limine bios-install salernos.iso > /dev/null 2> /dev/null
 
 rebuild:
-	rm salernos.iso && \
-		rm -rf iso_root/ && \
-		./jinx regen kernel && \
+	./jinx regen kernel && \
 		./jinx rebuild kernel && \
+		rm salernos.iso && \
+		rm -rf iso_root/ && \
 		./jinx install iso_root/ '*' && \
 		$(MAKE) salernos.iso
 
@@ -66,7 +66,7 @@ purge:
 	rm -rf builds host-builds sources host-pkgs kernel pkgs iso_root limine *.iso
 
 run: salernos.iso
-	qemu-system-x86_64 -M q35 -m 24000m -enable-kvm -smp cpus=8 -no-shutdown -no-reboot -debugcon file:/dev/stdout -serial file:/dev/stdout -netdev user,id=net0 -device virtio-net,netdev=net0 -object filter-dump,id=f1,netdev=net0,file=netdump.dat -cdrom salernos.iso
+	qemu-system-x86_64 -M q35 -m 12000m -enable-kvm -smp cpus=8 -no-shutdown -no-reboot -debugcon file:/dev/stdout -serial file:/dev/stdout -netdev user,id=net0 -device virtio-net,netdev=net0 -object filter-dump,id=f1,netdev=net0,file=netdump.dat -cdrom salernos.iso
 
 debug: salernos.iso
 	qemu-system-x86_64 -M q35 -m 24000m -enable-kvm -smp cpus=8 -no-shutdown -no-reboot -debugcon file:/dev/stdout -serial file:/dev/stdout -netdev user,id=net0 -device virtio-net,netdev=net0 -object filter-dump,id=f1,netdev=net0,file=netdump.dat -cdrom salernos.iso -S -s
