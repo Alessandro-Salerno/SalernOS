@@ -351,6 +351,19 @@ int sys_sigprocmask(int how,
     return 0;
 }
 
+int sys_thread_sigmask(int how,
+                       const sigset_t *__restrict set,
+                       sigset_t *__restrict retrieve) {
+    struct __syscall_ret ret =
+        __syscall(__SALERNOS_SYSCALL_SIGTHREADMASK, how, set, retrieve);
+
+    if (0 != ret.errno) {
+        return ret.errno;
+    }
+
+    return 0;
+}
+
 int sys_sigpending(sigset_t *set) {
     struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_SIGPENDING, set);
 
@@ -379,12 +392,6 @@ int sys_sigaction(int                     signum,
         new_action.sa_flags |= SA_RESTORER;
     }
 
-    mlibc::infoLogger() << "sigaction(): setting handler for sig=" << signum
-                        << " at " << (void *)new_action.sa_handler
-                        << " with restorer at "
-                        << (void *)new_action.sa_restorer << "\n"
-                        << frg::endlog;
-
     struct __syscall_ret ret =
         __syscall(__SALERNOS_SYSCALL_SIGACTION, signum, call_action, oldact);
 
@@ -399,6 +406,24 @@ int sys_sigaction(int                     signum,
 
 int sys_kill(pid_t pid, int signal) {
     struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_KILL, pid, signal);
+
+    if (0 != ret.errno) {
+        return ret.errno;
+    }
+
+    return 0;
+}
+
+int sys_tgkill(int tgid, int tid, int sig) {
+    if (tgid != sys_getpid()) {
+        mlibc::infoLogger() << "tgkill(): kill_thread() currently does not "
+                               "support different pid\n"
+                            << frg::endlog;
+        return ENOSYS;
+    }
+
+    struct __syscall_ret ret =
+        __syscall(__SALERNOS_SYSCALL_KILL_THREAD, tid, sig);
 
     if (0 != ret.errno) {
         return ret.errno;

@@ -1,0 +1,8 @@
+source_dir=sources/mlibc
+
+cp -r ./mlibc-salernos/sysdeps "${source_dir}/sysdeps/salernos"
+cp -r ./mlibc-salernos/abi "${source_dir}/abis/salernos"
+for file in ./sources/mlibc/abis/salernos/*; do
+    ln -s "$file" "${source_dir}/sysdeps/salernos/include/abi-bits"
+done
+

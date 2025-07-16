@@ -1,9 +1,9 @@
 #!/bin/sh
 name=mlibc
-version=b4fb75b3379762d006e7d9b98fd739778e2d3a21
+version=9aaa738e3802518e6b1e68a996d47cf4e5b811a2
 source_method=tarball
 tarball_url="https://github.com/managarm/mlibc/archive/${version}.tar.gz"
-tarball_sha512="fa5c10847954fea6bd5de4da387b95ebf09abb922f1072e638b91de7338127417bb80b4a97ab570cb3ca94f1fec0990f4b55126d97976d9718dd57b3b9fb2410"
+tarball_sha512="461840aefafef0f2542a6d5df47975f984c8cbf007d10613e40eaf96dc06f9153910ae1474808c3ad32eaba953ab018132b28a5de416b0bbc9cd068695951457"
 
 prepare() {
     cp -r /base_dir/mlibc-salernos/sysdeps "${source_dir}/sysdeps/salernos"
