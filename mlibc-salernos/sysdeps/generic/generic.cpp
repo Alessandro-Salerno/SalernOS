@@ -379,6 +379,12 @@ int sys_sigaction(int                     signum,
         new_action.sa_flags |= SA_RESTORER;
     }
 
+    mlibc::infoLogger() << "sigaction(): setting handler for sig=" << signum
+                        << " at " << (void *)new_action.sa_handler
+                        << " with restorer at "
+                        << (void *)new_action.sa_restorer << "\n"
+                        << frg::endlog;
+
     struct __syscall_ret ret =
         __syscall(__SALERNOS_SYSCALL_SIGACTION, signum, call_action, oldact);
 

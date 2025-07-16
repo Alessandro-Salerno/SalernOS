@@ -1,165 +1,91 @@
 // THIS CODE WAS GENERATD BY CHAT GPT
 
-#define _GNU_SOURCE
+#include <assert.h>
 #include <errno.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/types.h>
-#include <sys/wait.h>
 #include <unistd.h>
 
 #define NUM_CHILDREN 5
-#define NUM_SIGNALS  3
+#define NUM_SIGNALS  100
+#define TEST_SIGNAL  SIGUSR1
 
-int test_signals[NUM_SIGNALS] = {SIGUSR1, SIGUSR2, SIGTERM};
+volatile sig_atomic_t signal_count = 0;
 
 // Signal handler
-void signal_handler(int sig, siginfo_t *info, void *ucontext) {
-    (void)ucontext;
-    printf("[PID %d] Received signal %d from PID %d\n",
-           getpid(),
-           sig,
-           info ? info->si_pid : -1);
-}
-
-// Set up signal handlers using sigaction
-void setup_signal_handlers() {
-    struct sigaction sa;
-    sa.sa_sigaction = signal_handler;
-    sa.sa_flags     = SA_SIGINFO;
-    sigemptyset(&sa.sa_mask);
-    for (int i = 0; i < NUM_SIGNALS; ++i) {
-        if (sigaction(test_signals[i], &sa, NULL) == -1) {
-            perror("sigaction");
-            exit(EXIT_FAILURE);
-        }
-    }
-}
-
-// Block test signals using sigprocmask
-void block_test_signals(sigset_t *old_mask) {
-    sigset_t new_mask;
-    sigemptyset(&new_mask);
-    for (int i = 0; i < NUM_SIGNALS; ++i) {
-        sigaddset(&new_mask, test_signals[i]);
-    }
-    if (sigprocmask(SIG_BLOCK, &new_mask, old_mask) == -1) {
-        perror("sigprocmask block");
-        exit(EXIT_FAILURE);
-    }
-}
-
-// Unblock signals
-void unblock_test_signals(sigset_t *old_mask) {
-    if (sigprocmask(SIG_SETMASK, old_mask, NULL) == -1) {
-        perror("sigprocmask unblock");
-        exit(EXIT_FAILURE);
-    }
-}
-
-// Child: install handlers, signal readiness to parent, wait for signal
-void child_process(int write_fd) {
-    close(STDIN_FILENO);
-    sigset_t old_mask;
-
-    block_test_signals(&old_mask);
-    setup_signal_handlers();
-    unblock_test_signals(&old_mask);
-
-    // Notify parent: ready
-    if (write(write_fd, "R", 1) != 1) {
-        perror("child write");
-        exit(EXIT_FAILURE);
-    }
-
-    close(write_fd);
-
-    // Wait indefinitely for signal
-    pause();
-
-    // Exit when signal is handled
-    _exit(EXIT_SUCCESS);
-}
-
-// Parent sends all test signals to each child
-void send_signals_to_children(pid_t *children) {
-    for (int i = 0; i < NUM_CHILDREN; ++i) {
-        for (int s = 0; s < NUM_SIGNALS; ++s) {
-            if (kill(children[i], test_signals[s]) == -1) {
-                fprintf(stderr,
-                        "kill(%d, %d) failed: %s\n",
-                        children[i],
-                        test_signals[s],
-                        strerror(errno));
-            } else {
-                printf("[Parent] Sent signal %d to child PID %d\n",
-                       test_signals[s],
-                       children[i]);
-            }
-        }
-    }
+void handler(int sig) {
+    signal_count++;
+    // fprintf(stderr, "in handler of signal %d\n", sig);
 }
 
 int main() {
-    pid_t children[NUM_CHILDREN];
-    int   pipe_fds[NUM_CHILDREN][2];
+    struct sigaction sa;
+    sigset_t         block_set, old_set, pending;
+    pid_t            children[NUM_CHILDREN];
 
-    // Block signals during setup to avoid race conditions
-    sigset_t old_mask;
-    block_test_signals(&old_mask);
+    pid_t root_pid = getpid();
+    printf("root process is pid=%d\n", root_pid);
 
-    for (int i = 0; i < NUM_CHILDREN; ++i) {
-        if (pipe(pipe_fds[i]) == -1) {
-            perror("pipe");
-            exit(EXIT_FAILURE);
-        }
+    // Setup signal handler for TEST_SIGNAL
+    memset(&sa, 0, sizeof(sa));
+    sa.sa_handler = handler;
+    sigaction(TEST_SIGNAL, &sa, NULL);
 
+    // Block TEST_SIGNAL
+    sigemptyset(&block_set);
+    sigaddset(&block_set, TEST_SIGNAL);
+    sigprocmask(SIG_BLOCK, &block_set, &old_set);
+
+    // Fork children
+    for (int i = 0; i < NUM_CHILDREN; i++) {
         pid_t pid = fork();
-        if (pid == -1) {
-            perror("fork");
-            exit(EXIT_FAILURE);
-        }
-
-        if (pid == 0) {
-            // Child
-            close(pipe_fds[i][0]); // Close read end
-            child_process(pipe_fds[i][1]);
+        if (pid < 0) {
+            perror("fork failed");
+            exit(1);
+        } else if (pid == 0) {
+            // Child: send signals to parent rapidly
+            pid_t ppid = getppid();
+            if (root_pid != ppid) {
+                fprintf(stderr,
+                        "somehow child process pid=%d has ppid=%d\n",
+                        getpid(),
+                        ppid);
+            }
+            assert(root_pid == ppid);
+            for (int j = 0; j < NUM_SIGNALS; j++) {
+                kill(ppid, TEST_SIGNAL);
+            }
+            exit(0);
         } else {
-            // Parent
-            close(pipe_fds[i][1]); // Close write end
             children[i] = pid;
         }
     }
 
-    // Wait for all children to signal readiness
-    for (int i = 0; i < NUM_CHILDREN; ++i) {
-        char buf;
-        if (read(pipe_fds[i][0], &buf, 1) != 1 || buf != 'R') {
-            fprintf(stderr, "Failed to read readiness from child %d\n", i);
-            exit(EXIT_FAILURE);
-        }
-        close(pipe_fds[i][0]);
+    // Wait a bit via busy loop to allow signals to arrive
+    for (volatile int i = 0; i < 100000000; ++i)
+        ;
+
+    // Check pending signals
+    sigpending(&pending);
+    if (sigismember(&pending, TEST_SIGNAL)) {
+        printf("Signal %d is pending as expected.\n", TEST_SIGNAL);
+    } else {
+        printf("Signal %d is NOT pending. Possible loss.\n", TEST_SIGNAL);
     }
 
-    // Unblock signals in parent (not needed here but good practice)
-    unblock_test_signals(&old_mask);
+    // Unblock the signal
+    sigprocmask(SIG_SETMASK, &old_set, NULL);
 
-    send_signals_to_children(children);
-
-    // Wait for all children to exit
-    for (int i = 0; i < NUM_CHILDREN; ++i) {
-        int status;
-        if (waitpid(children[i], &status, 0) == -1) {
-            perror("waitpid");
-        } else if (WIFEXITED(status)) {
-            printf("[Parent] Child %d exited with status %d\n",
-                   children[i],
-                   WEXITSTATUS(status));
-        }
+    // Spin until we have received all expected signals
+    int expected = NUM_CHILDREN * NUM_SIGNALS;
+    int spins    = 0;
+    while (signal_count < expected && spins++ < 1000000000) {
+        // Busy wait
     }
 
-    printf("All children handled signals and exited.\n");
+    printf("Received %d/%d signals.\n", signal_count, expected);
+
     return 0;
 }

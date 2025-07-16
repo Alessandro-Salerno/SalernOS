@@ -16,33 +16,31 @@
 
 #define STUB_ENOSYS                                              \
     {                                                            \
-        /*mlibc::infoLogger()                                    \
+        mlibc::infoLogger()                                      \
             << "mlibc: " << __func__ << " is a stub! (ENOSYS)\n" \
-            << frg::endlog;*/                                    \
+            << frg::endlog;                                      \
         return ENOSYS;                                           \
     }
 
-#define STUB_OK                                                                \
-    {                                                                          \
-        /*mlibc::infoLogger() << "mlibc: " << __func__ << " is a stub! (OK)\n" \
-                            << frg::endlog;*/                                  \
-        return 0;                                                              \
+#define STUB_OK                                                              \
+    {                                                                        \
+        mlibc::infoLogger() << "mlibc: " << __func__ << " is a stub! (OK)\n" \
+                            << frg::endlog;                                  \
+        return 0;                                                            \
     }
 
-#define STUB_NULL                                                      \
-    {                                                                  \
-        /*mlibc::infoLogger() << "mlibc: " << __func__ << " is a stub! \
-           (NULL)\n"                                                   \
-                            << frg::endlog;*/                          \
-        return NULL;                                                   \
+#define STUB_NULL                    \
+    {                                \
+        mlibc::infoLogger() << "mlibc: " << __func__ << " is a stub! \
+           (NULL)\n" << frg::endlog; \
+        return NULL;                 \
     }
 
-#define STUB_VOID                                                      \
-    {                                                                  \
-        /*mlibc::infoLogger() << "mlibc: " << __func__ << " is a stub! \
-           (void)\n"                                                   \
-                            << frg::endlog;*/                          \
-        return;                                                        \
+#define STUB_VOID                    \
+    {                                \
+        mlibc::infoLogger() << "mlibc: " << __func__ << " is a stub! \
+           (void)\n" << frg::endlog; \
+        return;                      \
     }
 
 #define STUB_NORETURN                               \
