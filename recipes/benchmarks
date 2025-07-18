@@ -22,6 +22,7 @@ build() {
     x86_64-salernos-mlibc-gcc -fno-delete-null-pointer-checks testnull.c -O2 -o testnull
     x86_64-salernos-mlibc-gcc testsig.c -O2 -o testsig
     x86_64-salernos-mlibc-gcc testfork.c -O2 -o testfork
+    x86_64-salernos-mlibc-gcc testsigheavy.c -O2 -o testsigheavy
 }
 
 package() {
@@ -37,4 +38,5 @@ package() {
     cp ./testnull "${dest_dir}"
     cp ./testsig "${dest_dir}"
     cp ./testfork "${dest_dir}"
+    cp ./testsigheavy "${dest_dir}"
 }
