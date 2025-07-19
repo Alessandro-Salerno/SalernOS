@@ -1,0 +1,5 @@
+ENV TERM linux
+ENV HOME /
+
+ADDPROP $PROP_CLEAR
+EXECL /fresh

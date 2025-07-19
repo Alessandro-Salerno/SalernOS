@@ -54,6 +54,8 @@ salernos.iso: iso_root/boot/limine iso_root/EFI/BOOT iso_root/initrd
 rebuild:
 	./jinx regen kernel && \
 		./jinx rebuild kernel && \
+		./jinx regen init && \
+		./jinx rebuild init && \
 		rm salernos.iso && \
 		rm -rf iso_root/ && \
 		./jinx install iso_root/ '*' && \
