@@ -1,6 +1,9 @@
+#include <fcntl.h>
 #include <init/interpreter.h>
 #include <init/log.h>
 #include <init/parse.h>
+#include <init/table.h>
+#include <signal.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -9,64 +12,32 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#define LOOKUP_FOUND     0
-#define LOOKUP_NOT_FOUND -1
-
 #define EVAL_OK             LOOKUP_FOUND
 #define EVAL_NOTABLE        -1
 #define EVAL_NOT_RECOGNIZED -2
 #define EVAL_WRONG_TYPE     -3
 
-#define PROP_CLEAR 1
+#define OPT_CLEAR 1
 
-#define CONST_TABLE(array)                                        \
-    (struct table) {                                              \
-        .entries     = array,                                     \
-        .num_entries = sizeof(array) / sizeof(struct table_entry) \
+static int   g_active_options = 0;
+static int   g_tty_lock       = 1;
+static pid_t g_children[20] = {0}; // TODO: arbitrary number higher than TTY_MAX
+static int   g_num_children = 0;
+
+static struct table_entry g_values_entries[] = {
+    {"TTY_TEXT_MODE", TYPE_INT, .value.local = (int)1},
+    {"OPT_CLEAR", TYPE_INT, .value.local = (int)OPT_CLEAR},
+};
+static struct table g_values = CONST_TABLE(g_values_entries);
+
+static void handle_sigusr1(int signo) {
+    __atomic_store_n(&g_tty_lock, 0, __ATOMIC_SEQ_CST);
+}
+
+static void wait_start_signal(void) {
+    while (__atomic_load_n(&g_tty_lock, __ATOMIC_SEQ_CST)) {
+        // waiting until init has finished
     }
-
-enum type {
-    TYPE_INT,
-    TYPE_STRING,
-    TYPE_FUNCTION,
-    TYPE_ANY,
-    TYPE_UNDEF,
-    TYPE_ENTRY, // generic entry
-};
-
-struct table_entry {
-    const char *name;
-    enum type   type;
-    union {
-        uintmax_t local;
-        void     *ptr;
-    } value;
-};
-
-struct table {
-    struct table_entry *entries;
-    size_t              num_entries;
-};
-
-static int g_active_properties = 0;
-
-static int table_lookup(struct table_entry *out,
-                        struct table       *table,
-                        const char         *name,
-                        size_t              namelen,
-                        enum type           type) {
-    for (size_t i = 0; i < table->num_entries; i++) {
-        struct table_entry entry = table->entries[i];
-
-        if (0 == strncmp(name, entry.name, namelen)) {
-            if (type == entry.type || TYPE_ANY == type) {
-                *out = entry;
-                return LOOKUP_FOUND;
-            }
-        }
-    }
-
-    return LOOKUP_NOT_FOUND;
 }
 
 static int eval(void         *out,
@@ -96,17 +67,24 @@ static int eval(void         *out,
                 const char   *value,
                 size_t        value_len,
                 enum type     exp_type) {
+    enum type _;
+    if (NULL == out_type) {
+        out_type = &_;
+    }
+
     if ('$' == value[0]) {
         if (NULL == table) {
             return EVAL_NOTABLE;
         }
+
         struct table_entry e;
         int ret = table_lookup(&e, table, &value[1], value_len - 1, exp_type);
+
         if (LOOKUP_FOUND == ret) {
             return eval_entry(out, out_type, &e);
-        } else {
-            return EVAL_NOT_RECOGNIZED;
         }
+
+        return EVAL_NOT_RECOGNIZED;
     }
 
     if (TYPE_STRING == exp_type) {
@@ -122,22 +100,15 @@ static int eval(void         *out,
     return EVAL_NOT_RECOGNIZED;
 }
 
-static struct table_entry g_values_entries[] = {
-    {"TTY_TEXT_MODE", TYPE_INT, .value.local = (int)1},
-    {"PROP_CLEAR", TYPE_INT, .value.local = (int)PROP_CLEAR},
-};
-static struct table g_values = CONST_TABLE(g_values_entries);
-
 static int cb_env(struct directive *d) {
     if (3 != d->num_args) {
         return INTERPRET_ERR;
     }
 
     const char *env_name, *env_value;
-    enum type   _;
 
     if (EVAL_OK != eval(&env_name,
-                        &_,
+                        NULL,
                         &g_values,
                         d->args[1].str,
                         d->args[1].len,
@@ -149,7 +120,7 @@ static int cb_env(struct directive *d) {
     }
 
     if (EVAL_OK != eval(&env_value,
-                        &_,
+                        NULL,
                         &g_values,
                         d->args[2].str,
                         d->args[2].len,
@@ -168,28 +139,52 @@ static int cb_env(struct directive *d) {
 }
 
 static int cb_tty(struct directive *d) {
-    IERR("tty thingy not implemented yet\n");
-    return INTERPRET_ERR;
-}
-
-static int cb_execl(struct directive *d) {
-    if (2 != d->num_args) {
+    if (d->num_args < 4) {
         return INTERPRET_ERR;
     }
 
-    const char *path;
-    enum type   _;
+    const char *tty_path;
+    int         tty_mode;
+    size_t      argc = d->num_args - 3;
+    char      **argv = malloc(sizeof(char *) * (argc + 1));
+    argv[argc]       = NULL;
 
-    if (EVAL_OK != eval(&path,
-                        &_,
+    if (EVAL_OK != eval(&tty_path,
+                        NULL,
                         &g_values,
                         d->args[1].str,
                         d->args[1].len,
                         TYPE_STRING)) {
-        IERR("unable to evaluate path %.*s",
+        IERR("failed to evaluate tty path %.*s",
              (int)d->args[1].len,
              d->args[1].str);
         return INTERPRET_ERR;
+    }
+
+    if (EVAL_OK != eval(&tty_mode,
+                        NULL,
+                        &g_values,
+                        d->args[2].str,
+                        d->args[2].len,
+                        TYPE_INT)) {
+        IERR("failed to evaluate tty mode %.*s",
+             (int)d->args[1].len,
+             d->args[1].str);
+        return INTERPRET_ERR;
+    }
+
+    for (size_t i = 0; i < argc; i++) {
+        if (EVAL_OK != eval(&argv[i],
+                            NULL,
+                            &g_values,
+                            d->args[3 + i].str,
+                            d->args[3 + i].len,
+                            TYPE_STRING)) {
+            IERR("failed to evaluate command line argument %.*s",
+                 (int)d->args[3 + i].len,
+                 d->args[3 + i].str);
+            return INTERPRET_ERR;
+        }
     }
 
     int pid = fork();
@@ -200,59 +195,69 @@ static int cb_execl(struct directive *d) {
     }
 
     if (0 == pid) {
-        ILOG("creating new process group for %s", path);
-        if (0 != setpgid(0, 0)) {
-            IERR("failed to set process group");
+        int tty_fd = open(tty_path, O_RDWR);
+        if (-1 == tty_fd) {
+            exit(-1);
         }
-        ILOG("switching to %s", path);
-        if (PROP_CLEAR & g_active_properties) {
-            fprintf(stderr, "\033[2J\033[H");
+
+        dup2(tty_fd, STDOUT_FILENO);
+        dup2(tty_fd, STDIN_FILENO);
+        dup2(tty_fd, STDERR_FILENO);
+
+        int sid = setsid();
+        ILOG("moved %s on %s to session sid=%d", argv[0], tty_path, sid);
+
+        ILOG("running %s on %s", argv[0], tty_path);
+        wait_start_signal();
+
+        if (OPT_CLEAR & g_active_options) {
+            fprintf(stderr, "\033[2J\033[H"); // ANSI escape to clear the screen
         }
-        if (0 != execl(path, path, NULL)) {
-            IERR("failed to perform execl() on %s", path);
+
+        if (0 != execv(argv[0], argv)) {
+            IERR("failed to perform execl() on %s", tty_path);
             exit(-1);
         }
     }
 
-    int status;
-    waitpid(pid, &status, 0);
+    g_children[g_num_children] = pid;
+    g_num_children++;
+
+    // TODO: cleanup all allocated memory
     return INTERPRET_OK;
 }
 
-static int cb_addprop(struct directive *d) {
+static int cb_enable(struct directive *d) {
     if (2 != d->num_args) {
         return INTERPRET_ERR;
     }
 
-    int       property;
-    enum type _;
+    int option;
 
-    if (EVAL_OK != eval(&property,
-                        &_,
+    if (EVAL_OK != eval(&option,
+                        NULL,
                         &g_values,
                         d->args[1].str,
                         d->args[1].len,
                         TYPE_INT)) {
-        IERR("unable to evaluate property %.*s",
+        IERR("failed to evaluate option %.*s",
              (int)d->args[1].len,
              d->args[1].str);
         return INTERPRET_ERR;
     }
 
-    g_active_properties |= property;
-    ILOG("set property with id=%04x, active_properties=%04x",
-         property,
-         g_active_properties);
+    g_active_options |= option;
+    ILOG("set option with id=%04x, active_options=%04x",
+         option,
+         g_active_options);
     return INTERPRET_OK;
 }
 
 static struct table_entry g_directive_entries[] = {
-    {"ENV", TYPE_FUNCTION, .value.ptr = cb_env},
-    {"TTY", TYPE_FUNCTION, .value.ptr = cb_tty},
-    {"EXECL", TYPE_FUNCTION, .value.ptr = cb_execl},
-    {"ADDPROP", TYPE_FUNCTION, .value.ptr = cb_addprop},
+    {"env", TYPE_FUNCTION, .value.ptr = cb_env},
+    {"tty", TYPE_FUNCTION, .value.ptr = cb_tty},
+    {"enable", TYPE_FUNCTION, .value.ptr = cb_enable},
 };
-
 static struct table g_directives = CONST_TABLE(g_directive_entries);
 
 int interpret_directive(struct directive *d, size_t i, size_t n) {
@@ -284,11 +289,26 @@ int interpret_directive(struct directive *d, size_t i, size_t n) {
 }
 
 int interpret_config(struct directive *directives, size_t num_directives) {
+    ILOG("setting signal handler for SIGUSR1");
+    struct sigaction act;
+    memset(&act, 0, sizeof(struct sigaction));
+    act.sa_handler = handle_sigusr1;
+    if (0 != sigaction(SIGUSR1, &act, NULL)) {
+        IERR("failed to perform sigaction() for SIGUSR1");
+        exit(-1);
+    }
+
     for (size_t i = 0; i < num_directives; i++) {
         if (INTERPRET_OK !=
             interpret_directive(&directives[i], i, num_directives)) {
             return INTERPRET_ERR;
         }
+    }
+
+    // Notify all children that they can start
+    ILOG("sending SIGUSR1 to all children");
+    for (int i = 0; i < g_num_children; i++) {
+        kill(g_children[i], SIGUSR1);
     }
 
     return INTERPRET_OK;

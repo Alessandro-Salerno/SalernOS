@@ -7,7 +7,7 @@ override OUTPUT := init
 
 CC ?= cc
 LD ?= cc
-CFLAGS := -g -O2 -pipe
+CFLAGS := -O2 -pipe
 CPPFLAGS :=
 LDFLAGS :=
 

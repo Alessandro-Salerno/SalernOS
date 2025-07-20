@@ -432,4 +432,19 @@ int sys_tgkill(int tgid, int tid, int sig) {
     return 0;
 }
 
+#ifndef MLIBC_BUILDING_RTLD
+
+int sys_dup2(int fd, int flags, int newfd) {
+    struct __syscall_ret ret =
+        __syscall(__SALERNOS_SYSCALL_DUP3, fd, newfd, flags);
+
+    if (0 != ret.errno) {
+        return ret.errno;
+    }
+
+    return 0;
+}
+
+#endif
+
 } // namespace mlibc

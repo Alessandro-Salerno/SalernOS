@@ -8,6 +8,10 @@
 #define INIT_CONF_PATH "/boot/initcfg"
 // #define INIT_CONF_PATH "./testcfg"
 
+static void handle_sigchild(int signo) {
+    IERR("received SIGCHILD, a child process has exited!");
+}
+
 int main(void) {
     ILOG("opening configuration file at %s", INIT_CONF_PATH);
     FILE *cfg_file = fopen(INIT_CONF_PATH, "r");
@@ -46,5 +50,10 @@ int main(void) {
     ILOG("running init");
     int r = interpret_config(directives, num_directives);
 
-    return EXIT_SUCCESS;
+    if (INTERPRET_OK != r) {
+        IERR("failed to run init");
+    }
+
+    while (1)
+        ;
 }

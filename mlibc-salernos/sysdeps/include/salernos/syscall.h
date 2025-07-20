@@ -34,6 +34,7 @@
 #define __SALERNOS_SYSCALL_KILL          30
 #define __SALERNOS_SYSCALL_KILL_THREAD   31
 #define __SALERNOS_SYSCALL_SIGRETURN     32
+#define __SALERNOS_SYSCALL_DUP3          33
 
 struct __syscall_ret {
     uint64_t ret;

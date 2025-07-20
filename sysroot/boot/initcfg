@@ -1,5 +1,10 @@
-ENV TERM linux
-ENV HOME /
+env TERM linux
+env HOME /
 
-ADDPROP $PROP_CLEAR
-EXECL /fresh
+enable $OPT_CLEAR
+tty /dev/tty0 $TTY_TEXT_MODE /fresh
+tty /dev/tty1 $TTY_TEXT_MODE /fresh
+tty /dev/tty2 $TTY_TEXT_MODE /fresh
+tty /dev/tty3 $TTY_TEXT_MODE /fresh
+tty /dev/tty4 $TTY_TEXT_MODE /fresh
+tty /dev/tty5 $TTY_TEXT_MODE /fresh

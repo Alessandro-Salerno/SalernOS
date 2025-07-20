@@ -304,10 +304,6 @@ int sys_dup(int fd, int flags, int *newfd) {
     STUB_ENOSYS
 }
 
-int sys_dup2(int fd, int flags, int newfd) {
-    STUB_ENOSYS
-}
-
 extern "C" void __mlibc_restorer();
 
 int sys_signalfd_create(sigset_t mask, int flags, int *fd) {
