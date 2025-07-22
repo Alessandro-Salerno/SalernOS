@@ -96,10 +96,6 @@ typedef struct {
     char           d_name[1024];
 } dent_t;
 
-int sys_getcwd(char *buffer, size_t size) {
-    STUB_ENOSYS
-}
-
 #endif
 
 int sys_openat(int dirfd, const char *path, int flags, mode_t mode, int *fd) {

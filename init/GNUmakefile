@@ -17,6 +17,7 @@ override CFLAGS += \
     -Wall \
     -Wextra \
     -std=gnu11 \
+	-lutil
 
 override CPPFLAGS := \
     $(CPPFLAGS) \

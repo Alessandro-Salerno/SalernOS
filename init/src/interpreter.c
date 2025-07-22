@@ -1,3 +1,4 @@
+#include <asm/ioctls.h>
 #include <fcntl.h>
 #include <init/interpreter.h>
 #include <init/log.h>
@@ -9,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/ioctl.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
@@ -205,9 +207,11 @@ static int cb_tty(struct directive *d) {
         dup2(tty_fd, STDERR_FILENO);
 
         int sid = setsid();
+        ioctl(tty_fd, TIOCSCTTY, NULL);
         ILOG("moved %s on %s to session sid=%d", argv[0], tty_path, sid);
 
         ILOG("running %s on %s", argv[0], tty_path);
+
         wait_start_signal();
 
         if (OPT_CLEAR & g_active_options) {

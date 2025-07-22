@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/ioctl.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
@@ -18,6 +19,10 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "ERROR: out of memory\n");
         return -2;
     }
+
+    setpgid(0, 0);
+    pid_t mpgid = getpgid(getpid());
+    ioctl(0, 0x5410, &mpgid);
 
     for (int i = 0; i < num_times; i++) {
         int pid = fork();

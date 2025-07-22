@@ -445,6 +445,17 @@ int sys_dup2(int fd, int flags, int newfd) {
     return 0;
 }
 
+int sys_getcwd(char *buffer, size_t size) {
+    struct __syscall_ret ret =
+        __syscall(__SALERNOS_SYSCALL_GETCWD, buffer, size);
+
+    if (0 != ret.errno) {
+        return ret.errno;
+    }
+
+    return 0;
+}
+
 #endif
 
 } // namespace mlibc

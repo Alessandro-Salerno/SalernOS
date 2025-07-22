@@ -5,3 +5,4 @@
 -I../../sources/mlibc/options/bsd/include
 -I../../sources/mlibc/options/internal/include
 -I../../sources/mlibc/
+-I../../sources/mlibc/abi-bits/salernos

@@ -13,6 +13,7 @@ rtld_sources += files(
 libc_sources += files(
 	'generic/entry.cpp',
 	'generic/generic.cpp',
+	'generic/tty.cpp',
 	'generic/stubs.cpp',
 	'generic/thread.cpp',
 	'generic/thread.S',
