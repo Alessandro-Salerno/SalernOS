@@ -98,10 +98,6 @@ typedef struct {
 
 #endif
 
-int sys_openat(int dirfd, const char *path, int flags, mode_t mode, int *fd) {
-    STUB_ENOSYS
-}
-
 #ifndef MLIBC_BUILDING_RTLD
 
 int sys_open_dir(const char *path, int *handle) {
@@ -171,18 +167,18 @@ int sys_anon_free(void *pointer, size_t size) {
 
 #ifndef MLIBC_BUILDING_RTLD
 
-uid_t sys_getuid(){STUB_ENOSYS}
+uid_t sys_getuid(){STUB_OK}
 
-uid_t sys_geteuid(){STUB_ENOSYS}
+uid_t sys_geteuid(){STUB_OK}
 
 gid_t sys_getgid() {
-    STUB_ENOSYS
+    STUB_OK
 }
 
 int sys_setgid(gid_t gid){STUB_ENOSYS}
 
 gid_t sys_getegid() {
-    STUB_ENOSYS
+    STUB_OK
 }
 
 int sys_ttyname(int fd, char *buf, size_t size) {
@@ -195,16 +191,8 @@ int sys_clock_get(int clock, time_t *secs, long *nanos) {
     STUB_OK
 }
 
-int sys_stat(fsfd_target  fsfdt,
-             int          fd,
-             const char  *path,
-             int          flags,
-             struct stat *statbuf) {
-    STUB_ENOSYS
-}
-
 int sys_faccessat(int dirfd, const char *pathname, int mode, int flags) {
-    STUB_ENOSYS
+    STUB_OK
 }
 
 int sys_access(const char *path, int mode) {
@@ -212,7 +200,7 @@ int sys_access(const char *path, int mode) {
 }
 
 int sys_chdir(const char *path) {
-    STUB_ENOSYS
+    STUB_OK
 }
 
 int sys_mkdir(const char *path, mode_t mode) {
@@ -292,14 +280,6 @@ int sys_inotify_create(int flags, int *fd) {
     STUB_ENOSYS
 }
 
-int sys_fcntl(int fd, int request, va_list args, int *result) {
-    STUB_ENOSYS
-}
-
-int sys_dup(int fd, int flags, int *newfd) {
-    STUB_ENOSYS
-}
-
 extern "C" void __mlibc_restorer();
 
 int sys_signalfd_create(sigset_t mask, int flags, int *fd) {
@@ -335,7 +315,8 @@ int sys_umount2(const char *target, int flags) {
 }
 
 int sys_gethostname(char *buffer, size_t bufsize) {
-    STUB_ENOSYS
+    strncpy(buffer, "salernos", bufsize);
+    STUB_OK
 }
 
 int sys_sethostname(const char *buffer, size_t bufsize) {

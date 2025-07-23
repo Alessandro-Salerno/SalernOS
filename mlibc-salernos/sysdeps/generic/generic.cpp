@@ -132,20 +132,57 @@ int sys_ioctl(int fd, unsigned long request, void *arg, int *result) {
     return 0;
 }
 
+int sys_stat(fsfd_target  fsfdt,
+             int          fd,
+             const char  *path,
+             int          flags,
+             struct stat *statbuf) {
+    struct __syscall_ret ret;
+
+    switch (fsfdt) {
+    case fsfd_target::fd: {
+        ret = __syscall(__SALERNOS_SYSCALL_FSTATAT,
+                        fd,
+                        path,
+                        statbuf,
+                        flags | AT_EMPTY_PATH);
+        break;
+    }
+    case fsfd_target::path: {
+        ret = __syscall(
+            __SALERNOS_SYSCALL_FSTATAT, AT_FDCWD, path, statbuf, flags);
+        break;
+    }
+    case fsfd_target::fd_path: {
+        ret = __syscall(__SALERNOS_SYSCALL_FSTATAT, fd, path, statbuf, flags);
+        break;
+    }
+    default: {
+        __ensure(!"stat: Invalid fsfdt");
+        __builtin_unreachable();
+    }
+    }
+    if (ret.errno != 0)
+        return ret.errno;
+    return ret.ret;
+}
+
 #endif
 
-int sys_open(const char *path, int flags, mode_t mode, int *fd) {
-    // TODO: have modes
-    (void)mode;
+int sys_openat(int dirfd, const char *path, int flags, mode_t mode, int *fd) {
     struct __syscall_ret ret =
-        __syscall(__SALERNOS_SYSCALL_OPEN, path, strlen(path), flags);
+        __syscall(__SALERNOS_SYSCALL_OPENAT, dirfd, path, flags, mode);
 
     if (0 != ret.errno) {
         return ret.errno;
     }
 
-    *fd = ret.ret;
+    *fd = (int)ret.ret;
     return 0;
+}
+
+int sys_open(const char *path, int flags, mode_t mode, int *fd) {
+    return sys_openat(AT_FDCWD, path, flags, mode, fd);
 }
 
 int sys_vm_map(void  *hint,
@@ -445,6 +482,18 @@ int sys_dup2(int fd, int flags, int newfd) {
     return 0;
 }
 
+int sys_dup(int fd, int flags, int *newfd) {
+    (void)flags;
+    __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_FCNTL, fd, F_DUPFD, 0);
+
+    if (0 != ret.errno) {
+        return ret.errno;
+    }
+
+    *newfd = (ssize_t)ret.ret;
+    return 0;
+}
+
 int sys_getcwd(char *buffer, size_t size) {
     struct __syscall_ret ret =
         __syscall(__SALERNOS_SYSCALL_GETCWD, buffer, size);
@@ -453,6 +502,18 @@ int sys_getcwd(char *buffer, size_t size) {
         return ret.errno;
     }
 
+    return 0;
+}
+
+int sys_fcntl(int fd, int request, va_list args, int *result) {
+    struct __syscall_ret ret = __syscall(
+        __SALERNOS_SYSCALL_FCNTL, fd, request, va_arg(args, uint64_t));
+
+    if (0 != ret.errno) {
+        return ret.errno;
+    }
+
+    *result = (ssize_t)ret.ret;
     return 0;
 }
 

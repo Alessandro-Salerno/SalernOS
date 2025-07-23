@@ -10,12 +10,12 @@
 #define __SALERNOS_SYSCALL_WAITPID       6
 #define __SALERNOS_SYSCALL_EXIT          7
 #define __SALERNOS_SYSCALL_IOCTL         8
-#define __SALERNOS_SYSCALL_OPEN          9
+#define __SALERNOS_SYSCALL_OPENAT        9
 #define __SALERNOS_SYSCALL_MMAP          10
 #define __SALERNOS_SYSCALL_SET_TLS       11
 #define __SALERNOS_SYSCALL_SEEK          12
 #define __SALERNOS_SYSCALL_ISATTY        13
-#define __SALERNOS_SYSCALL_STAT          14
+#define __SALERNOS_SYSCALL_FSTATAT       14
 #define __SALERNOS_SYSCALL_TRUNCATE      15
 #define __SALERNOS_SYSCALL_PIPE          16
 #define __SALERNOS_SYSCALL_GETPID        17
@@ -36,6 +36,7 @@
 #define __SALERNOS_SYSCALL_SIGRETURN     32
 #define __SALERNOS_SYSCALL_DUP3          33
 #define __SALERNOS_SYSCALL_GETCWD        34
+#define __SALERNOS_SYSCALL_FCNTL         35
 
 struct __syscall_ret {
     uint64_t ret;

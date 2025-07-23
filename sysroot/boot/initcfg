@@ -1,5 +1,6 @@
 env TERM linux
 env HOME /
+env PATH /bin:/usr/bin:/usr/local/bin:/usr/sbin:/usr/local/sbin
 
 enable $OPT_CLEAR
-tty /dev/tty0 $TTY_TEXT_MODE /usr/bin/bash
+tty /dev/tty0 $TTY_TEXT_MODE /usr/bin/bash --noediting
