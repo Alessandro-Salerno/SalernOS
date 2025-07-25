@@ -37,6 +37,9 @@
 #define __SALERNOS_SYSCALL_DUP3          33
 #define __SALERNOS_SYSCALL_GETCWD        34
 #define __SALERNOS_SYSCALL_FCNTL         35
+#define __SALERNOS_SYSCALL_CLOSE         36
+#define __SALERNOS_SYSCALL_READDIR       37
+#define __SALERNOS_SYSCALL_CHDIR         38
 
 struct __syscall_ret {
     uint64_t ret;

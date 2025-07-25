@@ -23,6 +23,7 @@ build() {
     x86_64-salernos-mlibc-gcc testsig.c -O2 -o testsig
     x86_64-salernos-mlibc-gcc testfork.c -O2 -o testfork
     x86_64-salernos-mlibc-gcc testsigheavy.c -O2 -o testsigheavy
+    x86_64-salernos-mlibc-gcc testcwd.c -O2 -o testcwd
 }
 
 package() {
@@ -39,4 +40,5 @@ package() {
     cp ./testsig "${dest_dir}"
     cp ./testfork "${dest_dir}"
     cp ./testsigheavy "${dest_dir}"
+    cp ./testcwd "${dest_dir}"
 }

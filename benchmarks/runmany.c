@@ -20,10 +20,6 @@ int main(int argc, char *argv[]) {
         return -2;
     }
 
-    setpgid(0, 0);
-    pid_t mpgid = getpgid(getpid());
-    ioctl(0, 0x5410, &mpgid);
-
     for (int i = 0; i < num_times; i++) {
         int pid = fork();
 

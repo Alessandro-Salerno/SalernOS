@@ -7,25 +7,17 @@ BRIGHT_MAGENTA="\[\033[1;95m\]"
 BRIGHT_CYAN="\[\033[1;96m\]"
 RESET="\[\033[0m\]"
 
-# ANSI colors (no \[ \] — for non-PS1 output)
-ANSI_RED="\033[1;91m"
-ANSI_ORANGE="\033[38;5;208m"
-ANSI_YELLOW="\033[1;93m"
-ANSI_GREEN="\033[1;92m"
-ANSI_BLUE="\033[1;94m"
-ANSI_INDIGO="\033[38;5;57m"
-ANSI_VIOLET="\033[1;95m"
-ANSI_RESET="\033[0m"
-
-# Prompt-safe versions (\[ \] around them)
-PS1_RED="\[\033[1;91m\]"
-PS1_ORANGE="\[\033[38;5;208m\]"
-PS1_YELLOW="\[\033[1;93m\]"
-PS1_GREEN="\[\033[1;92m\]"
-PS1_BLUE="\[\033[1;94m\]"
-PS1_INDIGO="\[\033[38;5;57m\]"
-PS1_VIOLET="\[\033[1;95m\]"
-PS1_RESET="\[\033[0m\]"
+bash /rainbow.sh
+echo "SalernOS Kernel: Copyright (C) 2021 - 2025 Alessandro Salerno (GPL v3)"
+echo "SalernOS: Copyright (C) 2021 - 2025 Alessandro Salerno (GPL v3)"
+echo "flanterm: Copyright (C) 2022 - 2025 mintsuki and contributors (BSD 2-clause)"
+echo "limine: Copyright (C) 2019 - 2025 mintsuki and contributors (BSD 2-clause)"
+echo "mlibc: Copyright (C) 2015 - 2025 mlibc contributors (MIT)"
+echo ""
+echo "This distribution comes with GNU software. Copyright (C) Free Software Foundation, Inc."
+echo ""
+echo "Welcome to SalernOS! Thanks for checking out my project!"
+echo ""
 
 # Prompt format: user@host dir  →
 export PS1="${BRIGHT_RED}root${BRIGHT_MAGENTA}@${BRIGHT_YELLOW}\h ${BRIGHT_GREEN}\w  ${BRIGHT_CYAN}→ ${RESET}"

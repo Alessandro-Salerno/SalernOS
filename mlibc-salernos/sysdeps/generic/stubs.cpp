@@ -88,37 +88,6 @@ int sys_pselect(int                    nfds,
 
 #ifndef MLIBC_BUILDING_RTLD
 
-typedef struct {
-    ino_t          d_ino;
-    off_t          d_off;
-    unsigned short d_reclen;
-    unsigned char  d_type;
-    char           d_name[1024];
-} dent_t;
-
-#endif
-
-#ifndef MLIBC_BUILDING_RTLD
-
-int sys_open_dir(const char *path, int *handle) {
-    STUB_ENOSYS
-}
-
-int sys_read_entries(int     fd,
-                     void   *buffer,
-                     size_t  max_size,
-                     size_t *bytes_read) {
-    STUB_ENOSYS
-}
-
-#endif
-
-int sys_close(int fd) {
-    STUB_OK
-}
-
-#ifndef MLIBC_BUILDING_RTLD
-
 int sys_readlink(const char *path,
                  void       *data,
                  size_t      max_size,
@@ -197,10 +166,6 @@ int sys_faccessat(int dirfd, const char *pathname, int mode, int flags) {
 
 int sys_access(const char *path, int mode) {
     return sys_faccessat(AT_FDCWD, path, mode, 0);
-}
-
-int sys_chdir(const char *path) {
-    STUB_OK
 }
 
 int sys_mkdir(const char *path, mode_t mode) {

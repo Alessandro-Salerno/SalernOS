@@ -9,6 +9,6 @@ prepare() {
     cp -r /base_dir/mlibc-salernos/sysdeps "${source_dir}/sysdeps/salernos"
     cp -r /base_dir/mlibc-salernos/abi "${source_dir}/abis/salernos"
     for file in /base_dir/sources/mlibc/abis/salernos/*; do
-        ln -s "$file" "${source_dir}/sysdeps/salernos/include/abi-bits"
+        cp "$file" "${source_dir}/sysdeps/salernos/include/abi-bits"
     done
 }

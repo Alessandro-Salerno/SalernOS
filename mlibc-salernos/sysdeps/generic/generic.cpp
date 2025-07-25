@@ -519,4 +519,55 @@ int sys_fcntl(int fd, int request, va_list args, int *result) {
 
 #endif
 
+int sys_close(int fd) {
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_CLOSE, fd);
+
+    if (0 != ret.errno) {
+        return ret.errno;
+    }
+
+    return 0;
+}
+
+#ifndef MLIBC_BUILDING_RTLD
+
+typedef struct {
+    ino_t          d_ino;
+    off_t          d_off;
+    unsigned short d_reclen;
+    unsigned char  d_type;
+    char           d_name[1024];
+} dent_t;
+
+int sys_open_dir(const char *path, int *handle) {
+    return sys_open(path, O_DIRECTORY, 0, handle);
+}
+
+int sys_read_entries(int     fd,
+                     void   *buffer,
+                     size_t  max_size,
+                     size_t *bytes_read) {
+    struct __syscall_ret ret =
+        __syscall(__SALERNOS_SYSCALL_READDIR, fd, buffer, max_size);
+
+    if (0 != ret.errno) {
+        return ret.errno;
+    }
+
+    *bytes_read = ret.ret;
+    return 0;
+}
+
+int sys_chdir(const char *path) {
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_CHDIR, path);
+
+    if (0 != ret.errno) {
+        return ret.errno;
+    }
+
+    return 0;
+}
+
+#endif
+
 } // namespace mlibc

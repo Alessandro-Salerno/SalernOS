@@ -16,6 +16,7 @@ libc_sources += files(
 	'generic/tty.cpp',
 	'generic/stubs.cpp',
 	'generic/thread.cpp',
+	'generic/mntent.cpp',
 	'generic/thread.S',
 	'x86_64/sigrestorer.S',
 )
@@ -81,6 +82,16 @@ if not no_headers
 		'include/asm/ioctls.h',
 		subdir: 'asm',
 	)
+
+    install_headers(
+		'include/sys/mount.h',
+		'include/sys/statfs.h',
+		subdir: 'sys',
+	)
+
+    install_headers(
+      'include/mntent.h'
+    )
 
 endif
 

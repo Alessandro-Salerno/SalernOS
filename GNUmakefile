@@ -15,7 +15,7 @@ target:
 	./jinx build '*'
 
 install_sysroot:
-	cp -r sysroot/* iso_root/
+	cp -r sysroot/. iso_root/
 
 iso_root: kernel target
 	./jinx install iso_root/ '*'
