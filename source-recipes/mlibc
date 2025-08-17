@@ -8,7 +8,6 @@ tarball_sha512="461840aefafef0f2542a6d5df47975f984c8cbf007d10613e40eaf96dc06f915
 prepare() {
     cp -r /base_dir/mlibc-salernos/sysdeps "${source_dir}/sysdeps/salernos"
     cp -r /base_dir/mlibc-salernos/abi "${source_dir}/abis/salernos"
-    for file in /base_dir/sources/mlibc/abis/salernos/*; do
-        cp "$file" "${source_dir}/sysdeps/salernos/include/abi-bits"
-    done
+    mkdir -p "${source_dir}/sysdeps/salernos/include/abi-bits"
+    cp -r /base_dir/mlibc-salernos/abi/* "${source_dir}/sysdeps/salernos/include/abi-bits/"
 }

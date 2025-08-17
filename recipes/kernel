@@ -1,15 +1,17 @@
 #!/bin/sh
 
 name=kernel
-version=0.2.2
+version=0.2.4
 skip_pkg_check=yes
 revision=1
 source_dir="kernel"
 imagedeps="build-essential curl nasm"
+hostdeps="gcc binutils"
+deps="mlibc-headers"
 
 build() {
     cp -pr "${source_dir}"/* .
-    make -j${parallelism}
+    make -j${parallelism} CC=x86_64-salernos-mlibc-gcc LD=x86_64-salernos-mlibc-ld AS=x86_64-salernos-mlibc-as
 }
 
 package() {
