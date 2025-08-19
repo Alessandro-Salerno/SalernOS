@@ -1,0 +1,85 @@
+# Below is a vibrant and readable dircolors configuration
+# Save this as ~/.dircolors
+
+TERM linux
+
+# File types
+NORMAL 00           # Default text
+FILE 00             # Regular file
+DIR 01;36           # Cyan, bold
+LINK 01;35          # Magenta, bold
+FIFO 01;33          # Yellow, bold
+SOCK 01;32          # Green, bold
+DOOR 01;35          # Magenta, bold
+BLK 01;34           # Blue, bold
+CHR 01;34           # Blue, bold
+ORPHAN 01;31        # Red, bold (broken symlinks)
+MISSING 01;31       # Red, bold
+EXEC 01;92          # Bright green, bold
+
+# Archive and compressed files
+.tar 01;91          # Bright red, bold
+.tgz 01;91
+.arc 01;91
+.arj 01;91
+.taz 01;91
+.lzh 01;91
+.lzma 01;91
+.tlz 01;91
+.txz 01;91
+.zip 01;91
+.z 01;91
+.Z 01;91
+.gz 01;91
+.bz2 01;91
+.bz 01;91
+.xz 01;91
+.zst 01;91
+.rar 01;91
+.7z 01;91
+
+# Image files
+.jpg 01;96
+.jpeg 01;96
+.png 01;96
+.gif 01;96
+.bmp 01;96
+.tiff 01;96
+.svg 01;96
+.webp 01;96
+
+# Video files
+.avi 01;93
+.mkv 01;93
+.mp4 01;93
+.mov 01;93
+.wmv 01;93
+.flv 01;93
+
+# Audio files
+.mp3 01;94
+.wav 01;94
+.ogg 01;94
+.flac 01;94
+
+# Documents
+.pdf 01;95
+.doc 01;95
+.docx 01;95
+.odt 01;95
+.txt 01;37
+.md 01;37
+
+# Scripts
+.sh 01;92
+.py 01;92
+.js 01;92
+.ts 01;92
+.rb 01;92
+.pl 01;92
+
+# Temporary or backup files
+.bak 01;31
+.tmp 01;31
+.swp 01;31
+

@@ -22,3 +22,5 @@ echo ""
 # Prompt format: user@host dir  →
 export PS1="${BRIGHT_RED}root${BRIGHT_MAGENTA}@${BRIGHT_YELLOW}\h ${BRIGHT_GREEN}\w  ${BRIGHT_CYAN}→ ${RESET}"
 
+eval "$(dircolors -b /.dircolors)"
+alias ls="ls --color=auto"

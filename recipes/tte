@@ -16,6 +16,6 @@ build() {
 }
 
 package() {
-    mkdir -p "${dest_dir}"
-    cp ./tte "${dest_dir}"
+    mkdir -p "${dest_dir}/usr/bin"
+    cp ./tte "${dest_dir}/usr/bin"
 }
