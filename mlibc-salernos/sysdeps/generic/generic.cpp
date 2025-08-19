@@ -568,6 +568,21 @@ int sys_chdir(const char *path) {
     return 0;
 }
 
+int sys_faccessat(int dirfd, const char *pathname, int mode, int flags) {
+    struct __syscall_ret ret =
+        __syscall(__SALERNOS_SYSCALL_FACCESSAT, dirfd, pathname, mode, flags);
+
+    if (0 != ret.errno) {
+        return ret.errno;
+    }
+
+    return 0;
+}
+
+int sys_access(const char *path, int mode) {
+    return sys_faccessat(AT_FDCWD, path, mode, 0);
+}
+
 #endif
 
 int sys_clock_get(int clock, time_t *secs, long *nanos) {

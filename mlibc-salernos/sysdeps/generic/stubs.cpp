@@ -154,14 +154,6 @@ int sys_ttyname(int fd, char *buf, size_t size) {
     STUB_ENOSYS
 }
 
-int sys_faccessat(int dirfd, const char *pathname, int mode, int flags) {
-    STUB_OK
-}
-
-int sys_access(const char *path, int mode) {
-    return sys_faccessat(AT_FDCWD, path, mode, 0);
-}
-
 int sys_mkdir(const char *path, mode_t mode) {
     STUB_ENOSYS
 }
