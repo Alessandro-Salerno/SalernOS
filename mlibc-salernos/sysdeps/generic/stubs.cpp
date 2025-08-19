@@ -116,7 +116,7 @@ int sys_fchmod(int fd, mode_t mode) {
 }
 
 int sys_fsync(int) {
-    STUB_ENOSYS
+    STUB_OK
 }
 
 #endif
@@ -152,12 +152,6 @@ gid_t sys_getegid() {
 
 int sys_ttyname(int fd, char *buf, size_t size) {
     STUB_ENOSYS
-}
-
-int sys_clock_get(int clock, time_t *secs, long *nanos) {
-    *secs  = 0;
-    *nanos = 0;
-    STUB_OK
 }
 
 int sys_faccessat(int dirfd, const char *pathname, int mode, int flags) {

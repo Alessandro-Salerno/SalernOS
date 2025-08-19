@@ -570,4 +570,19 @@ int sys_chdir(const char *path) {
 
 #endif
 
+int sys_clock_get(int clock, time_t *secs, long *nanos) {
+    struct timespec      ts;
+    struct __syscall_ret ret =
+        __syscall(__SALERNOS_SYSCALL_CLOCK_GET, clock, &ts);
+
+    if (0 != ret.errno) {
+        return ret.errno;
+    }
+
+    *secs  = ts.tv_sec;
+    *nanos = ts.tv_nsec;
+
+    return 0;
+}
+
 } // namespace mlibc
