@@ -42,6 +42,7 @@
 #define __SALERNOS_SYSCALL_CHDIR         38
 #define __SALERNOS_SYSCALL_CLOCK_GET     39
 #define __SALERNOS_SYSCALL_FACCESSAT     40
+#define __SALERNOS_SYSCALL_PPOLL         41
 
 struct __syscall_ret {
     uint64_t ret;

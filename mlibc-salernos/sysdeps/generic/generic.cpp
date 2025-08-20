@@ -600,4 +600,105 @@ int sys_clock_get(int clock, time_t *secs, long *nanos) {
     return 0;
 }
 
+#ifndef MLIBC_BUILDING_RTLD
+
+int sys_ppoll(struct pollfd         *fds,
+              int                    nfds,
+              const struct timespec *timeout,
+              const sigset_t        *sigmask,
+              int                   *num_events) {
+    __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_PPOLL, fds, nfds, timeout);
+
+    if (ret.errno != 0) {
+        return ret.errno;
+    }
+
+    *num_events = (int)ret.ret;
+    return 0;
+}
+
+int sys_poll(struct pollfd *fds, nfds_t count, int timeout, int *num_events) {
+    struct timespec ts;
+    ts.tv_sec  = timeout / 1000;
+    ts.tv_nsec = (timeout % 1000) * 1000000;
+    return sys_ppoll(fds, count, timeout < 0 ? NULL : &ts, NULL, num_events);
+}
+
+// TAKEN: vloxei64/ke
+int sys_pselect(int                    nfds,
+                fd_set                *read_set,
+                fd_set                *write_set,
+                fd_set                *except_set,
+                const struct timespec *timeout,
+                const sigset_t        *sigmask,
+                int                   *num_events) {
+    struct pollfd *fds = (struct pollfd *)calloc(nfds, sizeof(struct pollfd));
+    if (fds == NULL) {
+        return ENOMEM;
+    }
+
+    for (int i = 0; i < nfds; i++) {
+        struct pollfd *fd = &fds[i];
+
+        if (read_set && FD_ISSET(i, read_set))
+            fd->events |= POLLIN; // TODO: Additional events.
+        if (write_set && FD_ISSET(i, write_set))
+            fd->events |= POLLOUT; // TODO: Additional events.
+        if (except_set && FD_ISSET(i, except_set))
+            fd->events |= POLLPRI;
+
+        if (!fd->events) {
+            fd->fd = -1;
+            continue;
+        }
+
+        fd->fd = i;
+    }
+
+    int e = sys_ppoll(fds, nfds, timeout, sigmask, num_events);
+
+    if (e != 0) {
+        free(fds);
+        return e;
+    }
+
+    fd_set res_read_set;
+    fd_set res_write_set;
+    fd_set res_except_set;
+    FD_ZERO(&res_read_set);
+    FD_ZERO(&res_write_set);
+    FD_ZERO(&res_except_set);
+
+    for (int i = 0; i < nfds; i++) {
+        struct pollfd *fd = &fds[i];
+
+        if (read_set && FD_ISSET(i, read_set) &&
+            fd->revents & (POLLIN | POLLERR | POLLHUP)) {
+            FD_SET(i, &res_read_set);
+        }
+
+        if (write_set && FD_ISSET(i, write_set) &&
+            fd->revents & (POLLOUT | POLLERR | POLLHUP)) {
+            FD_SET(i, &res_write_set);
+        }
+
+        if (except_set && FD_ISSET(i, except_set) && fd->revents & POLLPRI) {
+            FD_SET(i, &res_except_set);
+        }
+    }
+
+    free(fds);
+
+    if (read_set)
+        *read_set = res_read_set;
+    if (write_set)
+        *write_set = res_write_set;
+    if (except_set)
+        *except_set = res_except_set;
+
+    return 0;
+}
+
+#endif
+
 } // namespace mlibc

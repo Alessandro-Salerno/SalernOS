@@ -53,34 +53,7 @@ namespace mlibc {
 
 #ifndef MLIBC_BUILDING_RTLD
 
-#endif
-
-#ifndef MLIBC_BUILDING_RTLD
-
-int sys_ppoll(struct pollfd         *fds,
-              int                    nfds,
-              const struct timespec *timeout,
-              const sigset_t        *sigmask,
-              int                   *num_events) {
-    STUB_ENOSYS
-}
-
 int sys_pause() {
-    STUB_ENOSYS
-}
-
-int sys_poll(struct pollfd *fds, nfds_t count, int timeout, int *num_events) {
-    *num_events = 1;
-    STUB_OK
-}
-
-int sys_pselect(int                    nfds,
-                fd_set                *read_set,
-                fd_set                *write_set,
-                fd_set                *except_set,
-                const struct timespec *timeout,
-                const sigset_t        *sigmask,
-                int                   *num_events) {
     STUB_ENOSYS
 }
 
