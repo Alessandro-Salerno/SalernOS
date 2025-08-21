@@ -210,18 +210,6 @@ int sys_signalfd_create(sigset_t mask, int flags, int *fd) {
     STUB_ENOSYS
 }
 
-int sys_ptsname(int fd, char *buffer, size_t length) {
-    STUB_ENOSYS
-}
-
-int sys_posix_openpt(int flags, int *fd) {
-    STUB_ENOSYS
-}
-
-int sys_unlockpt(int fd) {
-    STUB_ENOSYS
-}
-
 int sys_getgroups(size_t size, gid_t *list, int *_ret) {
     STUB_ENOSYS
 }

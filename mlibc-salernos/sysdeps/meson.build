@@ -13,7 +13,7 @@ rtld_sources += files(
 libc_sources += files(
 	'generic/entry.cpp',
 	'generic/generic.cpp',
-	'generic/tty.cpp',
+	'generic/pty.cpp',
 	'generic/stubs.cpp',
 	'generic/thread.cpp',
 	'generic/mntent.cpp',
@@ -90,7 +90,8 @@ if not no_headers
 	)
 
     install_headers(
-      'include/mntent.h'
+      'include/mntent.h',
+      'include/pty.h',
     )
 
 endif

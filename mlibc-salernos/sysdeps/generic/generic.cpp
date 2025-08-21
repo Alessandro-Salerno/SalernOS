@@ -699,6 +699,33 @@ int sys_pselect(int                    nfds,
     return 0;
 }
 
+int sys_ptsname(int fd, char *buffer, size_t length) {
+    int index;
+    int result;
+    if (sys_ioctl(fd, TIOCGPTN, &index, &result); result) {
+        return result;
+    }
+    if ((size_t)snprintf(buffer, length, "/dev/pts/%d", index) >= length) {
+        return ERANGE;
+    }
+    return 0;
+}
+
+int sys_posix_openpt(int flags, int *fd) {
+    return sys_open("/dev/ptmx", flags, 0, fd);
+}
+
+int sys_unlockpt(int fd) {
+    int unlock = 0;
+    int result;
+
+    if (sys_ioctl(fd, TIOCSPTLCK, &unlock, &result); result) {
+        return result;
+    }
+
+    return 0;
+}
+
 #endif
 
 } // namespace mlibc
