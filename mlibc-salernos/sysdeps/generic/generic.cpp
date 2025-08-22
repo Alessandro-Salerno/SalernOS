@@ -236,8 +236,13 @@ int sys_seek(int fd, off_t offset, int whence, off_t *new_offset) {
 #ifndef MLIBC_BUILDING_RTLD
 
 int sys_isatty(int fd) {
-    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_ISATTY, fd);
-    return ret.errno;
+    struct winsize ws;
+    int            ret;
+
+    if (!sys_ioctl(fd, TIOCGWINSZ, &ws, &ret))
+        return 0;
+
+    return ENOTTY;
 }
 
 int sys_tcgetattr(int fd, struct termios *attr) {

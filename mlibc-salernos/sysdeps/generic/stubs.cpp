@@ -249,6 +249,16 @@ int sys_setitimer(int                     which,
     STUB_ENOSYS
 }
 
+int sys_uname(struct utsname *buf) {
+    if (!buf)
+        return EFAULT;
+    strcpy(buf->sysname, "salernos");
+    strcpy(buf->nodename, "salernos");
+    strcpy(buf->release, "0.2.4");
+    strcpy(buf->version, "amd64");
+    return 0;
+}
+
 #endif
 
 } // namespace mlibc
