@@ -238,10 +238,14 @@ int sys_seek(int fd, off_t offset, int whence, off_t *new_offset) {
 int sys_isatty(int fd) {
     struct winsize ws;
     int            ret;
+    int            err = 0;
 
-    if (!sys_ioctl(fd, TIOCGWINSZ, &ws, &ret))
+    if (!(err = sys_ioctl(fd, TIOCGWINSZ, &ws, &ret)))
         return 0;
 
+    mlibc::infoLogger() << "isatty(" << fd << ") failed with errno " << err
+                        << "\n"
+                        << frg::endlog;
     return ENOTTY;
 }
 
@@ -645,31 +649,30 @@ int sys_pselect(int                    nfds,
     for (int i = 0; i < nfds; i++) {
         struct pollfd *fd = &fds[i];
 
-        if (read_set && FD_ISSET(i, read_set))
-            fd->events |= POLLIN; // TODO: Additional events.
-        if (write_set && FD_ISSET(i, write_set))
-            fd->events |= POLLOUT; // TODO: Additional events.
-        if (except_set && FD_ISSET(i, except_set))
+        if (read_set && FD_ISSET(i, read_set)) {
+            fd->events |= POLLIN;
+        }
+        if (write_set && FD_ISSET(i, write_set)) {
+            fd->events |= POLLOUT;
+        }
+        if (except_set && FD_ISSET(i, except_set)) {
             fd->events |= POLLPRI;
+        }
 
         if (!fd->events) {
             fd->fd = -1;
             continue;
         }
-
         fd->fd = i;
     }
 
-    int e = sys_ppoll(fds, nfds, timeout, sigmask, num_events);
-
-    if (e != 0) {
+    int ret = sys_ppoll(fds, nfds, timeout, sigmask, num_events);
+    if (ret != 0) {
         free(fds);
-        return e;
+        return ret;
     }
 
-    fd_set res_read_set;
-    fd_set res_write_set;
-    fd_set res_except_set;
+    fd_set res_read_set, res_write_set, res_except_set;
     FD_ZERO(&res_read_set);
     FD_ZERO(&res_write_set);
     FD_ZERO(&res_except_set);
@@ -678,28 +681,29 @@ int sys_pselect(int                    nfds,
         struct pollfd *fd = &fds[i];
 
         if (read_set && FD_ISSET(i, read_set) &&
-            fd->revents & (POLLIN | POLLERR | POLLHUP)) {
+            (fd->revents & (POLLIN | POLLERR | POLLHUP)) != 0) {
             FD_SET(i, &res_read_set);
         }
-
         if (write_set && FD_ISSET(i, write_set) &&
-            fd->revents & (POLLOUT | POLLERR | POLLHUP)) {
+            (fd->revents & (POLLOUT | POLLERR | POLLHUP)) != 0) {
             FD_SET(i, &res_write_set);
         }
-
-        if (except_set && FD_ISSET(i, except_set) && fd->revents & POLLPRI) {
+        if (except_set && FD_ISSET(i, except_set) &&
+            (fd->revents & POLLPRI) != 0) {
             FD_SET(i, &res_except_set);
         }
     }
 
     free(fds);
-
-    if (read_set)
+    if (read_set) {
         *read_set = res_read_set;
-    if (write_set)
+    }
+    if (write_set) {
         *write_set = res_write_set;
-    if (except_set)
+    }
+    if (except_set) {
         *except_set = res_except_set;
+    }
 
     return 0;
 }

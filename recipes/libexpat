@@ -1,14 +1,13 @@
 #! /bin/sh
 
-name=mpc
-version=1.3.1
+name=libexpat
+version=2.6.4
 revision=1
-tarball_url="https://fosszone.csd.auth.gr/gnu/mpc/mpc-${version}.tar.gz"
-tarball_blake2b="76434e6f8830af3571836d51576bfebbc9701e9bbb5c4686f134081cd96cd90ae02f7ff42bf9e3957c7a7ba92b6b2d9cdabe18f0269271147521cd7f6a2d551c"
-source_imagedeps="git"
+tarball_url="https://github.com/libexpat/libexpat/releases/download/R_2_6_4/expat-${version}.tar.xz"
+tarball_blake2b="70d716722358db8d0acb2c74dbbc9d2362d04a0b856eab6b6d723614b656cf6aad9f6646339e0a32b4151db2e9541439bcb81ec87791e5e6ec0bd36a3ca067cc"
 source_hostdeps="automake autoconf libtool pkg-config"
 hostdeps="gcc autoconf automake libtool pkg-config"
-deps="core-libs gmp mpfr"
+deps="core-libs"
 
 prepare() {
     autotools_recursive_regen
