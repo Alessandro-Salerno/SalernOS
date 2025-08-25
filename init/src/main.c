@@ -53,7 +53,4 @@ int main(void) {
     if (INTERPRET_OK != r) {
         IERR("failed to run init");
     }
-
-    while (1)
-        ;
 }
