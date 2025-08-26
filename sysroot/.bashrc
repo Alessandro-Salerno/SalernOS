@@ -14,3 +14,4 @@ export PS1="${BRIGHT_RED}root${BRIGHT_MAGENTA}@${BRIGHT_YELLOW}\h ${BRIGHT_GREEN
 
 eval "$(dircolors -b /.dircolors)"
 alias ls="ls --color=auto"
+alias python="PYTHONHASHSEED=0 python"
