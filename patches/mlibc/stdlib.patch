@@ -1,0 +1,443 @@
+diff -uNr mlibc-clean/options/ansi/generic/stdlib.cpp mlibc-workdir/options/ansi/generic/stdlib.cpp
+--- mlibc-clean/options/ansi/generic/stdlib.cpp	2025-07-16 22:33:46.000000000 +0200
++++ mlibc-workdir/options/ansi/generic/stdlib.cpp	2025-08-26 16:12:17.757775798 +0200
+@@ -1,26 +1,26 @@
+ 
++#include <ctype.h>
+ #include <errno.h>
++#include <limits.h>
++#include <setjmp.h>
++#include <signal.h>
+ #include <stdint.h>
++#include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+-#include <signal.h>
+-#include <ctype.h>
+-#include <stdio.h>
+ #include <wchar.h>
+-#include <setjmp.h>
+-#include <limits.h>
+ 
+-#include <frg/random.hpp>
+-#include <mlibc/debug.hpp>
+ #include <bits/ensure.h>
+ #include <bits/sigset_t.h>
++#include <frg/random.hpp>
++#include <mlibc/debug.hpp>
+ 
+ #include <mlibc/allocator.hpp>
+-#include <mlibc/charcode.hpp>
+ #include <mlibc/ansi-sysdeps.hpp>
++#include <mlibc/charcode.hpp>
++#include <mlibc/global-config.hpp>
+ #include <mlibc/strtofp.hpp>
+ #include <mlibc/strtol.hpp>
+-#include <mlibc/global-config.hpp>
+ 
+ #if __MLIBC_POSIX_OPTION
+ #include <pthread.h>
+@@ -30,36 +30,28 @@
+ void __mlibc_do_finalize();
+ 
+ namespace {
+-	// According to the first paragraph of [C11 7.22.7],
+-	// mblen(), mbtowc() and wctomb() have an internal state.
+-	// The string functions mbstowcs() and wcstombs() do *not* have this state.
+-	thread_local __mlibc_mbstate mblen_state = __MLIBC_MBSTATE_INITIALIZER;
+-	thread_local __mlibc_mbstate mbtowc_state = __MLIBC_MBSTATE_INITIALIZER;
+-}
+-
+-double atof(const char *string) {
+-	return strtod(string, NULL);
+-}
+-int atoi(const char *string) {
+-	return strtol(string, nullptr, 10);
+-}
+-long atol(const char *string) {
+-	return strtol(string, nullptr, 10);
+-}
+-long long atoll(const char *string) {
+-	return strtoll(string, nullptr, 10);
+-}
++// According to the first paragraph of [C11 7.22.7],
++// mblen(), mbtowc() and wctomb() have an internal state.
++// The string functions mbstowcs() and wcstombs() do *not* have this state.
++thread_local __mlibc_mbstate mblen_state = __MLIBC_MBSTATE_INITIALIZER;
++thread_local __mlibc_mbstate mbtowc_state = __MLIBC_MBSTATE_INITIALIZER;
++} // namespace
++
++double atof(const char *string) { return strtod(string, NULL); }
++int atoi(const char *string) { return strtol(string, nullptr, 10); }
++long atol(const char *string) { return strtol(string, nullptr, 10); }
++long long atoll(const char *string) { return strtoll(string, nullptr, 10); }
+ 
+ // POSIX extensions but are here for simplicities sake. Forward declaration is here
+ // to avoid exporting sigprocmask when posix is disabled.
+ int sigprocmask(int, const sigset_t *__restrict, sigset_t *__restrict);
+ extern "C" {
+-	__attribute__((__returns_twice__)) int __sigsetjmp(sigjmp_buf buffer, int savesigs) {
+-		buffer[0].__savesigs = savesigs;
+-		if (savesigs)
+-			sigprocmask(0, NULL, &buffer[0].__sigset);
+-		return 0;
+-	}
++__attribute__((__returns_twice__)) int __sigsetjmp(sigjmp_buf buffer, int savesigs) {
++	buffer[0].__savesigs = savesigs;
++	if (savesigs)
++		sigprocmask(0, NULL, &buffer[0].__sigset);
++	return 0;
++}
+ }
+ 
+ __attribute__((__noreturn__)) void siglongjmp(sigjmp_buf buffer, int value) {
+@@ -108,13 +100,9 @@
+ 	return x;
+ }
+ 
+-int rand_r(unsigned *seed) {
+-	return temper(*seed = *seed * 1103515245 + 12345) / 2;
+-}
++int rand_r(unsigned *seed) { return temper(*seed = *seed * 1103515245 + 12345) / 2; }
+ 
+-void srand(unsigned int s) {
+-	__mlibc_rand_engine.seed(s);
+-}
++void srand(unsigned int s) { __mlibc_rand_engine.seed(s); }
+ 
+ void *aligned_alloc(size_t alignment, size_t size) {
+ 	void *ptr;
+@@ -135,19 +123,18 @@
+ 		return nullptr;
+ 	}
+ 	return ptr;
+-
+ }
+ void *calloc(size_t count, size_t size) {
+ 	// we want to ensure that count*size > SIZE_MAX doesn't happen
+ 	// to prevent overflowing, we divide both sides of the inequality by size and check with that
+-	if(size && count > (SIZE_MAX / size)) {
++	if (size && count > (SIZE_MAX / size)) {
+ 		errno = EINVAL;
+ 		return NULL;
+ 	}
+ 
+ 	// TODO: this could be done more efficient if the OS gives us already zero'd pages
+ 	void *ptr = malloc(count * size);
+-	if(!ptr)
++	if (!ptr)
+ 		return nullptr;
+ 	memset(ptr, 0, count * size);
+ 	return ptr;
+@@ -190,7 +177,7 @@
+ 	// TODO: the function pointer types are not compatible;
+ 	// the conversion here is undefined behavior. its fine to do
+ 	// this on the x86_64 abi though.
+-	__cxa_atexit((void (*) (void *))func, nullptr, nullptr);
++	__cxa_atexit((void (*)(void *))func, nullptr, nullptr);
+ 	return 0;
+ }
+ int at_quick_exit(void (*func)(void)) {
+@@ -204,9 +191,7 @@
+ 	mlibc::sys_exit(status);
+ }
+ 
+-void _Exit(int status) {
+-	mlibc::sys_exit(status);
+-}
++void _Exit(int status) { mlibc::sys_exit(status); }
+ 
+ // getenv() is provided by POSIX
+ void quick_exit(int) {
+@@ -220,8 +205,11 @@
+ 	int status = -1;
+ 	pid_t child;
+ 
+-	MLIBC_CHECK_OR_ENOSYS(mlibc::sys_fork && mlibc::sys_waitpid &&
+-			mlibc::sys_execve && mlibc::sys_sigprocmask && mlibc::sys_sigaction, -1);
++	MLIBC_CHECK_OR_ENOSYS(
++	    mlibc::sys_fork && mlibc::sys_waitpid && mlibc::sys_execve && mlibc::sys_sigprocmask
++	        && mlibc::sys_sigaction,
++	    -1
++	);
+ 
+ #if __MLIBC_POSIX_OPTION
+ 	pthread_testcancel();
+@@ -251,9 +239,7 @@
+ 		mlibc::sys_sigaction(SIGQUIT, &old_quit, nullptr);
+ 		mlibc::sys_sigprocmask(SIG_SETMASK, &old_mask, nullptr);
+ 
+-		const char *args[] = {
+-			"sh", "-c", command, nullptr
+-		};
++		const char *args[] = {"sh", "-c", command, nullptr};
+ 
+ 		mlibc::sys_execve("/bin/sh", const_cast<char **>(args), environ);
+ 		_Exit(127);
+@@ -282,21 +268,26 @@
+ 	__builtin_unreachable();
+ }
+ 
+-void *bsearch(const void *key, const void *base, size_t count, size_t size,
+-		int (*compare)(const void *, const void *)) {
++void *bsearch(
++    const void *key,
++    const void *base,
++    size_t count,
++    size_t size,
++    int (*compare)(const void *, const void *)
++) {
+ 	// Invariant: Element is in the interval [i, j).
+ 	size_t i = 0;
+ 	size_t j = count;
+ 
+-	while(i < j) {
++	while (i < j) {
+ 		size_t k = (j - i) / 2;
+ 		auto element = reinterpret_cast<const char *>(base) + (i + k) * size;
+ 		auto res = compare(key, element);
+-		if(res < 0) {
++		if (res < 0) {
+ 			j = i + k;
+-		}else if(res > 0) {
++		} else if (res > 0) {
+ 			i = i + k + 1;
+-		}else{
++		} else {
+ 			return const_cast<char *>(element);
+ 		}
+ 	}
+@@ -311,26 +302,29 @@
+ 	return compare(a, b);
+ }
+ 
+-void qsort(void *base, size_t count, size_t size,
+-		int (*compare)(const void *, const void *)) {
+-	return qsort_r(base, count, size, qsort_callback, (void *) compare);
++void qsort(void *base, size_t count, size_t size, int (*compare)(const void *, const void *)) {
++	return qsort_r(base, count, size, qsort_callback, (void *)compare);
+ }
+ 
+-void qsort_r(void *base, size_t count, size_t size,
+-		int (*compare)(const void *, const void *, void *),
+-		void *arg) {
++void qsort_r(
++    void *base,
++    size_t count,
++    size_t size,
++    int (*compare)(const void *, const void *, void *),
++    void *arg
++) {
+ 	// TODO: implement a faster sort
+-	for(size_t i = 0; i < count; i++) {
++	for (size_t i = 0; i < count; i++) {
+ 		void *u = (void *)((uintptr_t)base + i * size);
+-		for(size_t j = i + 1; j < count; j++) {
++		for (size_t j = i + 1; j < count; j++) {
+ 			void *v = (void *)((uintptr_t)base + j * size);
+-			if(compare(u, v, arg) <= 0)
++			if (compare(u, v, arg) <= 0)
+ 				continue;
+ 
+ 			// swap u and v
+ 			char *u_bytes = (char *)u;
+ 			char *v_bytes = (char *)v;
+-			for(size_t k = 0; k < size; k++) {
++			for (size_t k = 0; k < size; k++) {
+ 				char temp = u_bytes[k];
+ 				u_bytes[k] = v_bytes[k];
+ 				v_bytes[k] = temp;
+@@ -339,17 +333,11 @@
+ 	}
+ }
+ 
+-int abs(int num) {
+-	return num < 0 ? -num : num;
+-}
++int abs(int num) { return num < 0 ? -num : num; }
+ 
+-long labs(long num) {
+-	return num < 0 ? -num : num;
+-}
++long labs(long num) { return num < 0 ? -num : num; }
+ 
+-long long llabs(long long num) {
+-	return num < 0 ? -num : num;
+-}
++long long llabs(long long num) { return num < 0 ? -num : num; }
+ 
+ div_t div(int number, int denom) {
+ 	div_t r;
+@@ -378,19 +366,22 @@
+ 	mlibc::code_seq<const char> nseq{mbs, mbs + mb_limit};
+ 	mlibc::code_seq<wchar_t> wseq{&wc, &wc + 1};
+ 
+-	if(!mbs) {
++	if (!mbs) {
+ 		mblen_state = __MLIBC_MBSTATE_INITIALIZER;
+ 		return cc->has_shift_states;
+ 	}
+ 
+-	if(auto e = cc->decode_wtranscode(nseq, wseq, mblen_state); e != mlibc::charcode_error::null)
++	if (auto e = cc->decode_wtranscode(nseq, wseq, mblen_state); e != mlibc::charcode_error::null)
+ 		__ensure(!"decode_wtranscode() errors are not handled");
+ 	return nseq.it - mbs;
+ }
+ 
+ int mbtowc(wchar_t *__restrict wc, const char *__restrict mb, size_t max_size) {
+ 	auto cc = mlibc::current_charcode();
+-	__ensure(max_size);
++	if (!max_size) {
++		errno = -EILSEQ;
++		return -1;
++	}
+ 
+ 	// If wc is NULL, decode into a single local character which we discard
+ 	// to obtain the length.
+@@ -403,7 +394,7 @@
+ 			mlibc::code_seq<wchar_t> wseq{wc, wc + 1};
+ 			mlibc::code_seq<const char> nseq{mb, mb + frg::min(max_size, MB_CUR_MAX)};
+ 			auto e = cc->decode_wtranscode(nseq, wseq, mbtowc_state);
+-			switch(e) {
++			switch (e) {
+ 				// We keep the state, so we can simply return here.
+ 				case mlibc::charcode_error::input_underflow:
+ 				case mlibc::charcode_error::null: {
+@@ -414,11 +405,15 @@
+ 					return -1;
+ 				}
+ 				case mlibc::charcode_error::dirty: {
+-					mlibc::panicLogger() << "decode_wtranscode() charcode_error::dirty errors are not handled" << frg::endlog;
++					mlibc::panicLogger()
++					    << "decode_wtranscode() charcode_error::dirty errors are not handled"
++					    << frg::endlog;
+ 					break;
+ 				}
+ 				case mlibc::charcode_error::output_overflow: {
+-					mlibc::panicLogger() << "decode_wtranscode() charcode_error::output_overflow errors are not handled" << frg::endlog;
++					mlibc::panicLogger() << "decode_wtranscode() charcode_error::output_overflow "
++					                        "errors are not handled"
++					                     << frg::endlog;
+ 					break;
+ 				}
+ 			}
+@@ -432,10 +427,43 @@
+ 		return cc->has_shift_states;
+ 	}
+ }
+-
+-int wctomb(char *, wchar_t) {
+-	__ensure(!"Not implemented");
+-	__builtin_unreachable();
++#define IS_CODEUNIT(c) ((unsigned)(c) - 0xdf80 < 0x80)
++size_t wcrtomb(char *s, wchar_t wc, mbstate_t *st) {
++	if (!s)
++		return 1;
++	if ((unsigned)wc < 0x80) {
++		*s = wc;
++		return 1;
++	} else if (MB_CUR_MAX == 1) {
++		if (!IS_CODEUNIT(wc)) {
++			errno = EILSEQ;
++			return -1;
++		}
++		*s = wc;
++		return 1;
++	} else if ((unsigned)wc < 0x800) {
++		*s++ = 0xc0 | (wc >> 6);
++		*s = 0x80 | (wc & 0x3f);
++		return 2;
++	} else if ((unsigned)wc < 0xd800 || (unsigned)wc - 0xe000 < 0x2000) {
++		*s++ = 0xe0 | (wc >> 12);
++		*s++ = 0x80 | ((wc >> 6) & 0x3f);
++		*s = 0x80 | (wc & 0x3f);
++		return 3;
++	} else if ((unsigned)wc - 0x10000 < 0x100000) {
++		*s++ = 0xf0 | (wc >> 18);
++		*s++ = 0x80 | ((wc >> 12) & 0x3f);
++		*s++ = 0x80 | ((wc >> 6) & 0x3f);
++		*s = 0x80 | (wc & 0x3f);
++		return 4;
++	}
++	errno = EILSEQ;
++	return -1;
++}
++int wctomb(char *s, wchar_t wc) {
++	if (!s)
++		return 0;
++	return wcrtomb(s, wc, 0);
+ }
+ 
+ size_t mbstowcs(wchar_t *__restrict wcs, const char *__restrict mbs, size_t wc_limit) {
+@@ -444,19 +472,20 @@
+ 	mlibc::code_seq<const char> nseq{mbs, nullptr};
+ 	mlibc::code_seq<wchar_t> wseq{wcs, wcs + wc_limit};
+ 
+-	if(!wcs) {
++	if (!wcs) {
+ 		size_t size;
+-		if(auto e = cc->decode_wtranscode_length(nseq, &size, st); e != mlibc::charcode_error::null)
++		if (auto e = cc->decode_wtranscode_length(nseq, &size, st);
++		    e != mlibc::charcode_error::null)
+ 			__ensure(!"decode_wtranscode() errors are not handled");
+ 		return size;
+ 	}
+ 
+-	if(auto e = cc->decode_wtranscode(nseq, wseq, st); e != mlibc::charcode_error::null) {
++	if (auto e = cc->decode_wtranscode(nseq, wseq, st); e != mlibc::charcode_error::null) {
+ 		__ensure(!"decode_wtranscode() errors are not handled");
+ 		__builtin_unreachable();
+-	}else{
++	} else {
+ 		size_t n = wseq.it - wcs;
+-		if(n < wc_limit) // Null-terminate resulting wide string.
++		if (n < wc_limit) // Null-terminate resulting wide string.
+ 			wcs[n] = 0;
+ 		return n;
+ 	}
+@@ -470,9 +499,8 @@
+ void free(void *ptr) {
+ 	// TODO: Print PID only if POSIX option is enabled.
+ 	if (mlibc::globalConfig().debugMalloc) {
+-		mlibc::infoLogger() << "mlibc (PID ?): free() on "
+-				<< ptr << frg::endlog;
+-		if((uintptr_t)ptr & 1)
++		mlibc::infoLogger() << "mlibc (PID ?): free() on " << ptr << frg::endlog;
++		if ((uintptr_t)ptr & 1)
+ 			mlibc::infoLogger() << __builtin_return_address(0) << frg::endlog;
+ 	}
+ 	getAllocator().free(ptr);
+@@ -482,8 +510,7 @@
+ 	auto nptr = getAllocator().allocate(size);
+ 	// TODO: Print PID only if POSIX option is enabled.
+ 	if (mlibc::globalConfig().debugMalloc)
+-		mlibc::infoLogger() << "mlibc (PID ?): malloc() returns "
+-				<< nptr << frg::endlog;
++		mlibc::infoLogger() << "mlibc (PID ?): malloc() returns " << nptr << frg::endlog;
+ 	return nptr;
+ }
+ 
+@@ -491,18 +518,18 @@
+ 	auto nptr = getAllocator().reallocate(ptr, size);
+ 	// TODO: Print PID only if POSIX option is enabled.
+ 	if (mlibc::globalConfig().debugMalloc)
+-		mlibc::infoLogger() << "mlibc (PID ?): realloc() on "
+-				<< ptr << " returns " << nptr << frg::endlog;
++		mlibc::infoLogger() << "mlibc (PID ?): realloc() on " << ptr << " returns " << nptr
++		                    << frg::endlog;
+ 	return nptr;
+ }
+ 
+ int posix_memalign(void **out, size_t align, size_t size) {
+-	if(align < sizeof(void *))
++	if (align < sizeof(void *))
+ 		return EINVAL;
+-	if(align & (align - 1)) // Make sure that align is a power of two.
++	if (align & (align - 1)) // Make sure that align is a power of two.
+ 		return EINVAL;
+ 	auto p = getAllocator().allocate(frg::max(align, size));
+-	if(!p)
++	if (!p)
+ 		return ENOMEM;
+ 	// Hope that the alignment was respected. This works on the current allocator.
+ 	// TODO: Make the allocator alignment-aware.
