@@ -61,13 +61,6 @@ int sys_pause() {
 
 #ifndef MLIBC_BUILDING_RTLD
 
-int sys_readlink(const char *path,
-                 void       *data,
-                 size_t      max_size,
-                 ssize_t    *length) {
-    STUB_ENOSYS
-}
-
 int sys_link(const char *old_path, const char *new_path) {
     STUB_ENOSYS
 }
@@ -77,10 +70,6 @@ int sys_linkat(int         olddirfd,
                int         newdirfd,
                const char *new_path,
                int         flags) {
-    STUB_ENOSYS
-}
-
-int sys_unlinkat(int fd, const char *path, int flags) {
     STUB_ENOSYS
 }
 

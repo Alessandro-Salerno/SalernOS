@@ -735,6 +735,59 @@ int sys_unlockpt(int fd) {
     return 0;
 }
 
+int sys_readlinkat(int         dirfd,
+                   const char *path,
+                   void       *buffer,
+                   size_t      max_size,
+                   ssize_t    *length) {
+    struct __syscall_ret ret =
+        __syscall(__SALERNOS_SYSCALL_READLINKAT, dirfd, path, buffer, max_size);
+
+    if (0 != ret.errno) {
+        return ret.errno;
+    }
+
+    *length = ret.ret;
+    return 0;
+}
+
+int sys_readlink(const char *path,
+                 void       *data,
+                 size_t      max_size,
+                 ssize_t    *length) {
+    return sys_readlinkat(AT_FDCWD, path, data, max_size, length);
+}
+
+int sys_symlinkat(const char *target_path, int dirfd, const char *link_path) {
+    struct __syscall_ret ret =
+        __syscall(__SALERNOS_SYSCALL_SYMLINKAT, target_path, dirfd, link_path);
+
+    if (0 != ret.errno) {
+        return ret.errno;
+    }
+
+    return 0;
+}
+
+int sys_symlink(const char *target_path, const char *link_path) {
+    return sys_symlinkat(target_path, AT_FDCWD, link_path);
+}
+
+int sys_unlinkat(int fd, const char *path, int flags) {
+    struct __syscall_ret ret =
+        __syscall(__SALERNOS_SYSCALL_UNLINKAT, fd, path, flags);
+
+    if (0 != ret.errno) {
+        return ret.errno;
+    }
+
+    return 0;
+}
+
+int sys_rmdir(const char *path) {
+    return sys_unlinkat(AT_FDCWD, path, AT_REMOVEDIR);
+}
+
 #endif
 
 } // namespace mlibc

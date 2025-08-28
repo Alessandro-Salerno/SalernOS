@@ -26,7 +26,7 @@ kernel:
 iso_root/initrd:
 	$(MAKE) install_sysroot && \
 		cd iso_root/ && \
-		tar -cf ../initrd --dereference --hard-dereference . && \
+		tar -cf ../initrd --hard-dereference . && \
 		mv ../initrd ./initrd
 
 limine:
