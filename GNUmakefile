@@ -27,6 +27,11 @@ iso_root/initrd:
 	$(MAKE) install_sysroot && \
 		cd iso_root/ && \
 		tar -cf ../initrd --hard-dereference . && \
+		mv ./EFI ../EFI && \
+		mv ./boot ../boot && \
+		rm -rf ./* && \
+		mv ../EFI ./EFI && \
+		mv ../boot ./boot && \
 		mv ../initrd ./initrd
 
 limine:
