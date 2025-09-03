@@ -124,21 +124,7 @@ int sys_mkdirat(int dirfd, const char *path, mode_t mode) {
     STUB_ENOSYS
 }
 
-int sys_socket(int domain, int type_and_flags, int proto, int *fd) {
-    STUB_ENOSYS
-}
-
 int sys_socketpair(int domain, int type_and_flags, int proto, int *fds) {
-    STUB_ENOSYS
-}
-
-int sys_bind(int fd, const struct sockaddr *addr_ptr, socklen_t addr_length) {
-    STUB_ENOSYS
-}
-
-int sys_connect(int                    fd,
-                const struct sockaddr *addr_ptr,
-                socklen_t              addr_length) {
     STUB_ENOSYS
 }
 
@@ -147,14 +133,6 @@ int sys_fchownat(int         dirfd,
                  uid_t       owner,
                  gid_t       group,
                  int         flags) {
-    STUB_ENOSYS
-}
-
-int sys_accept(int              fd,
-               int             *newfd,
-               struct sockaddr *addr_ptr,
-               socklen_t       *addr_length,
-               int              flags) {
     STUB_ENOSYS
 }
 
@@ -174,18 +152,10 @@ int sys_setsockopt(int         fd,
     STUB_ENOSYS
 }
 
-int sys_msg_recv(int sockfd, struct msghdr *hdr, int flags, ssize_t *length) {
-    STUB_ENOSYS
-}
-
 int sys_peername(int              fd,
                  struct sockaddr *addr_ptr,
                  socklen_t        max_addr_length,
                  socklen_t       *actual_length) {
-    STUB_ENOSYS
-}
-
-int sys_listen(int fd, int backlog) {
     STUB_ENOSYS
 }
 

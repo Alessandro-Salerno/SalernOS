@@ -17,6 +17,7 @@
 #include <string.h>
 #include <sys/select.h>
 #include <sys/stat.h>
+#include <sys/uio.h>
 #include <unistd.h>
 
 #define STUB_ONLY                                   \
@@ -48,8 +49,12 @@ void sys_exit(int code) {
 #ifndef MLIBC_BUILDING_RTLD
 
 int sys_write(int fd, const void *buf, size_t count, ssize_t *bytes_written) {
+    struct iovec iov;
+    iov.iov_base = (void *)buf;
+    iov.iov_len  = count;
+
     struct __syscall_ret ret =
-        __syscall(__SALERNOS_SYSCALL_WRITE, fd, buf, count);
+        __syscall(__SALERNOS_SYSCALL_WRITEV, fd, &iov, 1);
 
     if (ret.errno != 0) {
         return ret.errno;
@@ -62,8 +67,10 @@ int sys_write(int fd, const void *buf, size_t count, ssize_t *bytes_written) {
 #endif
 
 int sys_read(int fd, void *buf, size_t count, ssize_t *bytes_read) {
-    struct __syscall_ret ret =
-        __syscall(__SALERNOS_SYSCALL_READ, fd, buf, count);
+    struct iovec iov;
+    iov.iov_base             = (void *)buf;
+    iov.iov_len              = count;
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_READV, fd, &iov, 1);
 
     if (ret.errno != 0) {
         return ret.errno;
@@ -788,6 +795,121 @@ int sys_rmdir(const char *path) {
     return sys_unlinkat(AT_FDCWD, path, AT_REMOVEDIR);
 }
 
+int sys_socket(int domain, int type_and_flags, int proto, int *fd) {
+    struct __syscall_ret ret =
+        __syscall(__SALERNOS_SYSCALL_SOCKET, domain, type_and_flags, proto);
+
+    if (0 != ret.errno) {
+        return ret.errno;
+    }
+
+    *fd = (int)ret.ret;
+    return 0;
+}
+
+int sys_bind(int fd, const struct sockaddr *addr_ptr, socklen_t addr_length) {
+    struct __syscall_ret ret =
+        __syscall(__SALERNOS_SYSCALL_BIND, fd, addr_ptr, addr_length);
+
+    if (0 != ret.errno) {
+        return ret.errno;
+    }
+
+    return 0;
+}
+
+int sys_listen(int fd, int backlog) {
+    struct __syscall_ret ret =
+        __syscall(__SALERNOS_SYSCALL_LISTEN, fd, backlog);
+
+    if (0 != ret.errno) {
+        return ret.errno;
+    }
+
+    return 0;
+}
+
+int fcntl_helper(int fd, int request, int *result, ...) {
+    va_list args;
+    va_start(args, result);
+    if (!mlibc::sys_fcntl) {
+        return ENOSYS;
+    }
+    int ret = mlibc::sys_fcntl(fd, request, args, result);
+    va_end(args);
+    return ret;
+}
+
+int sys_accept(int              fd,
+               int             *newfd,
+               struct sockaddr *addr_ptr,
+               socklen_t       *addr_length,
+               int              flags) {
+    (void)flags;
+    struct __syscall_ret ret =
+        __syscall(__SALERNOS_SYSCALL_ACCEPT, fd, addr_ptr, addr_length);
+
+    if (0 != ret.errno) {
+        return ret.errno;
+    }
+
+    *newfd = (int)ret.ret;
+
+    if (flags & SOCK_NONBLOCK) {
+        int fcntl_ret = 0;
+        fcntl_helper(*newfd, F_GETFL, &fcntl_ret);
+        fcntl_helper(*newfd, F_SETFL, &fcntl_ret, fcntl_ret | O_NONBLOCK);
+    }
+
+    if (flags & SOCK_CLOEXEC) {
+        int fcntl_ret = 0;
+        fcntl_helper(*newfd, F_GETFD, &fcntl_ret);
+        fcntl_helper(*newfd, F_SETFD, &fcntl_ret, fcntl_ret | FD_CLOEXEC);
+    }
+
+    return 0;
+}
+
+int sys_connect(int                    fd,
+                const struct sockaddr *addr_ptr,
+                socklen_t              addr_length) {
+    struct __syscall_ret ret =
+        __syscall(__SALERNOS_SYSCALL_CONNECT, fd, addr_ptr, addr_length);
+
+    if (0 != ret.errno) {
+        return ret.errno;
+    }
+
+    return 0;
+}
+
 #endif
+
+int sys_msg_send(int                  sockfd,
+                 const struct msghdr *hdr,
+                 int                  flags,
+                 ssize_t             *length) {
+    struct __syscall_ret ret =
+        __syscall(__SALERNOS_SYSCALL_SENDMSG, sockfd, hdr, flags);
+
+    if (0 != ret.errno) {
+        return ret.errno;
+    }
+
+    *length = (ssize_t)ret.ret;
+    return 0;
+}
+
+int sys_msg_recv(int sockfd, struct msghdr *hdr, int flags, ssize_t *length) {
+    struct __syscall_ret ret =
+        __syscall(__SALERNOS_SYSCALL_RECVMSG, sockfd, hdr, flags);
+
+    if (0 != ret.errno) {
+        return ret.errno;
+    }
+
+    *length = (ssize_t)ret.ret;
+    return 0;
+}
 
 } // namespace mlibc

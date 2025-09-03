@@ -2,8 +2,8 @@
 #include <stdint.h>
 
 #define __SALERNOS_SYSCALL_TEST          0
-#define __SALERNOS_SYSCALL_WRITE         1
-#define __SALERNOS_SYSCALL_READ          2
+#define __SALERNOS_SYSCALL_WRITEV        1
+#define __SALERNOS_SYSCALL_READV         2
 #define __SALERNOS_SYSCALL_EXECVE        3
 #define __SALERNOS_SYSCALL_FORK          4
 #define __SALERNOS_SYSSCALL_SYSINFO      5
@@ -46,6 +46,13 @@
 #define __SALERNOS_SYSCALL_READLINKAT    42
 #define __SALERNOS_SYSCALL_SYMLINKAT     43
 #define __SALERNOS_SYSCALL_UNLINKAT      44
+#define __SALERNOS_SYSCALL_SOCKET        45
+#define __SALERNOS_SYSCALL_BIND          46
+#define __SALERNOS_SYSCALL_LISTEN        47
+#define __SALERNOS_SYSCALL_ACCEPT        48
+#define __SALERNOS_SYSCALL_CONNECT       49
+#define __SALERNOS_SYSCALL_SENDMSG       50
+#define __SALERNOS_SYSCALL_RECVMSG       51
 
 struct __syscall_ret {
     uint64_t ret;

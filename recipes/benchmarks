@@ -25,6 +25,8 @@ build() {
     x86_64-salernos-mlibc-gcc testsigheavy.c -O2 -o testsigheavy
     x86_64-salernos-mlibc-gcc testcwd.c -O2 -o testcwd
     x86_64-salernos-mlibc-gcc testpty.c -O2 -o testpty
+    x86_64-salernos-mlibc-gcc testsockbase.c -O2 -o testsockbase
+    x86_64-salernos-mlibc-gcc testsock.c -O2 -o testsock
 }
 
 package() {
@@ -43,4 +45,6 @@ package() {
     cp ./testsigheavy "${dest_dir}"
     cp ./testcwd "${dest_dir}"
     cp ./testpty "${dest_dir}"
+    cp ./testsockbase "${dest_dir}"
+    cp ./testsock "${dest_dir}"
 }
