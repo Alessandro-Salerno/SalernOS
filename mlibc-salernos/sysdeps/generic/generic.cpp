@@ -883,6 +883,19 @@ int sys_connect(int                    fd,
     return 0;
 }
 
+int sys_setitimer(int                     which,
+                  const struct itimerval *new_value,
+                  struct itimerval       *old_value) {
+    struct __syscall_ret ret =
+        __syscall(__SALERNOS_SYSCALL_SETITIMER, which, new_value, old_value);
+
+    if (0 != ret.errno) {
+        return ret.errno;
+    }
+
+    return 0;
+}
+
 #endif
 
 int sys_msg_send(int                  sockfd,

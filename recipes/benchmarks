@@ -27,6 +27,8 @@ build() {
     x86_64-salernos-mlibc-gcc testpty.c -O2 -o testpty
     x86_64-salernos-mlibc-gcc testsockbase.c -O2 -o testsockbase
     x86_64-salernos-mlibc-gcc testsock.c -O2 -o testsock
+    x86_64-salernos-mlibc-gcc testalarm.c -O2 -o testalarm
+    x86_64-salernos-mlibc-gcc testfb.c -O2 -o testfb
 }
 
 package() {
@@ -47,4 +49,6 @@ package() {
     cp ./testpty "${dest_dir}"
     cp ./testsockbase "${dest_dir}"
     cp ./testsock "${dest_dir}"
+    cp ./testalarm "${dest_dir}"
+    cp ./testfb "${dest_dir}"
 }

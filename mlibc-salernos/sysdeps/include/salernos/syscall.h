@@ -53,6 +53,7 @@
 #define __SALERNOS_SYSCALL_CONNECT       49
 #define __SALERNOS_SYSCALL_SENDMSG       50
 #define __SALERNOS_SYSCALL_RECVMSG       51
+#define __SALERNOS_SYSCALL_SETITIMER     52
 
 struct __syscall_ret {
     uint64_t ret;

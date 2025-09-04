@@ -1,0 +1,144 @@
+diff --git xf86-input-mouse-clean/configure.ac xf86-input-mouse-workdir/configure.ac
+index 1d871b2..3aff36a 100644
+--- xf86-input-mouse-clean/configure.ac
++++ xf86-input-mouse-workdir/configure.ac
+@@ -62,7 +62,7 @@ AC_SUBST(inputdir)
+ 
+ # X Server SDK location is required to install xf86-mouse-properties.h
+ # This location is also relayed in the xorg-mouse.pc file
+-sdkdir=`$PKG_CONFIG --variable=sdkdir xorg-server`
++sdkdir="$includedir"
+ 
+ # Workaround overriding sdkdir to be able to create a tarball when user has no
+ # write permission in sdkdir. See DISTCHECK_CONFIGURE_FLAGS in Makefile.am
+@@ -84,6 +84,9 @@ case $host_os in
+   gnu*)
+     OS_MOUSE_NAME=hurd
+     ;;
++  salernos*)
++    OS_MOUSE_NAME=salernos
++    ;;
+ esac
+ AC_SUBST([OS_MOUSE_NAME])
+ 
+diff --git xf86-input-mouse-workdir/src/salernos_mouse.c xf86-input-mouse-workdir/src/salernos_mouse.c
+new file mode 100644
+index 0000000..b83cad1
+--- /dev/null
++++ xf86-input-mouse-workdir/src/salernos_mouse.c
+@@ -0,0 +1,115 @@
++#ifdef HAVE_XORG_CONFIG_H
++#include <xorg-config.h>
++#endif
++
++#include <xorg-server.h>
++#include <X11/X.h>
++#include <X11/Xproto.h>
++#include "inputstr.h"
++#include "scrnintstr.h"
++#include "mipointer.h"
++
++#include "xf86.h"
++#include "xf86Xinput.h"
++#include "mouse.h"
++#include "xf86_OSlib.h"
++#include "xisb.h"
++
++#include <stdio.h>
++#include <errno.h>
++#include <stdbool.h>
++#include <stdint.h>
++
++#include <sys/stat.h>
++
++struct salernos_mouse_data {
++   int  x_variation;
++   int  y_variation;
++   int  z_variation;
++   bool is_left;
++   bool is_right;
++   bool is_middle;
++   bool is_4th;
++   bool is_5th;
++};
++
++static void salernosReadInput(InputInfoPtr pInfo) {
++    MouseDevPtr mouse = pInfo->private;
++    struct salernos_mouse_data packet;
++
++    if (read(pInfo->fd, &packet, sizeof(struct salernos_mouse_data))) {
++        int b = mouse->lastButtons;
++        b &= ~0x7;
++
++        b |= packet.is_right  ? 0b00001 : 0;
++        b |= packet.is_middle ? 0b00010 : 0;
++        b |= packet.is_left   ? 0b00100 : 0;
++        b |= packet.is_4th    ? 0b01000 : 0;
++        b |= packet.is_5th    ? 0b10000 : 0;
++        mouse->PostEvent(pInfo, b, packet.x_variation, packet.y_variation, packet.z_variation, 0);
++    }
++}
++
++static Bool salernosPreInit(InputInfoPtr pInfo, const char *proto, int flag) {
++    MouseDevPtr mouse;
++
++    mouse = pInfo->private;
++
++    mouse->protocol = proto;
++
++    xf86ProcessCommonOptions(pInfo, pInfo->options);
++
++    pInfo->fd = xf86OpenSerial(pInfo->options);
++    if (pInfo->fd == -1) {
++        xf86Msg(X_ERROR, "%s: cannot open mouse device!\n", pInfo->name);
++        return FALSE;
++    }
++
++    mouse->CommonOptions(pInfo);
++    pInfo->read_input = salernosReadInput;
++    return true;
++}
++
++#define DEVPATH "/dev/ps2mouse"
++
++static const char *getdevice(InputInfoPtr pInfo, const char *proto, int flag){
++    pInfo->options = xf86AddNewOption(pInfo->options, "Device", DEVPATH);
++    return DEVPATH;
++}
++
++static int interfacesupport() {
++    return MSE_PS2;
++}
++
++static const char *names[] = {
++    "PlaceholderMouseDev", NULL
++};
++
++static const char **protonames() {
++    return names;
++}
++
++static const char *defaultproto() {
++    return "PlaceholderMouseDev";
++}
++
++static Bool isdefault(const char *protocol) {
++    return strcmp(protocol, defaultproto()) == 0;
++}
++
++OSMouseInfoPtr OSMouseInit(int flag) {
++    OSMouseInfoPtr p;
++
++    p = calloc(sizeof(OSMouseInfoRec), 1);
++
++    if (p == NULL)
++        return NULL;
++
++    p->SupportedInterfaces = interfacesupport;
++    p->BuiltinNames = protonames;
++    p->FindDevice = getdevice;
++    p->DefaultProtocol = defaultproto;
++    p->CheckProtocol = isdefault;
++    p->PreInit = salernosPreInit;
++    return p;
++}

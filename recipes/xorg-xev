@@ -1,0 +1,29 @@
+#! /bin/sh
+
+name=xorg-xev
+version=1.2.6
+revision=1
+tarball_url="https://xorg.freedesktop.org/archive/individual/app/xev-${version}.tar.gz"
+tarball_sha512="a79450880250d9b8122b5598f6eafa9bf02bf538eae7a9bd5707b260c84eaeca0454abb3dc40965ea6f733a261ee3eb90238c998bdc22b90bd1f8ce7c8b977d0"
+source_hostdeps="automake autoconf libtool pkg-config"
+source_deps="xorg-util-macros"
+hostdeps="gcc autoconf automake libtool pkg-config"
+deps="core-libs libx11 libxt libxext libxmu libxrender libxi libxcb libxrandr"
+
+prepare() {
+    autotools_recursive_regen
+}
+
+configure() {
+    autotools_configure
+}
+
+build() {
+    make -j${parallelism}
+}
+
+package() {
+    DESTDIR="${dest_dir}" make install
+
+    post_package_strip
+}

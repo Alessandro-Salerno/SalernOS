@@ -1,0 +1,29 @@
+#! /bin/sh
+
+name=xorg-xmodmap
+version=1.0.11
+revision=1
+tarball_url="https://xorg.freedesktop.org/archive/individual/app/xmodmap-${version}.tar.gz"
+tarball_sha512="221d42ce3c5b263b1859562ca3041c484874723552545e42e47624ad5285b4a4047a75d3fbb9c25f4dd8c9527cfb735b8187b62dc9231e4ed5923fafe883b089"
+source_hostdeps="automake autoconf libtool pkg-config"
+source_deps="xorg-util-macros"
+hostdeps="gcc autoconf automake libtool pkg-config"
+deps="core-libs libx11 libxt libxext libxmu libxrender libxi libxcb libxrandr"
+
+prepare() {
+    autotools_recursive_regen
+}
+
+configure() {
+    autotools_configure
+}
+
+build() {
+    make -j${parallelism}
+}
+
+package() {
+    DESTDIR="${dest_dir}" make install
+
+    post_package_strip
+}

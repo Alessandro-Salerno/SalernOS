@@ -86,6 +86,7 @@ if not no_headers
     install_headers(
 		'include/sys/mount.h',
 		'include/sys/statfs.h',
+		'include/sys/sysmacros.h',
 		subdir: 'sys',
 	)
 
@@ -93,6 +94,11 @@ if not no_headers
       'include/mntent.h',
       'include/pty.h',
     )
+
+    install_headers(
+		'include/linux/fb.h',
+		subdir: 'linux',
+	)
 
 endif
 

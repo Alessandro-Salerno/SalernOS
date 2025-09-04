@@ -1,0 +1,30 @@
+#! /bin/sh
+
+name=xorg-xrdb
+version=1.2.2
+revision=1
+tarball_url="https://www.x.org/archive/individual/app/xrdb-${version}.tar.gz"
+tarball_blake2b="c863ec5d7cab9af264876916881ae029f25ae744c26fe6b57b6279faf97207564d7fbc54e6939eeff864c31d4a26f6b7bd8b9ce5955cd564a0f6f200968d7767"
+source_hostdeps="autoconf automake libtool pkg-config"
+source_deps="xorg-util-macros"
+hostdeps="gcc autoconf automake libtool pkg-config"
+builddeps="xbitmaps"
+deps="core-libs libx11 libxmu libxcursor"
+
+prepare() {
+    autotools_recursive_regen
+}
+
+configure() {
+    autotools_configure
+}
+
+build() {
+    make -j${parallelism}
+}
+
+package() {
+    make DESTDIR=${dest_dir} install
+
+    post_package_strip
+}
