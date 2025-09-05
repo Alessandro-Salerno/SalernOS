@@ -896,6 +896,34 @@ int sys_setitimer(int                     which,
     return 0;
 }
 
+int sys_mkdirat(int dirfd, const char *path, mode_t mode) {
+    struct __syscall_ret ret =
+        __syscall(__SALERNOS_SYSCALL_MKDIRAT, dirfd, path, mode);
+
+    if (0 != ret.errno) {
+        return ret.errno;
+    }
+
+    return 0;
+}
+
+int sys_mkdir(const char *path, mode_t mode) {
+    return sys_mkdirat(AT_FDCWD, path, mode);
+}
+
+int sys_pause() {
+    poll(NULL, 0, -1);
+    return 0;
+}
+
+int sys_sleep(time_t *secs, long *nanos) {
+    time_t s   = (NULL != secs) ? *secs : 0;
+    time_t n   = (NULL != nanos) ? *nanos : 0;
+    time_t tot = s * 1000UL + n / 1000000UL;
+    poll(NULL, 0, tot);
+    return 0;
+}
+
 #endif
 
 int sys_msg_send(int                  sockfd,

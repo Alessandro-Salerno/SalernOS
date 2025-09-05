@@ -53,14 +53,6 @@ namespace mlibc {
 
 #ifndef MLIBC_BUILDING_RTLD
 
-int sys_pause() {
-    STUB_ENOSYS
-}
-
-#endif
-
-#ifndef MLIBC_BUILDING_RTLD
-
 int sys_link(const char *old_path, const char *new_path) {
     STUB_OK
 }
@@ -73,8 +65,16 @@ int sys_linkat(int         olddirfd,
     STUB_OK
 }
 
+int sys_fchmodat(int fd, const char *pathname, mode_t mode, int flags) {
+    STUB_OK
+}
+
 int sys_fchmod(int fd, mode_t mode) {
     STUB_OK
+}
+
+int sys_chmod(const char *pathname, mode_t mode) {
+    return sys_fchmodat(AT_FDCWD, pathname, mode, 0);
 }
 
 int sys_fsync(int) {
@@ -91,7 +91,6 @@ int sys_vm_protect(void *pointer, size_t size, int prot) {
     STUB_OK
 }
 
-// TODO: kinda a stub
 int sys_anon_free(void *pointer, size_t size) {
     return sys_vm_unmap(pointer, size);
 }
@@ -106,21 +105,13 @@ gid_t sys_getgid() {
     STUB_OK
 }
 
-int sys_setgid(gid_t gid){STUB_ENOSYS}
+int sys_setgid(gid_t gid){STUB_OK}
 
 gid_t sys_getegid() {
     STUB_OK
 }
 
 int sys_ttyname(int fd, char *buf, size_t size) {
-    STUB_ENOSYS
-}
-
-int sys_mkdir(const char *path, mode_t mode) {
-    STUB_ENOSYS
-}
-
-int sys_mkdirat(int dirfd, const char *path, mode_t mode) {
     STUB_ENOSYS
 }
 
@@ -133,7 +124,7 @@ int sys_fchownat(int         dirfd,
                  uid_t       owner,
                  gid_t       group,
                  int         flags) {
-    STUB_ENOSYS
+    STUB_OK
 }
 
 int sys_getsockopt(int fd,
@@ -279,10 +270,6 @@ int sys_gethostname(char *buffer, size_t bufsize) {
 }
 
 int sys_sethostname(const char *buffer, size_t bufsize) {
-    STUB_ENOSYS
-}
-
-int sys_sleep(time_t *secs, long *nanos) {
     STUB_ENOSYS
 }
 
