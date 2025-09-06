@@ -29,6 +29,7 @@ build() {
     x86_64-salernos-mlibc-gcc testsock.c -O2 -o testsock
     x86_64-salernos-mlibc-gcc testalarm.c -O2 -o testalarm
     x86_64-salernos-mlibc-gcc testfb.c -O2 -o testfb
+    x86_64-salernos-mlibc-gcc testlibfbdevhw.c -O2 -o testlibfbdevhw
 }
 
 package() {
@@ -51,4 +52,5 @@ package() {
     cp ./testsock "${dest_dir}"
     cp ./testalarm "${dest_dir}"
     cp ./testfb "${dest_dir}"
+    cp ./testlibfbdevhw "${dest_dir}"
 }

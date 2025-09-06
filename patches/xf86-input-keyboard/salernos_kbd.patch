@@ -1,53 +1,3 @@
-diff --git xf86-input-keyboard-clean/configure.ac xf86-input-keyboard-workdir/configure.ac
-index 0f71ce3..024edd3 100644
---- xf86-input-keyboard-clean/configure.ac
-+++ xf86-input-keyboard-workdir/configure.ac
-@@ -57,6 +57,11 @@ AC_SUBST(inputdir)
- 
- # The keyboard driver code is O/S specific
- case $host_os in
-+
-+  salernos*)
-+    IS_SALERNOS="yes"
-+    ;;
-+
-   linux*)
-     AC_MSG_ERROR([This is not the keyboard driver you are looking for. Use evdev or libinput.])
-     ;;
-@@ -95,6 +100,7 @@ case $host_os in
- esac
- AC_SUBST([OS_FLAGS])
- 
-+AM_CONDITIONAL(SALERNOS, [test "x$IS_SALERNOS" = xyes])
- AM_CONDITIONAL(BSD, [test "x$IS_BSD" = xyes])
- AM_CONDITIONAL(SOLARIS, [test "x$IS_SOLARIS" = xyes])
- AM_CONDITIONAL(HURD, [test "x$IS_HURD" = xyes])
-diff --git xf86-input-keyboard-clean/src/Makefile.am xf86-input-keyboard-workdir/src/Makefile.am
-index 52f5f4d..3899868 100644
---- xf86-input-keyboard-clean/src/Makefile.am
-+++ xf86-input-keyboard-workdir/src/Makefile.am
-@@ -26,10 +26,15 @@ kbd_drv_la_SOURCES = kbd.c xf86OSKbd.h xf86Keymap.h atKeynames.h
- kbd_drv_la_LIBADD = $(XORG_LIBS)
- kbd_drv_ladir = @inputdir@
- 
-+SALERNOS_SRCS = salernos_kbd.c at_scancode.c
- BSD_SRCS = bsd_KbdMap.c bsd_kbd.c bsd_kbd.h at_scancode.c
- HURD_SRCS = hurd_kbd.c at_scancode.c
- SOLARIS_SRCS = sun_kbd.c sun_kbd.h sun_kbdMap.c
- 
-+if SALERNOS
-+kbd_drv_la_SOURCES += $(SALERNOS_SRCS)
-+endif
-+
- if BSD
- kbd_drv_la_SOURCES += $(BSD_SRCS)
- endif
-@@ -42,4 +47,4 @@ if HURD
- kbd_drv_la_SOURCES += $(HURD_SRCS)
- endif
- 
--EXTRA_DIST = $(BSD_SRCS) $(HURD_SRCS) $(SOLARIS_SRCS)
-+EXTRA_DIST = $(SALERNOS_SRCS) $(BSD_SRCS) $(HURD_SRCS) $(SOLARIS_SRCS)
 diff --git xf86-input-keyboard-workdir/src/salernos_KbdMap.c xf86-input-keyboard-workdir/src/salernos_KbdMap.c
 new file mode 100644
 index 0000000..2ca19fd
@@ -108,7 +58,7 @@ index 0000000..9de5fa7
 +#include <stdio.h>
 +#include <errno.h>
 +
-+// salernos stuff
++// stuff i don't know
 +
 +#define KBPACKET_FLAGS_RELEASED 1
 +#define KBPACKET_FLAGS_LEFTCTRL 2
