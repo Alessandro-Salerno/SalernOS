@@ -1,0 +1,22 @@
+diff -uNr xf86-input-keyboard-clean/src/Makefile.in xf86-input-keyboard-workdir/src/Makefile.in
+--- xf86-input-keyboard-clean/src/Makefile.in	2022-07-11 01:28:13.000000000 +0200
++++ xf86-input-keyboard-workdir/src/Makefile.in	2025-09-06 18:42:59.101359318 +0200
+@@ -154,15 +154,16 @@
+ kbd_drv_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+ am__kbd_drv_la_SOURCES_DIST = kbd.c xf86OSKbd.h xf86Keymap.h \
+ 	atKeynames.h bsd_KbdMap.c bsd_kbd.c bsd_kbd.h at_scancode.c \
+-	sun_kbd.c sun_kbd.h sun_kbdMap.c hurd_kbd.c
++	sun_kbd.c sun_kbd.h sun_kbdMap.c hurd_kbd.c salernos_kbd.c
+ am__objects_1 = bsd_KbdMap.lo bsd_kbd.lo at_scancode.lo
+ @BSD_TRUE@am__objects_2 = $(am__objects_1)
+ am__objects_3 = sun_kbd.lo sun_kbdMap.lo
+ @SOLARIS_TRUE@am__objects_4 = $(am__objects_3)
+ am__objects_5 = hurd_kbd.lo at_scancode.lo
+ @HURD_TRUE@am__objects_6 = $(am__objects_5)
++am__objects_7 = salernos_kbd.lo at_scancode.lo
+ am_kbd_drv_la_OBJECTS = kbd.lo $(am__objects_2) $(am__objects_4) \
+-	$(am__objects_6)
++	$(am__objects_6) $(am__objects_7)
+ kbd_drv_la_OBJECTS = $(am_kbd_drv_la_OBJECTS)
+ AM_V_lt = $(am__v_lt_@AM_V@)
+ am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
