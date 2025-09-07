@@ -17,4 +17,4 @@ fi
 
 alias ls="ls --color=auto"
 alias python="PYTHONHASHSEED=0 python"
-alias xserver="LD_PRELOAD=/usr/lib/xorg/modules/libshadow.so:/usr/lib/xorg/modules/libshadowfb.so:/usr/lib/xorg/modules/libwfb.so:/usr/lib/xorg/modules/libfbdevhw.so Xorg"
+alias xserver="LD_PRELOAD=/usr/lib/xorg/modules/libshadow.so:/usr/lib/xorg/modules/libwfb.so:/usr/lib/xorg/modules/libfbdevhw.so:/usr/bin/Xorg Xorg"
