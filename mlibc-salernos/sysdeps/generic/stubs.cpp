@@ -231,13 +231,6 @@ int sys_setsockopt(int         fd,
     }
 }
 
-int sys_peername(int              fd,
-                 struct sockaddr *addr_ptr,
-                 socklen_t        max_addr_length,
-                 socklen_t       *actual_length) {
-    STUB_ENOSYS
-}
-
 int sys_inotify_create(int flags, int *fd) {
     STUB_ENOSYS
 }

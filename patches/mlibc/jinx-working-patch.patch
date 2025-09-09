@@ -1,7 +1,7 @@
 diff -urN --no-dereference mlibc-clean/meson.build mlibc-workdir/meson.build
 --- mlibc-clean/meson.build
 +++ mlibc-workdir/meson.build
-@@ -264,6 +264,10 @@
+@@ -265,6 +265,10 @@
  	internal_conf.set10('MLIBC_MAP_DSO_SEGMENTS', true)
  	internal_conf.set10('MLIBC_MAP_FILE_WINDOWS', true)
  	subdir('sysdeps/astral')

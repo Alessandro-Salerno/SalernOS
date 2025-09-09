@@ -17,8 +17,7 @@ prepare() {
 configure() {
         SYSROOT=${sysroot_dir} \
     autotools_configure \
-        --disable-pciaccess \
-        --host=${OS_TRIPLET}
+        --disable-pciaccess
 }
 
 build() {

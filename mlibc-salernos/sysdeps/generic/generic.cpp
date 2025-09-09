@@ -924,6 +924,21 @@ int sys_sleep(time_t *secs, long *nanos) {
     return 0;
 }
 
+int sys_peername(int              fd,
+                 struct sockaddr *addr_ptr,
+                 socklen_t        max_addr_length,
+                 socklen_t       *actual_length) {
+    struct __syscall_ret ret = __syscall(
+        __SALERNOS_SYSCALL_GETPEERNAME, fd, addr_ptr, max_addr_length);
+
+    if (0 != ret.errno) {
+        return ret.errno;
+    }
+
+    *actual_length = (socklen_t)ret.ret;
+    return 0;
+}
+
 #endif
 
 int sys_msg_send(int                  sockfd,
