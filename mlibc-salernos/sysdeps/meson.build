@@ -100,6 +100,11 @@ if not no_headers
 		subdir: 'linux',
 	)
 
+    install_headers(
+		'include/salernos/ktty.h',
+		subdir: 'salernos',
+	)
+
 endif
 
 if not headers_only

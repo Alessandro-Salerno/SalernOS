@@ -15,12 +15,14 @@ AlignConsecutiveShortCaseStatements:
   AcrossComments: true
   AlignCaseColons: false
 AllowShortFunctionsOnASingleLine: 'false'
-IndentCaseLabels: 'false'
+AllowShortEnumsOnASingleLine: false
 IndentWidth: '4'
 SpaceBeforeParens: ControlStatements
 SpacesInCStyleCastParentheses: 'false'
 SpacesInSquareBrackets: 'false'
 TabWidth: '4'
+IndentCaseLabels: true
+AllowShortLoopsOnASingleLine: true
 IncludeBlocks: Regroup
 IncludeCategories:
   - Regex:           '<[[:alnum:].\/-]+>'
@@ -33,4 +35,6 @@ BinPackArguments: false
 BinPackParameters: false
 ExperimentalAutoDetectBinPacking: false
 AllowAllParametersOfDeclarationOnNextLine: false
+AllowAllArgumentsOnNextLine: false
+PenaltyBreakAssignment: 1000
 ...

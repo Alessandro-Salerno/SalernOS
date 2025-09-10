@@ -4,6 +4,7 @@
 #include <init/log.h>
 #include <init/parse.h>
 #include <init/table.h>
+#include <salernos/ktty.h>
 #include <signal.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -21,13 +22,17 @@
 
 #define OPT_CLEAR 1
 
+#define TTY_TEXT 1
+#define TTY_GFX  2
+
 static int   g_active_options = 0;
 static int   g_tty_lock       = 1;
 static pid_t g_children[20] = {0}; // TODO: arbitrary number higher than TTY_MAX
 static int   g_num_children = 0;
 
 static struct table_entry g_values_entries[] = {
-    {"TTY_TEXT_MODE", TYPE_INT, .value.local = (int)1},
+    {"TTY_TEXT_MODE", TYPE_INT, .value.local = (int)TTY_TEXT},
+    {"TTY_GFX_MODE", TYPE_INT, .value.local = (int)TTY_GFX},
     {"OPT_CLEAR", TYPE_INT, .value.local = (int)OPT_CLEAR},
 };
 static struct table g_values = CONST_TABLE(g_values_entries);
@@ -209,6 +214,11 @@ static int cb_tty(struct directive *d) {
         int sid = setsid();
         ioctl(tty_fd, TIOCSCTTY, NULL);
         ILOG("moved %s on %s to session sid=%d", argv[0], tty_path, sid);
+
+        if (TTY_GFX == tty_mode) {
+            ILOG("switching tty %s to graphical mode", tty_path);
+            ioctl(tty_fd, KTTY_IOCTL_SETMODE, KTTY_MODE_GRAPHICS);
+        }
 
         ILOG("running %s on %s", argv[0], tty_path);
 

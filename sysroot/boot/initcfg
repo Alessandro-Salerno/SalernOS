@@ -1,13 +1,14 @@
 env TERM linux
-env HOME /
+env HOME /root
 env PATH /bin:/usr/bin:/usr/local/bin:/usr/sbin:/usr/local/sbin
 env SHELL /usr/bin/bash
+env DISPLAY :0
 
 enable $OPT_CLEAR
-tty /dev/tty0 $TTY_TEXT_MODE /usr/bin/bash
 tty /dev/tty1 $TTY_TEXT_MODE /usr/bin/bash
 tty /dev/tty2 $TTY_TEXT_MODE /usr/bin/bash
 tty /dev/tty3 $TTY_TEXT_MODE /usr/bin/bash
 tty /dev/tty4 $TTY_TEXT_MODE /usr/bin/bash
 tty /dev/tty5 $TTY_TEXT_MODE /usr/bin/bash
 tty /dev/tty6 $TTY_TEXT_MODE /usr/bin/bash
+tty /dev/tty0 $TTY_GFX_MODE /usr/bin/bash --noediting /root/.xinit

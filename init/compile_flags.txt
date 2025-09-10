@@ -1,1 +1,2 @@
 -Iinclude/
+-I../mlibc-salernos/sysdeps/include

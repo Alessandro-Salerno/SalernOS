@@ -49,6 +49,7 @@ autotools_configure() {
     autotools_configure_noflags "$@"
 }
 
+
 autotools_configure_noflags() {
     if [ -z "${configure_script_path}" ]; then
         configure_script_path="${source_dir}/configure"
