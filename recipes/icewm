@@ -1,0 +1,23 @@
+name=icewm
+revision=1
+version=3.8.2
+tarball_url="https://github.com/ice-wm/icewm/archive/${version}/icewm-${version}.tar.gz"
+tarball_sha512="e1bab36507bc87ddf0b4b9802f48af9efb72f0bff5734e8b77bac75695a9110eade47b1b52c6e69eec0fd6efdaa67dd20764034c9e1255f5784b418c7ec215c2"
+source_hostdeps="automake autoconf libtool pkg-config"
+source_deps="gettext"
+hostdeps="gcc autoconf automake libtool pkg-config"
+deps="core-libs libx11 fribidi libxpm libxft libxres fontconfig libxinerama libxcomposite libxdamage imlib2"
+
+configure() {
+	cmake_configure \
+	-DCFGFIR=/etc -DBUILD_TESTING=off \
+	${source_dir}
+}
+
+build() {
+	ninja -j${parallelism}
+}
+
+package() {
+	DESTDIR="${dest_dir}" ninja install
+}

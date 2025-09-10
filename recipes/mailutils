@@ -1,0 +1,35 @@
+#! /bin/sh
+
+name=mailutils
+version=3.18
+revision=1
+tarball_url="https://ftp.gnu.org/gnu/mailutils/mailutils-${version}.tar.xz"
+tarball_blake2b="7866a9c0419daaeaf277f266893030cda771804c636ce143e36a9cd1823280c2662b0696825387b3b0727115e0ab131ca376bd99445d4b4080f66289dca11316"
+source_hostdeps="automake autoconf libtool pkg-config"
+hostdeps="gcc autoconf automake libtool pkg-config"
+deps="core-libs"
+
+prepare() {
+    autoreconf -fvi
+}
+
+configure() {
+    cp -rp ${source_dir}/. ./
+
+        configure_script_path=./configure \
+    autotools_configure \
+        --disable-python \
+        --disable-build-imap4d
+}
+
+build() {
+    make -j${parallelism}
+}
+
+package() {
+    DESTDIR="${dest_dir}" make install
+
+    ln -s mail "${dest_dir}${prefix}"/bin/mailx
+
+    post_package_strip
+}

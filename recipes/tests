@@ -1,0 +1,373 @@
+#!/bin/sh
+
+name=tests
+version=0.0.1
+skip_pkg_check=yes
+revision=1
+imagedeps="git build-essential"
+hostdeps="gcc binutils libgcc-binaries"
+deps="core-libs"
+
+build() {
+    cat > test1.c <<EOF
+#define _XOPEN_SOURCE 600
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <pthread.h>
+#include <string.h>
+#include <errno.h>
+#include <termios.h>
+#define _XOPEN_SOURCE 600
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <pthread.h>
+#include <string.h>
+#include <poll.h>
+#include <errno.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <termios.h>
+
+struct closer_args {
+    int fd;
+};
+
+void *closer_thread(void *arg) {
+    struct closer_args *args = arg;
+    poll(NULL, 0, 2000); 
+    printf("[closer] Closing slave FD...\n");
+    close(args->fd);
+    poll(NULL, 0, 5000); 
+    return NULL;
+}
+
+int main(void) {
+    int master_fd, slave_fd;
+    char *slave_name;
+
+    master_fd = posix_openpt(O_RDWR | O_NOCTTY);
+    if (master_fd < 0) { perror("posix_openpt"); return 1; }
+
+    if (grantpt(master_fd) < 0 || unlockpt(master_fd) < 0) {
+        perror("grantpt/unlockpt");
+        return 1;
+    }
+
+    slave_name = ptsname(master_fd);
+    if (!slave_name) { perror("ptsname"); return 1; }
+
+    printf("Master FD: %d, Slave: %s\n", master_fd, slave_name);
+
+    slave_fd = open(slave_name, O_RDWR | O_NOCTTY);
+    if (slave_fd < 0) { perror("open slave"); return 1; }
+
+    pthread_t t;
+    struct closer_args args = { .fd = slave_fd };
+    pthread_create(&t, NULL, closer_thread, &args);
+
+    // Try reading from master in a loop
+    char buf[64];
+    while (1) {
+        ssize_t n = read(master_fd, buf, sizeof(buf));
+        if (n > 0) {
+            buf[n] = '\0';
+            printf("[master] Read: %s\n", buf);
+        } else if (n == 0) {
+            printf("[master] EOF (unexpected for PTM!)\n");
+            break;
+        } else {
+            if (errno == EIO) {
+                printf("[master] Read failed: EIO (expected after slave closes)\n");
+                break;
+            } else if (errno == EINTR) {
+                continue;
+            } else {
+                perror("[master] read");
+                break;
+            }
+        }
+        sleep(1);
+    }
+
+    pthread_join(t, NULL);
+    close(master_fd);
+    return 0;
+}
+EOF
+
+
+    cat > test2.c <<EOF
+    #define _XOPEN_SOURCE 600
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <pthread.h>
+#include <string.h>
+#include <poll.h>
+#include <errno.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <termios.h>
+
+struct thread_args {
+    int slave_fd;
+};
+
+void *closer_thread(void *arg) {
+    struct thread_args *args = arg;
+    sleep(2);  // give main thread time to start polling
+    printf("[closer] Closing slave FD...\n");
+    close(args->slave_fd);
+    return NULL;
+}
+
+int main(void) {
+    int master_fd, slave_fd;
+    char *slave_name;
+
+    // Open PTY master
+    master_fd = posix_openpt(O_RDWR | O_NOCTTY);
+    if (master_fd < 0) {
+        perror("posix_openpt");
+        exit(EXIT_FAILURE);
+    }
+
+    if (grantpt(master_fd) < 0 || unlockpt(master_fd) < 0) {
+        perror("grantpt/unlockpt");
+        exit(EXIT_FAILURE);
+    }
+
+    slave_name = ptsname(master_fd);
+    if (!slave_name) {
+        perror("ptsname");
+        exit(EXIT_FAILURE);
+    }
+
+    printf("PTY master: %d, slave: %s\n", master_fd, slave_name);
+
+    // Open slave side
+    slave_fd = open(slave_name, O_RDWR | O_NOCTTY);
+    if (slave_fd < 0) {
+        perror("open slave");
+        exit(EXIT_FAILURE);
+    }
+
+    // Start the closer thread
+    pthread_t t;
+    struct thread_args args = { .slave_fd = slave_fd };
+    pthread_create(&t, NULL, closer_thread, &args);
+
+    // Poll on the slave FD
+    struct pollfd pfd;
+    pfd.fd = master_fd;
+    pfd.events = POLLIN | POLLOUT | POLLHUP;
+
+    printf("[poller] Polling on slave FD...\n");
+
+    while (1) {
+        int ret = poll(&pfd, 1, 5000); // 5s timeout
+        if (ret < 0) {
+            perror("poll");
+            break;
+        } else if (ret == 0) {
+            printf("[poller] Timeout waiting for event\n");
+            continue;
+        }
+
+        printf("[poller] Events: ");
+        if (pfd.revents & POLLIN)   printf("POLLIN ");
+        if (pfd.revents & POLLOUT)  printf("POLLOUT ");
+        if (pfd.revents & POLLHUP)  printf("POLLHUP ");
+        if (pfd.revents & POLLERR)  printf("POLLERR ");
+        if (pfd.revents & POLLNVAL) printf("POLLNVAL ");
+        printf("\n");
+
+        if (pfd.revents & POLLHUP) {
+            printf("[poller] Peer closed (hangup detected)\n");
+            break;
+        }
+        usleep(500*1000);
+    }
+
+    pthread_join(t, NULL);
+    close(master_fd);
+    return 0;
+}
+EOF
+
+    cat > test3.c <<EOF
+#define _XOPEN_SOURCE 600
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <pthread.h>
+#include <string.h>
+#include <errno.h>
+#include <termios.h>
+#define _XOPEN_SOURCE 600
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <pthread.h>
+#include <string.h>
+#include <poll.h>
+#include <errno.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <termios.h>
+
+struct closer_args {
+    int fd;
+};
+
+void *closer_thread(void *arg) {
+    struct closer_args *args = arg;
+    poll(NULL, 0, 2000); 
+    printf("[closer] Closing slave FD...\n");
+    close(args->fd);
+    poll(NULL, 0, 5000); 
+    return NULL;
+}
+
+int main(void) {
+    int master_fd, slave_fd;
+    char *slave_name;
+
+    master_fd = posix_openpt(O_RDWR | O_NOCTTY);
+    if (master_fd < 0) { perror("posix_openpt"); return 1; }
+
+    if (grantpt(master_fd) < 0 || unlockpt(master_fd) < 0) {
+        perror("grantpt/unlockpt");
+        return 1;
+    }
+
+    slave_name = ptsname(master_fd);
+    if (!slave_name) { perror("ptsname"); return 1; }
+
+    printf("Master FD: %d, Slave: %s\n", master_fd, slave_name);
+
+    slave_fd = open(slave_name, O_RDWR | O_NOCTTY);
+    if (slave_fd < 0) { perror("open slave"); return 1; }
+
+    pthread_t t;
+    struct closer_args args = { .fd = slave_fd };
+    pthread_create(&t, NULL, closer_thread, &args);
+
+    // Try reading from master in a loop
+    const char buf[] = "Hello world this is a test that is designed to be very lonhello\n";
+    while (1) {
+        ssize_t n = write(master_fd, buf, sizeof(buf) - 1);
+        if (n > 0) {
+            printf("[master] Write: \n" );
+        } else if (n == 0) {
+            printf("[master] EOF (unexpected for PTM!)\n");
+            break;
+        } else {
+            if (errno == EIO) {
+                printf("[master] Write failed: EIO (expected after slave closes)\n");
+                break;
+            } else if (errno == EINTR) {
+                continue;
+            } else {
+                perror("[master] read");
+                break;
+            }
+        }
+        sleep(1);
+    }
+
+    pthread_join(t, NULL);
+    close(master_fd);
+    return 0;
+}
+EOF
+
+    cat > test4.c <<EOF
+    #define _GNU_SOURCE
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <signal.h>
+#include <poll.h>
+#include <sys/ioctl.h>
+#include <pty.h>
+#include <sys/wait.h>
+
+volatile int got_sighup = 0;
+
+void sighup_handler(int sig) {
+    got_sighup = 1;
+}
+
+int main() {
+    int master_fd, slave_fd;
+    char slave_name[256];
+    pid_t pid;
+    
+    printf("Creating PTY...\n");
+    if (openpty(&master_fd, &slave_fd, slave_name, NULL, NULL) == -1) {
+        perror("openpty");
+        exit(1);
+    }
+    
+    printf("PTY created: master=%d, slave=%s\n", master_fd, slave_name);
+    
+    if ((pid = fork()) == 0) {
+        // Child: become session leader with PTY as controlling terminal
+        close(master_fd);  // Don't need master in child
+        
+        setsid();  // New session
+        ioctl(slave_fd, TIOCSCTTY, 0);  // Make PTY our controlling terminal
+        
+        signal(SIGHUP, sighup_handler);
+        
+        printf("Child %d: PTY %s is my controlling terminal\n", getpid(), ttyname(slave_fd));
+        printf("Child %d: Waiting for SIGHUP...\n", getpid());
+        
+        // Wait for SIGHUP
+        while (!got_sighup) {
+            poll(NULL, 0, 1000); 
+        }
+        
+        printf("Child %d: Got SIGHUP!\n", getpid());
+        exit(0);
+        
+    } else {
+        // Parent: hold master, then close it
+        close(slave_fd);  // Don't need slave in parent
+        
+        printf("Parent %d: Sleeping 3 seconds, then closing master...\n", getpid());
+        poll(NULL, 0, 3000); 
+
+        
+        printf("Parent %d: Closing master FD %d (this should send SIGHUP to child)\n", getpid(), master_fd);
+        close(master_fd);  // This should trigger SIGHUP
+        
+        // Wait for child to exit
+        int status;
+        wait(&status);
+        printf("Parent %d: Child exited with status %d\n", getpid(), WEXITSTATUS(status));
+    }
+    
+    return 0;
+}
+EOF
+
+    ${OS_TRIPLET}-gcc test1.c -o test1
+    ${OS_TRIPLET}-gcc test2.c -o test2
+    ${OS_TRIPLET}-gcc test3.c -o test3
+    ${OS_TRIPLET}-gcc test4.c -o test4
+
+}
+
+package() {
+    mkdir -p "${dest_dir}"
+    cp ./test* "${dest_dir}"
+}

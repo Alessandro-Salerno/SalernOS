@@ -1,4 +1,5 @@
-#!/bin/sh
+#! /bin/sh
+
 name=pkg-config
 from_source=pkg-config
 revision=1
@@ -28,4 +29,7 @@ SystemIncludePaths: ${sysroot_dir}/usr/include
 SystemLibraryPaths: ${sysroot_dir}/usr/lib
 EOF
     ln -s pkgconf "${dest_dir}${prefix}/bin/${OS_TRIPLET}-pkg-config"
+
+        strip_command=strip \
+    post_package_strip
 }

@@ -1,8 +1,8 @@
-diff --git xf86-input-mouse-clean/configure xf86-input-mouse-workdir/configure
-index 70f3013..458bec4 100755
---- xf86-input-mouse-clean/configure
-+++ xf86-input-mouse-workdir/configure
-@@ -19591,7 +19591,7 @@ inputdir=${moduledir}/input
+diff --git xf86-input-mouse-clean/configure.ac xf86-input-mouse-workdir/configure.ac
+index 1d871b2..3aff36a 100644
+--- xf86-input-mouse-clean/configure.ac
++++ xf86-input-mouse-workdir/configure.ac
+@@ -62,7 +62,7 @@ AC_SUBST(inputdir)
  
  # X Server SDK location is required to install xf86-mouse-properties.h
  # This location is also relayed in the xorg-mouse.pc file
@@ -11,21 +11,21 @@ index 70f3013..458bec4 100755
  
  # Workaround overriding sdkdir to be able to create a tarball when user has no
  # write permission in sdkdir. See DISTCHECK_CONFIGURE_FLAGS in Makefile.am
-@@ -19619,6 +19619,9 @@ case $host_os in
+@@ -84,6 +84,9 @@ case $host_os in
    gnu*)
      OS_MOUSE_NAME=hurd
      ;;
 +  salernos*)
-+    OS_MOUSE_NAME=ironclad
++    OS_MOUSE_NAME=salernos
 +    ;;
  esac
+ AC_SUBST([OS_MOUSE_NAME])
  
- 
-diff --git xf86-input-mouse-workdir/src/ironclad_mouse.c xf86-input-mouse-workdir/src/ironclad_mouse.c
+diff --git xf86-input-mouse-workdir/src/salernos_mouse.c xf86-input-mouse-workdir/src/salernos_mouse.c
 new file mode 100644
 index 0000000..b83cad1
 --- /dev/null
-+++ xf86-input-mouse-workdir/src/ironclad_mouse.c
++++ xf86-input-mouse-workdir/src/salernos_mouse.c
 @@ -0,0 +1,115 @@
 +#ifdef HAVE_XORG_CONFIG_H
 +#include <xorg-config.h>
@@ -51,7 +51,7 @@ index 0000000..b83cad1
 +
 +#include <sys/stat.h>
 +
-+struct ironclad_mouse_data {
++struct salernos_mouse_data {
 +   int  x_variation;
 +   int  y_variation;
 +   int  z_variation;
@@ -62,11 +62,11 @@ index 0000000..b83cad1
 +   bool is_5th;
 +};
 +
-+static void ironcladReadInput(InputInfoPtr pInfo) {
++static void salernosReadInput(InputInfoPtr pInfo) {
 +    MouseDevPtr mouse = pInfo->private;
-+    struct ironclad_mouse_data packet;
++    struct salernos_mouse_data packet;
 +
-+    if (read(pInfo->fd, &packet, sizeof(struct ironclad_mouse_data))) {
++    if (read(pInfo->fd, &packet, sizeof(struct salernos_mouse_data))) {
 +        int b = mouse->lastButtons;
 +        b &= ~0x7;
 +
@@ -79,7 +79,7 @@ index 0000000..b83cad1
 +    }
 +}
 +
-+static Bool ironcladPreInit(InputInfoPtr pInfo, const char *proto, int flag) {
++static Bool salernosPreInit(InputInfoPtr pInfo, const char *proto, int flag) {
 +    MouseDevPtr mouse;
 +
 +    mouse = pInfo->private;
@@ -95,7 +95,7 @@ index 0000000..b83cad1
 +    }
 +
 +    mouse->CommonOptions(pInfo);
-+    pInfo->read_input = ironcladReadInput;
++    pInfo->read_input = salernosReadInput;
 +    return true;
 +}
 +
@@ -111,7 +111,7 @@ index 0000000..b83cad1
 +}
 +
 +static const char *names[] = {
-+    "IroncladMouseDev", NULL
++    "SalernosMouseDev", NULL
 +};
 +
 +static const char **protonames() {
@@ -119,7 +119,7 @@ index 0000000..b83cad1
 +}
 +
 +static const char *defaultproto() {
-+    return "IroncladMouseDev";
++    return "SalernosMouseDev";
 +}
 +
 +static Bool isdefault(const char *protocol) {
@@ -139,6 +139,6 @@ index 0000000..b83cad1
 +    p->FindDevice = getdevice;
 +    p->DefaultProtocol = defaultproto;
 +    p->CheckProtocol = isdefault;
-+    p->PreInit = ironcladPreInit;
++    p->PreInit = salernosPreInit;
 +    return p;
 +}

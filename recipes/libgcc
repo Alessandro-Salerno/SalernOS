@@ -1,11 +1,13 @@
-#!/bin/sh
+#! /bin/sh
 
 name=libgcc
-version=1
+from_source=gcc-host
+clean_workdirs=no
+skip_pkg_check=yes
 revision=1
-hostdeps="gcc autoconf-2.69 automake libtool pkg-config"
-imagedeps="build-essential"
-deps="mlibc-headers mlibc freestnd-c-hdrs freestnd-cxx-hdrs"
+hostdeps="gcc pkg-config"
+imagedeps="experimental:build-essential"
+deps="mlibc"
 
 build() {
     cd "${base_dir}"/host-builds/gcc/build

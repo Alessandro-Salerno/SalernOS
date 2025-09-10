@@ -1,11 +1,13 @@
 #! /bin/sh
 
 name=xf86-input-keyboard
-version=2.1.0
+version=2.0.0
 revision=1
 tarball_url="https://www.x.org/releases/individual/driver/xf86-input-keyboard-${version}.tar.gz"
-tarball_blake2b="a3d440b1e49df09ee50938a80c98c5274acaffd8824f0cb912844ae26831d3814c4cc2c23b52dbce88847a5bd33614b09b99f01d72ba102905e30166a52412f0"
-hostdeps="gcc pkg-config"
+tarball_sha512=2243d6b93315c0fdd97e57f62f86fcb26117a512817bfee0a5af76f686d5f8a5c8ea7b3f4e543e2d8ffc8d52129b6b575b9dc2a59e42fa8b23d8ba223544715a
+source_hostdeps="automake autoconf libtool pkg-config"
+source_deps="xorg-util-macros"
+hostdeps="gcc autoconf automake libtool pkg-config"
 deps="core-libs xorg-server xorg-util-macros"
 
 prepare() {

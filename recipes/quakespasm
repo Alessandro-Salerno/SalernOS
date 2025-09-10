@@ -1,0 +1,18 @@
+name=quakespasm
+version=0.96.3
+revision=1
+tarball_url="https://sourceforge.net/projects/quakespasm/files/Source/quakespasm-${version}.tar.gz"
+tarball_sha512="e8500d566a6cc6532c81823aa7775a48d9edcecc053528477d3c360ba17b8895b5fbda20b2679f571c9996da58d411eed1f975ef9435beb63a3261c14082f18e"
+hostdeps="gcc"
+deps="core-libs libx11 libxext sdl2-compat"
+
+
+build() {
+    cp -rp ${source_dir}/. ./
+    # workaround taken from astral to avoid sdl2-config
+	(cd Quake && make CC=${OS_TRIPLET}-gcc STRIP= DEBUG=1 DO_USERDIRS=1 USE_CODEC_MP3=0 USE_CODEC_VORBIS=0 USE_SDL2=1 SDL_CFLAGS="-I${sysroot_dir}/${prefix}/include/SDL2" SDL_LIBS="-lSDL2" -j${parallelism})
+}
+package() {
+	install -Dm 755 "Quake/quakespasm" "${dest_dir}${prefix}/bin/quakespasm"
+	install -Dm 644 "Quake/quakespasm.pak" "${dest_dir}${prefix}/share/games/quake/quakespasm.pak"
+}

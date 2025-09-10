@@ -1,0 +1,67 @@
+diff --git fox-clean/configure.ac fox-workdir/configure.ac
+index ce0f651..189b5e8 100644
+--- fox-clean/configure.ac
++++ fox-workdir/configure.ac
+@@ -9,6 +9,8 @@ AC_INIT(fox,[fox_version],jeroen@fox-toolkit.com)
+ AC_CONFIG_SRCDIR([include/fx.h])
+ AM_INIT_AUTOMAKE([foreign])
+ 
++PKG_PROG_PKG_CONFIG
++
+ # Set version
+ FOX_MAJOR_VERSION=fox_major
+ FOX_MINOR_VERSION=fox_minor
+@@ -190,8 +192,8 @@ AC_MSG_CHECKING(for Xft support)
+ AC_ARG_WITH(xft,[  --with-xft              enable Xft support])
+ AC_MSG_RESULT([$with_xft])
+ if test "x$with_xft" != "xno"; then
+-XFTCFLAGS="-I/usr/include/freetype2"
+-XFTLIBS="-lfreetype -lfontconfig -lXft"
++XFTCFLAGS="$($PKG_CONFIG --cflags freetype2 fontconfig xft)"
++XFTLIBS="$($PKG_CONFIG --libs freetype2 fontconfig xft)"
+ saved_cppflags="${CXXFLAGS}"
+ CXXFLAGS="${CXXFLAGS} -DHAVE_XFT_H=1 $XFTCFLAGS"
+ X_BASE_LIBS="${X_BASE_LIBS} $XFTLIBS"
+diff --git fox-clean/include/FXStream.h fox-workdir/include/FXStream.h
+index 41fe97a..e82638a 100644
+--- fox-clean/include/FXStream.h
++++ fox-workdir/include/FXStream.h
+@@ -52,9 +52,9 @@ enum FXStreamStatus {
+ 
+ /// Stream seeking
+ enum FXWhence {
+-  FXFromStart=0,                /// Seek from start position
+-  FXFromCurrent=1,              /// Seek from current position
+-  FXFromEnd=2                   /// Seek from end position
++  FXFromStart=1,                /// Seek from start position
++  FXFromCurrent=2,              /// Seek from current position
++  FXFromEnd=4                   /// Seek from end position
+   };
+ 
+ 
+diff --git fox-clean/src/FXString.cpp fox-workdir/src/FXString.cpp
+index ce9aa68..3686f83 100644
+--- fox-clean/src/FXString.cpp
++++ fox-workdir/src/FXString.cpp
+@@ -2501,18 +2501,18 @@ FXString FXStringVal(FXuint num,FXint base){
+ 
+ 
+ // Formatting for reals
+-static const char *const expo[]={"%.*f","%.*E","%.*G"};
++static const char *const expo[]={"%f","%f","%f"};
+ 
+ 
+ // Conversion of float to string
+ FXString FXStringVal(FXfloat num,FXint prec,FXint exp){
+-  return FXStringFormat(expo[exp],prec,num);
++  return FXStringFormat("%f",num);
+   }
+ 
+ 
+ // Conversion of double to string
+ FXString FXStringVal(FXdouble num,FXint prec,FXint exp){
+-  return FXStringFormat(expo[exp],prec,num);
++  return FXStringFormat("%f",num);
+   }
+ 
+ 

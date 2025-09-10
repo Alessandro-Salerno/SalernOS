@@ -24,6 +24,21 @@ diff -urN --no-dereference python-clean/Objects/mimalloc/prim/unix/prim.c python
  #if defined(__linux__)
    #include <features.h>
    #include <fcntl.h>
+@@ -51,10 +55,10 @@
+   #include <sys/sysctl.h>
+ #endif
+ 
+-#if !defined(__HAIKU__) && !defined(__APPLE__) && !defined(__CYGWIN__) && !defined(_AIX) && !defined(__OpenBSD__) && !defined(__FreeBSD__) && !defined(__sun) && !defined(__NetBSD__)
+-  #define MI_HAS_SYSCALL_H
+-  #include <sys/syscall.h>
+-#endif
++// #if !defined(__HAIKU__) && !defined(__APPLE__) && !defined(__CYGWIN__) && !defined(_AIX) && !defined(__OpenBSD__) && !defined(__FreeBSD__) && !defined(__sun) && !defined(__NetBSD__)
++//   #define MI_HAS_SYSCALL_H
++//   #include <sys/syscall.h>
++// #endif
+ 
+ //------------------------------------------------------------------------------------
+ // Use syscalls for some primitives to allow for libraries that override open/read/close etc.
 @@ -156,6 +160,9 @@
  static int unix_madvise(void* addr, size_t size, int advice) {
    #if defined(__sun)
@@ -92,15 +107,3 @@ diff -urN --no-dereference python-clean/configure python-workdir/configure
  	# -u libsys_s pulls in all symbols in libsys
  	Darwin/*|iOS/*)
  		LINKFORSHARED="$extra_undefs -framework CoreFoundation"
-diff -uNr python-clean/Objects/mimalloc/prim/unix/prim.c python-workdir/Objects/mimalloc/prim/unix/prim.c
---- python-clean/Objects/mimalloc/prim/unix/prim.c	2025-06-11 17:36:57.000000000 +0200
-+++ python-workdir/Objects/mimalloc/prim/unix/prim.c	2025-08-26 11:40:58.020165031 +0200
-@@ -51,7 +51,7 @@
-   #include <sys/sysctl.h>
- #endif
- 
--#if !defined(__HAIKU__) && !defined(__APPLE__) && !defined(__CYGWIN__) && !defined(_AIX) && !defined(__OpenBSD__) && !defined(__FreeBSD__) && !defined(__sun) && !defined(__NetBSD__)
-+#if !defined(__HAIKU__) && !defined(__APPLE__) && !defined(__CYGWIN__) && !defined(_AIX) && !defined(__OpenBSD__) && !defined(__FreeBSD__) && !defined(__sun) && !defined(__NetBSD__) && !defined(__salernos__)
-   #define MI_HAS_SYSCALL_H
-   #include <sys/syscall.h>
- #endif

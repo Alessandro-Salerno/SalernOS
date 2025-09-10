@@ -146,7 +146,7 @@ meson_configure_noflags() {
     fi
 
     meson setup "${meson_source_dir}" \
-        --cross-file "${base_dir}/build-support/crossfile-$ARCHITECTURE" \
+        --cross-file "${base_dir}/build-support/cross_file-$ARCHITECTURE.txt" \
         --prefix=${prefix} \
         --sysconfdir=/etc \
         --localstatedir=/var \

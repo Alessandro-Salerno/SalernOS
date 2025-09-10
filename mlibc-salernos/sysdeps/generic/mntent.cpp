@@ -1,4 +1,4 @@
-// NOTE: this is not mine. It does NOT work on SalernOS, I'm just trying to make
+// NOTE: this is not mine. It does NOT work on Salernos, I'm just trying to make
 // autotools happy
 
 #include <bits/ensure.h>

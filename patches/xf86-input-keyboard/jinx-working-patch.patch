@@ -1,147 +1,65 @@
-diff --git xf86-input-keyboard-clean/configure xf86-input-keyboard-workdir/configure
-index 76f1212..c2b8867 100755
---- xf86-input-keyboard-clean/configure
-+++ xf86-input-keyboard-workdir/configure
-@@ -664,6 +664,8 @@ SOLARIS_FALSE
- SOLARIS_TRUE
- BSD_FALSE
- BSD_TRUE
-+IRONCLAD_FALSE
-+IRONCLAD_TRUE
- OS_FLAGS
- inputdir
- XORG_LIBS
-@@ -19840,6 +19842,10 @@ inputdir=${moduledir}/input
+diff --git xf86-input-keyboard-clean/configure.ac xf86-input-keyboard-workdir/configure.ac
+index 0f71ce3..024edd3 100644
+--- xf86-input-keyboard-clean/configure.ac
++++ xf86-input-keyboard-workdir/configure.ac
+@@ -57,6 +57,11 @@ AC_SUBST(inputdir)
  
  # The keyboard driver code is O/S specific
  case $host_os in
++
 +  salernos*)
-+    IS_IRONCLAD="yes"
++    IS_SALERNOS="yes"
 +    ;;
 +
    linux*)
-     as_fn_error $? "This is not the keyboard driver you are looking for. Use evdev or libinput." "$LINENO" 5
+     AC_MSG_ERROR([This is not the keyboard driver you are looking for. Use evdev or libinput.])
      ;;
-@@ -19878,6 +19884,14 @@ case $host_os in
+@@ -95,6 +100,7 @@ case $host_os in
  esac
+ AC_SUBST([OS_FLAGS])
  
- 
-+ if test "x$IS_IRONCLAD" = xyes; then
-+  IRONCLAD_TRUE=
-+  IRONCLAD_FALSE='#'
-+else
-+  IRONCLAD_TRUE='#'
-+  IRONCLAD_FALSE=
-+fi
-+
-  if test "x$IS_BSD" = xyes; then
-   BSD_TRUE=
-   BSD_FALSE='#'
-@@ -20053,6 +20067,10 @@ if test -z "${am__fastdepCC_TRUE}" && test -z "${am__fastdepCC_FALSE}"; then
-   as_fn_error $? "conditional \"am__fastdepCC\" was never defined.
- Usually this means the macro was only invoked conditionally." "$LINENO" 5
- fi
-+if test -z "${IRONCLAD_TRUE}" && test -z "${IRONCLAD_FALSE}"; then
-+  as_fn_error $? "conditional \"IRONCLAD\" was never defined.
-+Usually this means the macro was only invoked conditionally." "$LINENO" 5
-+fi
- if test -z "${BSD_TRUE}" && test -z "${BSD_FALSE}"; then
-   as_fn_error $? "conditional \"BSD\" was never defined.
- Usually this means the macro was only invoked conditionally." "$LINENO" 5
-diff --git xf86-input-keyboard-clean/src/Makefile.in xf86-input-keyboard-workdir/src/Makefile.in
-index 6daf679..9a63513 100644
---- xf86-input-keyboard-clean/src/Makefile.in
-+++ xf86-input-keyboard-workdir/src/Makefile.in
-@@ -113,6 +113,7 @@ host_triplet = @host@
- @BSD_TRUE@am__append_1 = $(BSD_SRCS)
- @SOLARIS_TRUE@am__append_2 = $(SOLARIS_SRCS)
- @HURD_TRUE@am__append_3 = $(HURD_SRCS)
-+@IRONCLAD_TRUE@am__append_4 = $(IRONCLAD_SRCS)
- subdir = src
- ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
- am__aclocal_m4_deps = $(top_srcdir)/configure.ac
-@@ -155,15 +156,17 @@ am__DEPENDENCIES_1 =
- kbd_drv_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
- am__kbd_drv_la_SOURCES_DIST = kbd.c xf86OSKbd.h xf86Keymap.h \
- 	atKeynames.h bsd_KbdMap.c bsd_kbd.c bsd_kbd.h at_scancode.c \
--	sun_kbd.c sun_kbd.h sun_kbdMap.c hurd_kbd.c
-+	sun_kbd.c sun_kbd.h sun_kbdMap.c hurd_kbd.c ironclad_kbd.c
- am__objects_1 = bsd_KbdMap.lo bsd_kbd.lo at_scancode.lo
- @BSD_TRUE@am__objects_2 = $(am__objects_1)
- am__objects_3 = sun_kbd.lo sun_kbdMap.lo
- @SOLARIS_TRUE@am__objects_4 = $(am__objects_3)
- am__objects_5 = hurd_kbd.lo at_scancode.lo
- @HURD_TRUE@am__objects_6 = $(am__objects_5)
-+am__objects_7 = ironclad_kbd.lo at_scancode.lo
-+@IRONCLAD_TRUE@am__objects_8 = $(am__objects_7)
- am_kbd_drv_la_OBJECTS = kbd.lo $(am__objects_2) $(am__objects_4) \
--	$(am__objects_6)
-+	$(am__objects_6) $(am__objects_8)
- kbd_drv_la_OBJECTS = $(am_kbd_drv_la_OBJECTS)
- AM_V_lt = $(am__v_lt_@AM_V@)
- am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
-@@ -189,7 +192,7 @@ depcomp = $(SHELL) $(top_srcdir)/depcomp
- am__maybe_remake_depfiles = depfiles
- am__depfiles_remade = ./$(DEPDIR)/at_scancode.Plo \
- 	./$(DEPDIR)/bsd_KbdMap.Plo ./$(DEPDIR)/bsd_kbd.Plo \
--	./$(DEPDIR)/hurd_kbd.Plo ./$(DEPDIR)/kbd.Plo \
-+	./$(DEPDIR)/hurd_kbd.Plo ./$(DEPDIR)/ironclad_kbd.Plo ./$(DEPDIR)/kbd.Plo \
- 	./$(DEPDIR)/sun_kbd.Plo ./$(DEPDIR)/sun_kbdMap.Plo
- am__mv = mv -f
- COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
-@@ -388,13 +391,14 @@ AM_CFLAGS = $(XORG_CFLAGS) $(CWARNFLAGS) $(OS_FLAGS)
- kbd_drv_la_LTLIBRARIES = kbd_drv.la
- kbd_drv_la_LDFLAGS = -avoid-version -module
- kbd_drv_la_SOURCES = kbd.c xf86OSKbd.h xf86Keymap.h atKeynames.h \
--	$(am__append_1) $(am__append_2) $(am__append_3)
-+	$(am__append_1) $(am__append_2) $(am__append_3) $(am__append_4)
++AM_CONDITIONAL(SALERNOS, [test "x$IS_SALERNOS" = xyes])
+ AM_CONDITIONAL(BSD, [test "x$IS_BSD" = xyes])
+ AM_CONDITIONAL(SOLARIS, [test "x$IS_SOLARIS" = xyes])
+ AM_CONDITIONAL(HURD, [test "x$IS_HURD" = xyes])
+diff --git xf86-input-keyboard-clean/src/Makefile.am xf86-input-keyboard-workdir/src/Makefile.am
+index 52f5f4d..3899868 100644
+--- xf86-input-keyboard-clean/src/Makefile.am
++++ xf86-input-keyboard-workdir/src/Makefile.am
+@@ -26,10 +26,15 @@ kbd_drv_la_SOURCES = kbd.c xf86OSKbd.h xf86Keymap.h atKeynames.h
  kbd_drv_la_LIBADD = $(XORG_LIBS)
  kbd_drv_ladir = @inputdir@
-+IRONCLAD_SRCS = ironclad_kbd.c at_scancode.c
+ 
++SALERNOS_SRCS = salernos_kbd.c at_scancode.c
  BSD_SRCS = bsd_KbdMap.c bsd_kbd.c bsd_kbd.h at_scancode.c
  HURD_SRCS = hurd_kbd.c at_scancode.c
  SOLARIS_SRCS = sun_kbd.c sun_kbd.h sun_kbdMap.c
--EXTRA_DIST = $(BSD_SRCS) $(HURD_SRCS) $(SOLARIS_SRCS)
-+EXTRA_DIST = $(IRONCLAD_SRCS) $(BSD_SRCS) $(HURD_SRCS) $(SOLARIS_SRCS)
- all: all-am
  
- .SUFFIXES:
-@@ -475,6 +479,7 @@ distclean-compile:
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bsd_KbdMap.Plo@am__quote@ # am--include-marker
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bsd_kbd.Plo@am__quote@ # am--include-marker
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hurd_kbd.Plo@am__quote@ # am--include-marker
-+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ironclad_kbd.Plo@am__quote@ # am--include-marker
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/kbd.Plo@am__quote@ # am--include-marker
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sun_kbd.Plo@am__quote@ # am--include-marker
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sun_kbdMap.Plo@am__quote@ # am--include-marker
-@@ -643,6 +648,7 @@ distclean: distclean-am
- 	-rm -f ./$(DEPDIR)/bsd_KbdMap.Plo
- 	-rm -f ./$(DEPDIR)/bsd_kbd.Plo
- 	-rm -f ./$(DEPDIR)/hurd_kbd.Plo
-+	-rm -f ./$(DEPDIR)/ironclad_kbd.Plo
- 	-rm -f ./$(DEPDIR)/kbd.Plo
- 	-rm -f ./$(DEPDIR)/sun_kbd.Plo
- 	-rm -f ./$(DEPDIR)/sun_kbdMap.Plo
-@@ -695,6 +701,7 @@ maintainer-clean: maintainer-clean-am
- 	-rm -f ./$(DEPDIR)/bsd_KbdMap.Plo
- 	-rm -f ./$(DEPDIR)/bsd_kbd.Plo
- 	-rm -f ./$(DEPDIR)/hurd_kbd.Plo
-+	-rm -f ./$(DEPDIR)/ironclad_kbd.Plo
- 	-rm -f ./$(DEPDIR)/kbd.Plo
- 	-rm -f ./$(DEPDIR)/sun_kbd.Plo
- 	-rm -f ./$(DEPDIR)/sun_kbdMap.Plo
-diff --git xf86-input-keyboard-workdir/src/ironclad_kbd.c xf86-input-keyboard-workdir/src/ironclad_kbd.c
++if SALERNOS
++kbd_drv_la_SOURCES += $(SALERNOS_SRCS)
++endif
++
+ if BSD
+ kbd_drv_la_SOURCES += $(BSD_SRCS)
+ endif
+@@ -42,4 +47,4 @@ if HURD
+ kbd_drv_la_SOURCES += $(HURD_SRCS)
+ endif
+ 
+-EXTRA_DIST = $(BSD_SRCS) $(HURD_SRCS) $(SOLARIS_SRCS)
++EXTRA_DIST = $(SALERNOS_SRCS) $(BSD_SRCS) $(HURD_SRCS) $(SOLARIS_SRCS)
+diff --git xf86-input-keyboard-workdir/src/salernos_KbdMap.c xf86-input-keyboard-workdir/src/salernos_KbdMap.c
 new file mode 100644
-index 0000000..3f20d5c
+index 0000000..2ca19fd
 --- /dev/null
-+++ xf86-input-keyboard-workdir/src/ironclad_kbd.c
-@@ -0,0 +1,108 @@
++++ xf86-input-keyboard-workdir/src/salernos_KbdMap.c
+@@ -0,0 +1,27 @@
 +#ifdef HAVE_CONFIG_H
 +#include <config.h>
 +#endif
 +
-+#include <X11/X.h>
 +#include <xorg-server.h>
++#include <X11/X.h>
 +
 +#include "compiler.h"
 +
@@ -149,37 +67,102 @@ index 0000000..3f20d5c
 +#include "xf86Priv.h"
 +#include "xf86_OSlib.h"
 +
++#include "xf86Xinput.h"
++#include "xf86OSKbd.h"
 +#include "atKeynames.h"
 +#include "xf86Keymap.h"
-+#include "xf86OSKbd.h"
-+#include "xf86Xinput.h"
 +
-+#include <assert.h>
-+#include <errno.h>
 +#include <stdio.h>
-+#include <sys/file.h>
-+#include <sys/ioctl.h>
-+#include <sys/time.h>
++#include <errno.h>
 +
++void getmap(InputInfoPtr info, KeySymsPtr syms, CARD8 *map){
++    syms->map        = map;
++    syms->mapWidth   = GLYPHS_PER_KEY;
++    syms->minKeyCode = MIN_KEYCODE;
++    syms->maxKeyCode = MAX_KEYCODE;	
++}
+diff --git xf86-input-keyboard-workdir/src/salernos_kbd.c xf86-input-keyboard-workdir/src/salernos_kbd.c
+new file mode 100644
+index 0000000..9de5fa7
+--- /dev/null
++++ xf86-input-keyboard-workdir/src/salernos_kbd.c
+@@ -0,0 +1,158 @@
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <xorg-server.h>
++#include <X11/X.h>
++
++#include "compiler.h"
++
++#include "xf86.h"
++#include "xf86Priv.h"
++#include "xf86_OSlib.h"
++
++#include "xf86Xinput.h"
++#include "xf86OSKbd.h"
++#include "atKeynames.h"
++#include "xf86Keymap.h"
++
++#include <stdio.h>
++#include <errno.h>
++
++// salernos stuff
++
++#define KBPACKET_FLAGS_RELEASED 1
++#define KBPACKET_FLAGS_LEFTCTRL 2
++#define KBPACKET_FLAGS_CAPSLOCK 4
++#define KBPACKET_FLAGS_LEFTALT 8
++#define KBPACKET_FLAGS_RIGHTALT 16
++#define KBPACKET_FLAGS_LEFTSHIFT 32
++#define KBPACKET_FLAGS_RIGHTCTRL 64
++#define KBPACKET_FLAGS_RIGHTSHIFT 128
++
++#define KEYCODE_KEYPADENTER 96
++#define KEYCODE_RIGHTCTRL 97
++#define KEYCODE_KEYPADSLASH 98
++#define KEYCODE_SYSREQ 99
++#define KEYCODE_RIGHTALT 100
++#define KEYCODE_LINEFEED  101
++#define KEYCODE_HOME 102
++#define KEYCODE_UP 103
++#define KEYCODE_PAGEUP 104
++#define KEYCODE_LEFT 105
++#define KEYCODE_RIGHT 106
++#define KEYCODE_END 107
++#define KEYCODE_DOWN 108
++#define KEYCODE_PAGEDOWN 109
++#define KEYCODE_INSERT 110
++#define KEYCODE_DELETE 111
++
++typedef struct {
++        char ascii;
++        uintmax_t keycode;
++        int flags;
++} kbpacket_t;
++
++
++// interface
 +static int KbdOn(InputInfoPtr pInfo, int what) {
 +    return Success;
 +}
 +
 +static int KbdOff(InputInfoPtr pInfo, int what) {
-+    printf("kbdOff is a stub!\n");
++    // printf("kbdOff is a stub!\n");
 +    return -1;
 +}
 +
 +static void SoundKbdBell(InputInfoPtr pInfo, int loudness, int pitch, int duration) {
-+    printf("SoundKbdBell is a stub!\n");
++    // printf("SoundKbdBell is a stub!\n");
 +}
 +
 +static void SetKbdLeds(InputInfoPtr pInfo, int leds) {
-+    printf("SetKbdLeds: is a stub!\n");
++    // printf("SetKbdLeds: is a stub!\n");
 +}
 +
 +static int GetKbdLeds(InputInfoPtr pInfo) {
-+    printf("GetKbdLeds is a stub!\n");
++    // printf("GetKbdLeds is a stub!\n");
 +    return -1;
 +}
 +
@@ -190,57 +173,75 @@ index 0000000..3f20d5c
 +}
 +
 +static void KbdGetMapping(InputInfoPtr pInfo, KeySymsPtr pKeySyms, CARD8 *pModMap) {
-+    printf("KbdGetMapping is a stub!\n");
++    // printf("KbdGetMapping is a stub!\n");
 +}
 +
-+static void ReadInput(InputInfoPtr pInfo) {
-+    KbdDevPtr pKbd = (KbdDevPtr) pInfo->private;
++static int keycodeMap[] = {
++	KEYCODE_KEYPADENTER, KEY_KP_Enter,
++	KEYCODE_RIGHTCTRL, KEY_RCtrl,
++	KEYCODE_KEYPADSLASH, KEY_KP_Divide,
++	KEYCODE_RIGHTALT, KEY_AltLang,
++	KEYCODE_LINEFEED, KEY_KP_Enter,
++	KEYCODE_HOME, KEY_Home,
++	KEYCODE_UP, KEY_Up,
++	KEYCODE_PAGEUP, KEY_PgUp,
++	KEYCODE_LEFT, KEY_Left,
++	KEYCODE_RIGHT, KEY_Right,
++	KEYCODE_END, KEY_End,
++	KEYCODE_DOWN, KEY_Down,
++	KEYCODE_PAGEDOWN, KEY_PgDown,
++	KEYCODE_INSERT, KEY_Insert,
++	KEYCODE_DELETE, KEY_Delete
++};
 +
-+    uint8_t scancodes[64];
-+    ssize_t result = read(pInfo->fd, scancodes, sizeof(scancodes));
-+    if (result > 0) {
-+        for (ssize_t i = 0; i < result; i++) {
-+            pKbd->PostEvent(pInfo, scancodes[i] & 0x7f, scancodes[i] & 0x80 ? FALSE : TRUE);
-+        }
-+    }
++#define KEYCODE_MAP_SIZE (sizeof(keycodeMap) / sizeof(int))
++
++
++static void kbdread(InputInfoPtr info){
++	KbdDevPtr kbd = (KbdDevPtr) info->private;
++	kbpacket_t packet;
++
++	while (read(info->fd, &packet, sizeof(kbpacket_t)) > 0) {
++		int keycode = packet.keycode;
++
++		// is it a keycode that isn't in the AT keymap?
++		for (int i = 0; i < KEYCODE_MAP_SIZE; i += 2) {
++			if (keycode == keycodeMap[i]) {
++				keycode = keycodeMap[i + 1];
++				break;
++			}
++		}
++		
++		kbd->PostEvent(info, keycode, (packet.flags & KBPACKET_FLAGS_RELEASED) ? FALSE : TRUE);
++	}
++
 +}
 +
-+static Bool OpenKeyboard(InputInfoPtr pInfo) {
-+    char *kbdPath = xf86SetStrOption(pInfo->options, "Device", "/dev/ps2keyboard");
-+    Bool ret;
-+
-+    pInfo->fd = open(kbdPath, O_RDONLY | O_NONBLOCK);
-+
-+    if (pInfo->fd == -1) {
-+        xf86Msg(X_ERROR, "%s: cannot open \"%s\"\n", pInfo->name, kbdPath);
-+        ret = FALSE;
-+    } else {
-+        xf86MsgVerb(X_INFO, 3, "%s: opened device \"%s\"\n", pInfo->name, kbdPath);
-+        pInfo->read_input = ReadInput;
-+        ret = TRUE;
-+
-+        // in case it wasn't set and we fell back to default.
-+        xf86ReplaceStrOption(pInfo->options, "Device", kbdPath);
-+    }
-+
-+    free(kbdPath);
-+    return ret;
++static Bool OpenKeyboard(InputInfoPtr info){
++	char *kbdPath = xf86SetStrOption(info->options, "Device", "/dev/ps2keyboard");
++	info->fd = open("/dev/ps2keyboard", O_NONBLOCK | O_RDONLY);
++	if(info->fd == -1)
++		FatalError("Failed to open keyboard (%s)\n",strerror(errno));
++	
++	info->read_input   = kbdread;
++	
++	return TRUE;
 +}
 +
-+Bool xf86OSKbdPreInit(InputInfoPtr pInfo) {
-+    KbdDevPtr pKbd = pInfo->private;
++Bool xf86OSKbdPreInit(InputInfoPtr info){
 +
-+    pKbd->KbdInit       = KbdInit;
-+    pKbd->KbdOn         = KbdOn;
-+    pKbd->KbdOff        = KbdOff;
-+    pKbd->Bell          = SoundKbdBell;
-+    pKbd->SetLeds       = SetKbdLeds;
-+    pKbd->GetLeds       = GetKbdLeds;
-+    pKbd->KbdGetMapping = KbdGetMapping;
-+    pKbd->OpenKeyboard = OpenKeyboard;
++	KbdDevPtr kbd = info->private;
++	
++	kbd->KbdInit       = KbdInit;
++	kbd->KbdOn         = KbdOn;
++	kbd->KbdOff        = KbdOff;
++	kbd->Bell          = SoundKbdBell;
++	kbd->SetLeds       = SetKbdLeds;
++	kbd->GetLeds       = GetKbdLeds;
++	kbd->KbdGetMapping = KbdGetMapping;
++	kbd->OpenKeyboard  = OpenKeyboard;
++	kbd->RemapScanCode = NULL;
++	kbd->private       = NULL;
 +
-+    pKbd->RemapScanCode = NULL;
-+    pKbd->private = NULL;
-+
-+    return TRUE;
++	return TRUE;
 +}

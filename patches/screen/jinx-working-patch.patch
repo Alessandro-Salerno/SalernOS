@@ -1,0 +1,11 @@
+diff -urN --no-dereference screen-clean/tty.c screen-workdir/tty.c
+--- screen-clean/tty.c
++++ screen-workdir/tty.c
+@@ -30,6 +30,7 @@
+ 
+ #include "tty.h"
+ 
++#include <asm/ioctls.h>
+ #include <sys/types.h>
+ #include <signal.h>
+ #include <fcntl.h>

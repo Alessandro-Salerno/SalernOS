@@ -1,4 +1,5 @@
-#!/bin/sh
+#! /bin/sh
+
 name=autoconf-2.69
 from_source=autoconf-2.69
 revision=1
@@ -16,4 +17,7 @@ build() {
 
 package() {
     DESTDIR="${dest_dir}" make install
+
+        strip_command=strip \
+    post_package_strip
 }

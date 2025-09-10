@@ -1,0 +1,24 @@
+#! /bin/sh
+
+name=hsetroot
+version=9.5
+revision=1
+git_url="https://github.com/himdel/hsetroot.git"
+commit="a402d5323f45c058810c0d66d61d278d101d3610"
+source_hostdeps="automake autoconf libtool pkg-config"
+hostdeps="gcc automake autoconf libtool pkg-config"
+deps="core-libs imlib2 libxrender libx11 libxinerama"
+
+
+build() {
+    cp -rp "${source_dir}"/. ./
+
+    make \
+        CC=$OS_TRIPLET-gcc \
+        PKG_CONFIG=$OS_TRIPLET-pkg-config \
+        -j${parallelism}
+}
+
+package() {
+	install -Dm 755 "hsetroot" "${dest_dir}${prefix}/bin/hsetroot"
+}

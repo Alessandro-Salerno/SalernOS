@@ -1,0 +1,25 @@
+diff --git slim-clean/app.cpp slim-workdir/app.cpp
+index 237477d..9576290 100644
+--- slim-clean/app.cpp
++++ slim-workdir/app.cpp
+@@ -23,6 +23,7 @@
+ #include <sstream>
+ #include <vector>
+ #include <algorithm>
++#include <crypt.h>
+ 
+ #include "const.h"
+ #include "log.h"
+@@ -1155,10 +1163,12 @@ int App::StartServer()
+ 		}
+ 	}
+ 
++	/*
+ 	if (!hasVtSet && daemonmode)
+ 	{
+ 		server[argc++] = (char*)"vt07";
+ 	}
++	*/
+ 	server[argc] = NULL;
+ 
+ 	switch (ServerPID) {

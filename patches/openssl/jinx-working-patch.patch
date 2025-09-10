@@ -6,7 +6,7 @@ index f815a09..face7e1 100644
          ranlib           => "true",
      },
  
-+#### Placeholder
++#### Salernos
 +    "salernos-generic64" => {
 +        inherit_from     => [ "BASE_unix" ],
 +        CFLAGS           => picker(default   => "-Wall",

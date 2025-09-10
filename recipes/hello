@@ -1,0 +1,17 @@
+#! /bin/sh
+name=hello
+revision=1
+version=0.96.3
+hostdeps="gcc"
+deps="core-libs libx11 libxext sdl2-compat"
+tarball_url="http://localhost:8000/hello.tar"
+tarball_sha512="809e921f1d299ad49e43648c152ff6dc3c2a9eea3bf1d08906f2b60b931be69e8f491abdbc8764aff65c957d4f0b4fbfd3e95867f8507fba8b2dafe3dd4ba226"
+
+build() {
+    cp -rp ${source_dir}/. ./
+    ${OS_TRIPLET}-gcc hello.c -lX11 -lXext -lSDL2 -o hello
+}
+
+package() {
+	install -Dm 755 "hello" "${dest_dir}/hello"
+}

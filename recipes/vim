@@ -2,9 +2,9 @@
 name=vim
 revision=1
 from_source=vim
-imagedeps="build-essential"
-hostdeps="gcc binutils"
-deps="ncurses core-libs"
+source_hostdeps="automake autoconf libtool pkg-config"
+hostdeps="gcc automake autoconf libtool pkg-config"
+deps="core-libs ncurses"
 
 configure() {
     cp -rp ${source_dir}/* .
@@ -22,9 +22,7 @@ configure() {
         vim_cv_memmove_handles_overlap="yes" \
         vim_cv_bcopy_handles_overlap="yes" \
         vim_cv_memcpy_handles_overlap="yes" \
-    ./configure \
-        --host=x86_64-salernos-mlibc \
-        --prefix=${prefix} \
+    autotools_configure \
         --with-tlib=tinfo \
         --disable-gtktest \
         --disable-cion-cache-update \

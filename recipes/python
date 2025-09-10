@@ -6,14 +6,10 @@ version=3.13.5
 revision=1
 tarball_url="https://www.python.org/ftp/python/${version}/Python-${version}.tar.xz"
 tarball_blake2b="9caacad8745dcd238b208022cb140a6655ae57ae0b7f5ac88efc84a96635c310102a5de20cbaa43ef3c329f454b142a0a019141279d49a4d657be5682a1d6521"
-hostdeps="gcc pkg-config automake autoconf libtool"
+hostdeps="gcc pkg-config"
 deps="core-libs bzip2 xz zlib openssl ncurses readline gdbm libexpat libffi"
-source_hostdeps=${hostdeps}
-source_deps=${deps}
 
 prepare() {
-    cp -pv /usr/local/share/libtool/build-aux/config.guess ./
-    cp -pv /usr/local/share/libtool/build-aux/config.sub ./
     autotools_recursive_regen
 }
 
@@ -23,7 +19,7 @@ configure() {
         ac_cv_func_sched_setscheduler=no \
         ac_cv_buggy_getaddrinfo=no \
     autotools_configure \
-        --build=$JINX_ARCH \
+        --build=$ARCHITECTURE \
         --with-computed-gotos \
         --disable-optimizations \
         --enable-ipv6 \

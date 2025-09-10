@@ -1,4 +1,5 @@
-#!/bin/sh
+#! /bin/sh
+
 name=frigg
 version=307e9361acb49e7d9e5e7f62a1b48de66974d8f4
 revision=1
@@ -19,4 +20,6 @@ build() {
 
 package() {
     DESTDIR="${dest_dir}" ninja install
+
+    post_package_strip
 }

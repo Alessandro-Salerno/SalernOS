@@ -16,10 +16,10 @@ index cdfc439..02e3643 100755
      *:[Mm]anagarm:*:*)
  	GUESS="$UNAME_MACHINE-unknown-managarm-mlibc"
  	;;
-+    x86_64:[Ii]ronclad:*:*|i?86:[Ii]ronclad:*:*)
++    x86_64:[Ss]alernos:*:*|i?86:[Ss]alernos:*:*)
 +	GUESS="$UNAME_MACHINE-pc-salernos-mlibc"
 +	;;
-+    *:[Ii]ronclad:*:*)
++    *:[Ss]alernos:*:*)
 +	GUESS="$UNAME_MACHINE-unknown-salernos-mlibc"
 +	;;
      *:Minix:*:*)
@@ -68,4 +68,3 @@ index defe52c..426e8de 100755
  	windows*-msvc*-)
  		;;
  	-dietlibc*- | -newlib*- | -musl*- | -relibc*- | -uclibc*- | -mlibc*- )
-

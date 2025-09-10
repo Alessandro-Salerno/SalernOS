@@ -1,0 +1,53 @@
+name=sdl2
+revision=1
+version=2.30.2
+tarball_url="https://github.com/libsdl-org/SDL/archive/refs/tags/release-${version}.tar.gz"
+tarball_sha512="915f28c8406df36e6440b7d690c193076c3f886ad1b18c871c70869fe08dbe48d4ec5d2541d36d1b97ab26e1299fef2e3048e641e76ab4b63c687273968b0e5e"
+imagedeps="build-essential cmake ninja-build"
+hostdeps="gcc binutils pkg-config"
+deps="core-libs libx11 libxext libxcursor libxinerama libxi libxfixes libxrandr libxrender libxxf86vm mesa libiconv"
+
+configure() {
+	cmake_configure \
+	-DSDL_ALTIVEC=OFF \
+	-DSDL_DISKAUDIO=OFF \
+	-DSDL_DIRECTFB=ON \
+	-DSDL_OPENGL=ON \
+	-DSDL_OPENGLES=ON \
+	-DSDL_PTHREADS=ON \
+	-DSDL_PTHREADS_SEM=OFF \
+	-DSDL_OSS=ON \
+	-DSDL_ALSA=OFF \
+	-DSDL_JACK=OFF \
+	-DSDL_ESD=OFF \
+	-DSDL_PULSEAUDIO=OFF \
+	-DSDL_ARTS=OFF \
+	-DSDL_NAS=OFF \
+	-DSDL_SNDIO=OFF \
+	-DSDL_FUSIONSOUND=OFF \
+	-DSDL_LIBSAMPLERATE=OFF \
+	-DSDL_RPATH=OFF \
+	-DSDL_X11=ON \
+	-DSDL_WAYLAND=OFF \
+	-DSDL_WAYLAND_QT_TOUCH=OFF \
+	-DSDL_RPI=OFF \
+	-DSDL_COCOA=OFF \
+	-DSDL_DIRECTX=OFF \
+	-DSDL_WASAPI=OFF \
+	-DSDL_RENDER_D3D=OFF \
+	-DSDL_VIVANTE=OFF \
+	-DSDL_VULKAN=OFF \
+	-DSDL_KMSDRM=OFF \
+	-DSDL_HIDAPI=OFF \
+	-DSDL_SHARED=ON \
+	-DSDL_STATIC=OFF \
+	${source_dir}
+}
+
+build() {
+	ninja -j${parallelism}
+}
+
+package() {
+	DESTDIR="${dest_dir}" ninja install
+}

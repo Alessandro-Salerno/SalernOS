@@ -33,4 +33,3 @@ index 31f66b1..0244c96 100644
 +	//semsg(_(e_could_not_check_for_pending_sigalrm_str), strerror(errno));
  	alarm_pending = FALSE;
      }
- 

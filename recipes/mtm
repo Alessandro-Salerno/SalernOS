@@ -12,7 +12,7 @@ deps="mlibc-headers mlibc freestnd-c-hdrs freestnd-cxx-hdrs libgcc ncurses"
 
 build() {
     cp -pr "${source_dir}"/* .
-    make CC=x86_64-salernos-mlibc-gcc LIBS="-lutil -lncursesw -ltinfow"
+    make CC=${OS_TRIPLET}-gcc LIBS="-lutil -lncursesw -ltinfow"
 }
 
 package() {
