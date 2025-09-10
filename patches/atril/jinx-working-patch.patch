@@ -1,0 +1,59 @@
+diff --git atril-clean/backend/comics/meson.build atril-workdir/backend/comics/meson.build
+index abc2fdc..d67a51b 100644
+--- atril-clean/backend/comics/meson.build
++++ atril-workdir/backend/comics/meson.build
+@@ -2,8 +2,8 @@ backend_desktop_conf = configuration_data()
+ backend_desktop_conf.set('COMICS_MIME_TYPES', comic_mimetypes)
+ 
+ backend_desktop = configure_file(
+-    input: 'comicsdocument.atril-backend.in',
+-    output: 'comicsdocument.atril-backend',
++    input: 'comicsdocument.atril-backend.desktop.in',
++    output: 'comicsdocument.atril-backend.desktop',
+     configuration: backend_desktop_conf,
+     install: true,
+     install_dir: backendsdir,
+@@ -34,16 +34,3 @@ shared_module(
+ 
+ 
+ 
+-test_name = 'test-ev-archive'
+-
+-test_sources = files(
+-  'ev-archive.c',
+-  'test-ev-archive.c',
+-)
+-
+-executable(
+-  test_name,
+-  test_sources,
+-  include_directories: include_dirs,
+-  dependencies: comics_deps,
+-)
+diff --git atril-clean/backend/pixbuf/meson.build atril-workdir/backend/pixbuf/meson.build
+index 68afb36..aba94fd 100644
+--- atril-clean/backend/pixbuf/meson.build
++++ atril-workdir/backend/pixbuf/meson.build
+@@ -21,8 +21,8 @@ shared_module(
+ )
+ 
+ i18n.merge_file(
+-  input: 'pixbuf.atril-backend.desktop.in',
+-  output: 'pixbuf.atril-backend',
++  input: 'pixbufdocument.atril-backend.desktop.in',
++  output: 'pixbufdocument.atril-backend',
+   type: 'desktop',
+   po_dir: po_dir,
+   install: true,
+diff --git atril-clean/libdocument/ev-document.c atril-workdir/libdocument/ev-document.c
+index 96b8094..2c274b5 100644
+--- atril-clean/libdocument/ev-document.c
++++ atril-workdir/libdocument/ev-document.c
+@@ -23,6 +23,7 @@
+ 
+ #include <stdlib.h>
+ #include <string.h>
++#include <strings.h>
+ 
+ #include "ev-document.h"
+ #ifdef ENABLE_SYNCTEX

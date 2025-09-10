@@ -1,13 +1,11 @@
 #! /bin/sh
 
 name=gcc
-version=14.2.0
+version=15.2.0
 revision=1
-tarball_url="https://fosszone.csd.auth.gr/gnu/gcc/gcc-${version}/gcc-${version}.tar.xz"
-tarball_blake2b="87baf2a06dfa75d8fb6cd62c747ef1f57d3b9bbbe33a360d9ed3de4b4dbeaa8d920504c67e409bd9863414202c14fd854b46108e984418171205119216d03d3b"
-source_hostdeps="automake autoconf-2.69 libtool pkg-config"
-source_imagedeps="git"
-hostdeps="gcc autoconf-2.69 automake libtool pkg-config"
+tarball_url="https://ftpmirror.gnu.org/gnu/gcc/gcc-${version}/gcc-${version}.tar.xz"
+tarball_blake2b="e270320978ca690e6e8f5ef06414dc13caf561f16403a3783c76fbf3dcee57e755a2d5bba922bf7fcae0bb6120443755d819b003791ae823d54589dd799804de"
+hostdeps="gcc pkg-config"
 deps="core-libs binutils zlib gmp mpfr mpc gettext"
 imagedeps="build-essential"
 
@@ -16,19 +14,15 @@ prepare() {
         patch -p1 < "$i"
     done
 
-    autotools_recursive_regen -I"$(realpath ./config)"
-
-    cp -pv /usr/local/share/libtool/build-aux/{config.sub,config.guess,install-sh} libiberty/
+    autotools_recursive_regen
 }
 
 configure() {
     autotools_configure \
         CFLAGS_FOR_BUILD="$HOST_CFLAGS" \
-        CPPFLAGS_FOR_BUILD="$HOST_CPPFLAGS" \
         CXXFLAGS_FOR_BUILD="$HOST_CXXFLAGS" \
         LDFLAGS_FOR_BUILD="$HOST_LDFLAGS" \
         CFLAGS_FOR_TARGET="$TARGET_CFLAGS" \
-        CPPFLAGS_FOR_TARGET="$TARGET_CPPFLAGS" \
         CXXFLAGS_FOR_TARGET="$TARGET_CXXFLAGS" \
         LDFLAGS_FOR_TARGET="$TARGET_LDFLAGS" \
         --target=${OS_TRIPLET} \
@@ -51,7 +45,9 @@ build() {
 
 package() {
     DESTDIR="${dest_dir}" make install-gcc
-    DESTDIR="${dest_dir}" make -C gcc fortran.install-{common,man,info}
+    DESTDIR="${dest_dir}" make -C gcc fortran.install-common
+    DESTDIR="${dest_dir}" make -C gcc fortran.install-man
+    DESTDIR="${dest_dir}" make -C gcc fortran.install-info
 
     ln -s gcc "${dest_dir}${prefix}"/bin/cc
     ln -s gfortran "${dest_dir}${prefix}"/bin/f95

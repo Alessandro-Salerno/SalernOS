@@ -1,0 +1,40 @@
+#! /bin/sh
+
+name=limine
+version=9.6.6
+revision=1
+tarball_url="https://codeberg.org/Limine/Limine/releases/download/v${version}/limine-${version}.tar.gz"
+tarball_blake2b="67ebe44c68629d794310f2f21dcc2c2c14845e34accff473dfa931a452ce3d299dd5d1d81481bf744dbd5394453a86f60b065cb89f7b8d9ec5fca67a7f72b934"
+imagedeps="mtools nasm"
+hostdeps="gcc pkg-config"
+deps="core-libs"
+
+prepare() {
+    autotools_recursive_regen
+}
+
+configure() {
+    if [ "${JINX_ARCH}" = "x86_64" ]; then
+        X86_FLAGS="--enable-bios \
+                   --enable-bios-cd \
+                   --enable-bios-pxe \
+                   --enable-uefi-ia32 \
+        "
+    fi
+
+    autotools_configure \
+        $X86_FLAGS \
+        --enable-uefi-${JINX_ARCH} \
+        --enable-uefi-cd \
+        TOOLCHAIN_FOR_TARGET=${OS_TRIPLET}-
+}
+
+build() {
+    make -j${parallelism}
+}
+
+package() {
+    DESTDIR="${dest_dir}" make install
+
+    post_package_strip
+}

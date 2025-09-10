@@ -1,11 +1,10 @@
 #! /bin/sh
 
 name=xkeyboard-config
-version=2.43
+version=2.45
 revision=1
-tarball_url="https://www.x.org/archive/individual/data/xkeyboard-config/xkeyboard-config-${version}.tar.xz"
-tarball_blake2b="89cf4872305ce3358185ed63f0ff2f0dc90205d50d51b4b881256e0762b12a74f30d0905a75e5feff2f0fef09d94bee778a8cbe83cdf6e048653e8eb42f53087"
-imagedeps="meson ninja-build"
+git_url="https://gitlab.freedesktop.org/xkeyboard-config/xkeyboard-config.git"
+commit=a8b1be93168cbd3246359c724f090e821079b313
 hostdeps="gcc pkg-config"
 deps="core-libs xorg-xkbcomp"
 
@@ -15,11 +14,11 @@ configure() {
 }
 
 build() {
-    ninja -j${parallelism}
+    meson compile -j${parallelism}
 }
 
 package() {
-    DESTDIR="${dest_dir}" ninja install
+    DESTDIR="${dest_dir}" meson install --no-rebuild
 
     post_package_strip
 }

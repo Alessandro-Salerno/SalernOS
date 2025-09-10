@@ -8,11 +8,8 @@ MAKEFLAGS += -rR
 .PHONY: all
 all: iso_root salernos.iso
 
-host:
-	./jinx host-build '*'
-
 target: 
-	./jinx build '*'
+	mkdir -p build-x86_64 && cd build-x86_64 && ../build-support/makeimg.sh
 
 install_sysroot:
 	cp -r sysroot/. iso_root/

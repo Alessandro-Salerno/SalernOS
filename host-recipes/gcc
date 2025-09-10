@@ -1,13 +1,19 @@
-#!/bin/sh
+#! /bin/sh
+
 name=gcc
 from_source=gcc-host
-revision=1
-imagedeps="build-essential"
-hostdeps="autoconf-2.69 automake libtool pkg-config"
+clean_workdirs=no
+revision=2
+imagedeps="experimental:build-essential"
+hostdeps="pkg-config"
 hostrundeps="binutils"
 deps="mlibc-headers"
 
+. "${base_dir}"/build-support/gcc-ada-helpers
+
 configure() {
+    ada_symlink_gnat
+
     cp -rp "${source_dir}"/. ./
     mkdir -p build && cd build
 
@@ -24,8 +30,7 @@ configure() {
         --with-linker-hash-style=gnu \
         --enable-linker-build-id \
         --disable-libada \
-        --enable-languages=c,c++ \
-        -enable-threads=posix \
+        --enable-languages=c,c++,lto,ada \
         --enable-default-pie \
         --enable-default-ssp \
         --disable-multilib \
@@ -35,11 +40,21 @@ configure() {
 }
 
 build() {
+    ada_symlink_gnat
+
     cd build
     make -j${parallelism} all-gcc
+    make -j${parallelism} -C gcc cross-gnattools ada.all.cross
 }
 
 package() {
+    ada_symlink_gnat
+
     cd build
     DESTDIR="${dest_dir}" make install-gcc
+
+    ln -s ${OS_TRIPLET}-gnatbind "${dest_dir}${prefix}"/bin/${OS_TRIPLET}-gnatbind-15
+
+        strip_command=strip \
+    post_package_strip
 }

@@ -1,28 +1,24 @@
 #! /bin/sh
 
 name=libpng
-version=1.6.46
+version=1.6.50
 revision=1
-tarball_url="https://download.sourceforge.net/libpng/libpng-${version}.tar.xz"
-tarball_blake2b="0cc4e4ca0a9394e1ee2778065ef03859854062103609c9356709a9540b8953a6198b5c44a5a05ae97d8f0e6035a171ab1797627f6523805cedf3f985960752c3"
-source_hostdeps="automake autoconf libtool pkg-config"
-hostdeps="gcc autoconf automake libtool pkg-config"
+git_url="https://github.com/pnggroup/libpng.git"
+commit=2b978915d82377df13fcbb1fb56660195ded868a
+hostdeps="gcc pkg-config"
 deps="core-libs zlib"
 
-prepare() {
-    autotools_recursive_regen
-}
-
 configure() {
-    autotools_configure
+    cmake_configure \
+        -DPNG_STATIC=OFF
 }
 
 build() {
-    make -j${parallelism}
+    cmake --build . -j${parallelism}
 }
 
 package() {
-    DESTDIR="${dest_dir}" make install
+    DESTDIR="${dest_dir}" cmake --install .
 
     post_package_strip
 }

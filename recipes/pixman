@@ -1,11 +1,10 @@
 #! /bin/sh
 
 name=pixman
-version=0.44.2
+version=0.46.4
 revision=1
-tarball_url="https://www.x.org/archive/individual/lib/pixman-${version}.tar.xz"
-tarball_blake2b="856aa35ae705de522d70250beee8acc872b54d2b5caa9cee6bc12ffde7c293b3db76f56c75858cc5ab1bc592fb1d4078485c2def2ae4bcd5a50b6dfc2eb477eb"
-imagedeps="meson ninja-build"
+git_url="https://gitlab.freedesktop.org/pixman/pixman.git"
+commit=9cc163c9da0fb4da430641715313d95a6ec466d9
 hostdeps="gcc pkg-config"
 deps="core-libs libpng"
 
@@ -14,11 +13,11 @@ configure() {
 }
 
 build() {
-    ninja -j${parallelism}
+    meson compile -j${parallelism}
 }
 
 package() {
-    DESTDIR="${dest_dir}" ninja install
+    DESTDIR="${dest_dir}" meson install --no-rebuild
 
     post_package_strip
 }

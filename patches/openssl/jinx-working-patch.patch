@@ -1,12 +1,12 @@
 diff --git openssl-clean/Configurations/10-main.conf openssl-workdir/Configurations/10-main.conf
-index f815a09..face7e1 100644
+index f815a09..820fa24 100644
 --- openssl-clean/Configurations/10-main.conf
 +++ openssl-workdir/Configurations/10-main.conf
-@@ -925,6 +925,40 @@ my %targets = (
+@@ -925,6 +925,49 @@ my %targets = (
          ranlib           => "true",
      },
  
-+#### Placeholder
++#### Salernos
 +    "salernos-generic64" => {
 +        inherit_from     => [ "BASE_unix" ],
 +        CFLAGS           => picker(default   => "-Wall",
@@ -26,9 +26,8 @@ index f815a09..face7e1 100644
 +        shared_extension => ".so.\$(SHLIB_VERSION_NUMBER)",
 +    },
 +
-+    # This breaks the usual configuration naming convention but it's more
++    # These break the usual configuration naming convention but it's more
 +    # convenient for us, since it matches the target triples
-+
 +    "x86_64-salernos-mlibc" => {
 +        inherit_from     => [ "salernos-generic64", asm("x86_64_asm") ],
 +        perlasm_scheme   => "elf",
@@ -37,6 +36,16 @@ index f815a09..face7e1 100644
 +        # on to the GCC invocation
 +        CC               => "x86_64-salernos-mlibc-gcc",
 +        CXX              => "x86_64-salernos-mlibc-g++",
++
++    },
++    "riscv64-salernos-mlibc" => {
++        inherit_from     => [ "salernos-generic64", asm("riscv64_asm") ],
++        perlasm_scheme   => "elf",
++
++        # Configure doesn't want to play nice and passes "--cross-compile-suffix"
++        # on to the GCC invocation
++        CC               => "riscv64-salernos-mlibc-gcc",
++        CXX              => "riscv64-salernos-mlibc-g++",
 +
 +    },
 +
@@ -94,21 +103,6 @@ index 31c02cc..4e4ca4e 100644
  #include "internal/cryptlib.h"
  #include "internal/o_dir.h"
  #include <openssl/lhash.h>
-diff --git openssl-clean/crypto/mem_sec.c openssl-workdir/crypto/mem_sec.c
-index 222c786..edb5192 100644
---- openssl-clean/crypto/mem_sec.c
-+++ openssl-workdir/crypto/mem_sec.c
-@@ -492,8 +492,10 @@ static int sh_init(size_t size, int minsize)
-         ret = 2;
- #endif
- #ifdef MADV_DONTDUMP
-+/*
-     if (madvise(sh.arena, sh.arena_size, MADV_DONTDUMP) < 0)
-         ret = 2;
-+*/
- #endif
- 
-     return ret;
 diff --git openssl-clean/test/bntest.c openssl-workdir/test/bntest.c
 index 9273e86..c4a1683 100644
 --- openssl-clean/test/bntest.c
@@ -122,7 +116,7 @@ index 9273e86..c4a1683 100644
  
  #include <openssl/bn.h>
 diff --git openssl-clean/test/rsa_complex.c openssl-workdir/test/rsa_complex.c
-index fac5812..a36efaa 100644
+index fac5812..5e82ef3 100644
 --- openssl-clean/test/rsa_complex.c
 +++ openssl-workdir/test/rsa_complex.c
 @@ -14,7 +14,9 @@

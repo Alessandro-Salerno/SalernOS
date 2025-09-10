@@ -6,8 +6,8 @@ index 76f1212..c2b8867 100755
  SOLARIS_TRUE
  BSD_FALSE
  BSD_TRUE
-+IRONCLAD_FALSE
-+IRONCLAD_TRUE
++SALERNOS_FALSE
++SALERNOS_TRUE
  OS_FLAGS
  inputdir
  XORG_LIBS
@@ -16,7 +16,7 @@ index 76f1212..c2b8867 100755
  # The keyboard driver code is O/S specific
  case $host_os in
 +  salernos*)
-+    IS_IRONCLAD="yes"
++    IS_SALERNOS="yes"
 +    ;;
 +
    linux*)
@@ -26,12 +26,12 @@ index 76f1212..c2b8867 100755
  esac
  
  
-+ if test "x$IS_IRONCLAD" = xyes; then
-+  IRONCLAD_TRUE=
-+  IRONCLAD_FALSE='#'
++ if test "x$IS_SALERNOS" = xyes; then
++  SALERNOS_TRUE=
++  SALERNOS_FALSE='#'
 +else
-+  IRONCLAD_TRUE='#'
-+  IRONCLAD_FALSE=
++  SALERNOS_TRUE='#'
++  SALERNOS_FALSE=
 +fi
 +
   if test "x$IS_BSD" = xyes; then
@@ -41,8 +41,8 @@ index 76f1212..c2b8867 100755
    as_fn_error $? "conditional \"am__fastdepCC\" was never defined.
  Usually this means the macro was only invoked conditionally." "$LINENO" 5
  fi
-+if test -z "${IRONCLAD_TRUE}" && test -z "${IRONCLAD_FALSE}"; then
-+  as_fn_error $? "conditional \"IRONCLAD\" was never defined.
++if test -z "${SALERNOS_TRUE}" && test -z "${SALERNOS_FALSE}"; then
++  as_fn_error $? "conditional \"SALERNOS\" was never defined.
 +Usually this means the macro was only invoked conditionally." "$LINENO" 5
 +fi
  if test -z "${BSD_TRUE}" && test -z "${BSD_FALSE}"; then
@@ -56,7 +56,7 @@ index 6daf679..9a63513 100644
  @BSD_TRUE@am__append_1 = $(BSD_SRCS)
  @SOLARIS_TRUE@am__append_2 = $(SOLARIS_SRCS)
  @HURD_TRUE@am__append_3 = $(HURD_SRCS)
-+@IRONCLAD_TRUE@am__append_4 = $(IRONCLAD_SRCS)
++@SALERNOS_TRUE@am__append_4 = $(SALERNOS_SRCS)
  subdir = src
  ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
  am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -65,15 +65,15 @@ index 6daf679..9a63513 100644
  am__kbd_drv_la_SOURCES_DIST = kbd.c xf86OSKbd.h xf86Keymap.h \
  	atKeynames.h bsd_KbdMap.c bsd_kbd.c bsd_kbd.h at_scancode.c \
 -	sun_kbd.c sun_kbd.h sun_kbdMap.c hurd_kbd.c
-+	sun_kbd.c sun_kbd.h sun_kbdMap.c hurd_kbd.c ironclad_kbd.c
++	sun_kbd.c sun_kbd.h sun_kbdMap.c hurd_kbd.c salernos_kbd.c
  am__objects_1 = bsd_KbdMap.lo bsd_kbd.lo at_scancode.lo
  @BSD_TRUE@am__objects_2 = $(am__objects_1)
  am__objects_3 = sun_kbd.lo sun_kbdMap.lo
  @SOLARIS_TRUE@am__objects_4 = $(am__objects_3)
  am__objects_5 = hurd_kbd.lo at_scancode.lo
  @HURD_TRUE@am__objects_6 = $(am__objects_5)
-+am__objects_7 = ironclad_kbd.lo at_scancode.lo
-+@IRONCLAD_TRUE@am__objects_8 = $(am__objects_7)
++am__objects_7 = salernos_kbd.lo at_scancode.lo
++@SALERNOS_TRUE@am__objects_8 = $(am__objects_7)
  am_kbd_drv_la_OBJECTS = kbd.lo $(am__objects_2) $(am__objects_4) \
 -	$(am__objects_6)
 +	$(am__objects_6) $(am__objects_8)
@@ -85,7 +85,7 @@ index 6daf679..9a63513 100644
  am__depfiles_remade = ./$(DEPDIR)/at_scancode.Plo \
  	./$(DEPDIR)/bsd_KbdMap.Plo ./$(DEPDIR)/bsd_kbd.Plo \
 -	./$(DEPDIR)/hurd_kbd.Plo ./$(DEPDIR)/kbd.Plo \
-+	./$(DEPDIR)/hurd_kbd.Plo ./$(DEPDIR)/ironclad_kbd.Plo ./$(DEPDIR)/kbd.Plo \
++	./$(DEPDIR)/hurd_kbd.Plo ./$(DEPDIR)/salernos_kbd.Plo ./$(DEPDIR)/kbd.Plo \
  	./$(DEPDIR)/sun_kbd.Plo ./$(DEPDIR)/sun_kbdMap.Plo
  am__mv = mv -f
  COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -97,12 +97,12 @@ index 6daf679..9a63513 100644
 +	$(am__append_1) $(am__append_2) $(am__append_3) $(am__append_4)
  kbd_drv_la_LIBADD = $(XORG_LIBS)
  kbd_drv_ladir = @inputdir@
-+IRONCLAD_SRCS = ironclad_kbd.c at_scancode.c
++SALERNOS_SRCS = salernos_kbd.c at_scancode.c
  BSD_SRCS = bsd_KbdMap.c bsd_kbd.c bsd_kbd.h at_scancode.c
  HURD_SRCS = hurd_kbd.c at_scancode.c
  SOLARIS_SRCS = sun_kbd.c sun_kbd.h sun_kbdMap.c
 -EXTRA_DIST = $(BSD_SRCS) $(HURD_SRCS) $(SOLARIS_SRCS)
-+EXTRA_DIST = $(IRONCLAD_SRCS) $(BSD_SRCS) $(HURD_SRCS) $(SOLARIS_SRCS)
++EXTRA_DIST = $(SALERNOS_SRCS) $(BSD_SRCS) $(HURD_SRCS) $(SOLARIS_SRCS)
  all: all-am
  
  .SUFFIXES:
@@ -110,7 +110,7 @@ index 6daf679..9a63513 100644
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bsd_KbdMap.Plo@am__quote@ # am--include-marker
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bsd_kbd.Plo@am__quote@ # am--include-marker
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hurd_kbd.Plo@am__quote@ # am--include-marker
-+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ironclad_kbd.Plo@am__quote@ # am--include-marker
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/salernos_kbd.Plo@am__quote@ # am--include-marker
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/kbd.Plo@am__quote@ # am--include-marker
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sun_kbd.Plo@am__quote@ # am--include-marker
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sun_kbdMap.Plo@am__quote@ # am--include-marker
@@ -118,7 +118,7 @@ index 6daf679..9a63513 100644
  	-rm -f ./$(DEPDIR)/bsd_KbdMap.Plo
  	-rm -f ./$(DEPDIR)/bsd_kbd.Plo
  	-rm -f ./$(DEPDIR)/hurd_kbd.Plo
-+	-rm -f ./$(DEPDIR)/ironclad_kbd.Plo
++	-rm -f ./$(DEPDIR)/salernos_kbd.Plo
  	-rm -f ./$(DEPDIR)/kbd.Plo
  	-rm -f ./$(DEPDIR)/sun_kbd.Plo
  	-rm -f ./$(DEPDIR)/sun_kbdMap.Plo
@@ -126,15 +126,15 @@ index 6daf679..9a63513 100644
  	-rm -f ./$(DEPDIR)/bsd_KbdMap.Plo
  	-rm -f ./$(DEPDIR)/bsd_kbd.Plo
  	-rm -f ./$(DEPDIR)/hurd_kbd.Plo
-+	-rm -f ./$(DEPDIR)/ironclad_kbd.Plo
++	-rm -f ./$(DEPDIR)/salernos_kbd.Plo
  	-rm -f ./$(DEPDIR)/kbd.Plo
  	-rm -f ./$(DEPDIR)/sun_kbd.Plo
  	-rm -f ./$(DEPDIR)/sun_kbdMap.Plo
-diff --git xf86-input-keyboard-workdir/src/ironclad_kbd.c xf86-input-keyboard-workdir/src/ironclad_kbd.c
+diff --git xf86-input-keyboard-workdir/src/salernos_kbd.c xf86-input-keyboard-workdir/src/salernos_kbd.c
 new file mode 100644
 index 0000000..3f20d5c
 --- /dev/null
-+++ xf86-input-keyboard-workdir/src/ironclad_kbd.c
++++ xf86-input-keyboard-workdir/src/salernos_kbd.c
 @@ -0,0 +1,108 @@
 +#ifdef HAVE_CONFIG_H
 +#include <config.h>

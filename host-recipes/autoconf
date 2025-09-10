@@ -1,13 +1,15 @@
-#!/bin/sh
+#! /bin/sh
+
 name=autoconf
 from_source=autoconf
 revision=1
 
 configure() {
-    CFLAGS="$HOST_CFLAGS" \
-    CXXFLAGS="$HOST_CXXFLAGS" \
-    LDFLAGS="$HOST_LDFLAGS" \
-    "${source_dir}"/configure --prefix="${prefix}"
+        CFLAGS="$HOST_CFLAGS" \
+        CXXFLAGS="$HOST_CXXFLAGS" \
+        LDFLAGS="$HOST_LDFLAGS" \
+    "${source_dir}"/configure \
+        --prefix="${prefix}"
 }
 
 build() {
@@ -16,4 +18,7 @@ build() {
 
 package() {
     DESTDIR="${dest_dir}" make install
+
+        strip_command=strip \
+    post_package_strip
 }

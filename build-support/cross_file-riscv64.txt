@@ -1,0 +1,14 @@
+[binaries]
+c = 'riscv64-salernos-mlibc-gcc'
+cpp = 'riscv64-salernos-mlibc-g++'
+ar = 'riscv64-salernos-mlibc-ar'
+nm = 'riscv64-salernos-mlibc-nm'
+strip = 'riscv64-salernos-mlibc-strip'
+pkg-config = 'riscv64-salernos-mlibc-pkg-config'
+llvm-config = '/base_dir/build-support/cross-llvm-config'
+
+[host_machine]
+system = 'salernos'
+cpu_family = 'riscv64'
+cpu = 'riscv64'
+endian = 'little'

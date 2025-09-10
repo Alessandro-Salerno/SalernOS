@@ -1,0 +1,14 @@
+[binaries]
+c = 'x86_64-salernos-mlibc-gcc'
+cpp = 'x86_64-salernos-mlibc-g++'
+ar = 'x86_64-salernos-mlibc-ar'
+nm = 'x86_64-salernos-mlibc-nm'
+strip = 'x86_64-salernos-mlibc-strip'
+pkg-config = 'x86_64-salernos-mlibc-pkg-config'
+llvm-config = '/base_dir/build-support/cross-llvm-config'
+
+[host_machine]
+system = 'salernos'
+cpu_family = 'x86_64'
+cpu = 'x86_64'
+endian = 'little'

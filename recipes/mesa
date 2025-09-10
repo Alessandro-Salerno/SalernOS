@@ -1,29 +1,29 @@
 #! /bin/sh
 
 name=mesa
-version=24.3.4
-revision=1
-tarball_url="https://archive.mesa3d.org/mesa-${version}.tar.xz"
-tarball_blake2b="a5cf1f49c6d809d19510793f5d1dcec1a3842495d3b4166e303d7f2d4744d179811697d264c5c9b39f2819ebc64a76357195b3eae6b1d2a83128de141354e3c2"
-imagedeps="meson ninja-build python3-mako python3-yaml binutils"
-hostdeps="gcc pkg-config binutils"
-deps="core-libs libexpat libx11 libxcb libxext libxshmfence libxxf86vm libxrandr zlib zstd"
+version=25.2.1
+revision=2
+git_url="https://gitlab.freedesktop.org/mesa/mesa.git"
+commit=d6e3b017b2e38131a4918624c9c3c2792f477a96
+imagedeps="python3-mako python3-yaml glslang-tools"
+hostdeps="gcc pkg-config"
+deps="core-libs llvm-libs libexpat libx11 libxcb libxext libxshmfence libxxf86vm libxrandr zlib zstd"
 
 configure() {
     meson_configure \
         -Dglx=xlib \
         -Dplatforms=x11 \
-        -Dgallium-drivers=softpipe \
-        -Dvulkan-drivers= \
-        -Dllvm=disabled
+        -Dgallium-drivers=llvmpipe,softpipe \
+        -Dvulkan-drivers=swrast \
+        -Dvideo-codecs=all_free
 }
 
 build() {
-    ninja -j${parallelism}
+    meson compile -j${parallelism}
 }
 
 package() {
-    DESTDIR="${dest_dir}" ninja install
+    DESTDIR="${dest_dir}" meson install --no-rebuild
 
     post_package_strip
 }
