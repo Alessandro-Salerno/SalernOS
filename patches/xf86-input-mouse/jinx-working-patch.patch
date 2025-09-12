@@ -1,8 +1,7 @@
-diff --git xf86-input-mouse-clean/configure xf86-input-mouse-workdir/configure
-index 70f3013..458bec4 100755
---- xf86-input-mouse-clean/configure
-+++ xf86-input-mouse-workdir/configure
-@@ -19591,7 +19591,7 @@ inputdir=${moduledir}/input
+diff -uNr xf86-input-mouse-clean/configure xf86-input-mouse-workdir/configure
+--- xf86-input-mouse-clean/configure	2023-05-05 02:25:26.000000000 +0200
++++ xf86-input-mouse-workdir/configure	2023-05-05 02:25:26.000000000 +0200
+@@ -19591,7 +19591,7 @@
  
  # X Server SDK location is required to install xf86-mouse-properties.h
  # This location is also relayed in the xorg-mouse.pc file
@@ -11,75 +10,70 @@ index 70f3013..458bec4 100755
  
  # Workaround overriding sdkdir to be able to create a tarball when user has no
  # write permission in sdkdir. See DISTCHECK_CONFIGURE_FLAGS in Makefile.am
-@@ -19619,6 +19619,9 @@ case $host_os in
+@@ -19619,6 +19619,9 @@
    gnu*)
      OS_MOUSE_NAME=hurd
      ;;
 +  salernos*)
-+    OS_MOUSE_NAME=ironclad
++    OS_MOUSE_NAME=salernos
 +    ;;
  esac
  
  
-diff --git xf86-input-mouse-workdir/src/ironclad_mouse.c xf86-input-mouse-workdir/src/ironclad_mouse.c
-new file mode 100644
-index 0000000..b83cad1
---- /dev/null
-+++ xf86-input-mouse-workdir/src/ironclad_mouse.c
-@@ -0,0 +1,115 @@
+diff -uNr xf86-input-mouse-clean/src/salernos_mouse.c xf86-input-mouse-workdir/src/salernos_mouse.c
+--- xf86-input-mouse-clean/src/salernos_mouse.c	1970-01-01 01:00:00.000000000 +0100
++++ xf86-input-mouse-workdir/src/salernos_mouse.c	2025-09-11 18:41:54.706607133 +0200
+@@ -0,0 +1,110 @@
 +#ifdef HAVE_XORG_CONFIG_H
 +#include <xorg-config.h>
 +#endif
 +
-+#include <xorg-server.h>
 +#include <X11/X.h>
 +#include <X11/Xproto.h>
-+#include "inputstr.h"
-+#include "scrnintstr.h"
-+#include "mipointer.h"
-+
-+#include "xf86.h"
-+#include "xf86Xinput.h"
-+#include "mouse.h"
-+#include "xf86_OSlib.h"
-+#include "xisb.h"
-+
-+#include <stdio.h>
 +#include <errno.h>
 +#include <stdbool.h>
 +#include <stdint.h>
-+
++#include <stdio.h>
 +#include <sys/stat.h>
++#include <xorg-server.h>
 +
-+struct ironclad_mouse_data {
-+   int  x_variation;
-+   int  y_variation;
-+   int  z_variation;
-+   bool is_left;
-+   bool is_right;
-+   bool is_middle;
-+   bool is_4th;
-+   bool is_5th;
++#include "xf86_OSlib.h"
++
++#include "inputstr.h"
++#include "mipointer.h"
++#include "mouse.h"
++#include "scrnintstr.h"
++#include "xf86.h"
++#include "xf86Xinput.h"
++#include "xisb.h"
++
++#define MOUSE_RIGHTBUTTON 0x01
++#define MOUSE_MIDBUTTON   0x02
++#define MOUSE_LEFTBUTTON  0x04
++#define MOUSE_BUTTON4     0x08
++#define MOUSE_BUTTON5     0x10
++
++struct salernos_mouse_data {
++    void *reserved;
++    int   buttons;
++    int   dx;
++    int   dy;
++    int   dz;
 +};
 +
-+static void ironcladReadInput(InputInfoPtr pInfo) {
-+    MouseDevPtr mouse = pInfo->private;
-+    struct ironclad_mouse_data packet;
++static void salernosReadInput(InputInfoPtr pInfo) {
++    MouseDevPtr                mouse = pInfo->private;
++    struct salernos_mouse_data packet;
 +
-+    if (read(pInfo->fd, &packet, sizeof(struct ironclad_mouse_data))) {
++    if (read(pInfo->fd, &packet, sizeof(struct salernos_mouse_data))) {
 +        int b = mouse->lastButtons;
 +        b &= ~0x7;
-+
-+        b |= packet.is_right  ? 0b00001 : 0;
-+        b |= packet.is_middle ? 0b00010 : 0;
-+        b |= packet.is_left   ? 0b00100 : 0;
-+        b |= packet.is_4th    ? 0b01000 : 0;
-+        b |= packet.is_5th    ? 0b10000 : 0;
-+        mouse->PostEvent(pInfo, b, packet.x_variation, packet.y_variation, packet.z_variation, 0);
++        b |= packet.buttons;
++        mouse->PostEvent(pInfo, b, packet.dx, packet.dy, packet.dz, 0);
 +    }
 +}
 +
-+static Bool ironcladPreInit(InputInfoPtr pInfo, const char *proto, int flag) {
++static Bool salernosPreInit(InputInfoPtr pInfo, const char *proto, int flag) {
 +    MouseDevPtr mouse;
 +
 +    mouse = pInfo->private;
@@ -95,13 +89,13 @@ index 0000000..b83cad1
 +    }
 +
 +    mouse->CommonOptions(pInfo);
-+    pInfo->read_input = ironcladReadInput;
++    pInfo->read_input = salernosReadInput;
 +    return true;
 +}
 +
-+#define DEVPATH "/dev/ps2mouse"
++#define DEVPATH "/dev/mouse0"
 +
-+static const char *getdevice(InputInfoPtr pInfo, const char *proto, int flag){
++static const char *getdevice(InputInfoPtr pInfo, const char *proto, int flag) {
 +    pInfo->options = xf86AddNewOption(pInfo->options, "Device", DEVPATH);
 +    return DEVPATH;
 +}
@@ -110,16 +104,14 @@ index 0000000..b83cad1
 +    return MSE_PS2;
 +}
 +
-+static const char *names[] = {
-+    "IroncladMouseDev", NULL
-+};
++static const char *names[] = {"SalernOSMouseDev", NULL};
 +
 +static const char **protonames() {
 +    return names;
 +}
 +
 +static const char *defaultproto() {
-+    return "IroncladMouseDev";
++    return "SalernOSMouseDev";
 +}
 +
 +static Bool isdefault(const char *protocol) {
@@ -135,10 +127,10 @@ index 0000000..b83cad1
 +        return NULL;
 +
 +    p->SupportedInterfaces = interfacesupport;
-+    p->BuiltinNames = protonames;
-+    p->FindDevice = getdevice;
-+    p->DefaultProtocol = defaultproto;
-+    p->CheckProtocol = isdefault;
-+    p->PreInit = ironcladPreInit;
++    p->BuiltinNames        = protonames;
++    p->FindDevice          = getdevice;
++    p->DefaultProtocol     = defaultproto;
++    p->CheckProtocol       = isdefault;
++    p->PreInit             = salernosPreInit;
 +    return p;
 +}

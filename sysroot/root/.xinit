@@ -2,13 +2,8 @@
 
 # Configuration
 CONFIG_DEBUG_ON=/dev/tty6
-CONFIG_XLS_WAIT=2
-CONFIG_TWM_WAIT=2
+CONFIG_WM_WAIT=1
+CONFIG_WM_PATH=jwm
 
-# Internal variables
-_XLS_START=${CONFIG_XLS_WAIT}
-_TWM_START=$((_XLS_START + CONFIG_TWM_WAIT))
-
-Xorg -retro > ${CONFIG_DEBUG_ON} 2> ${CONFIG_DEBUG_ON} &
-(sleep 2 && xlsfonts > ${CONFIG_DEBUG_ON} 2> ${CONFIG_DEBUG_ON}) &
-(sleep 5 && xterm > ${CONFIG_DEBUG_ON} 2> ${CONFIG_DEBUG_ON}) &
+Xorg -dumbSched > ${CONFIG_DEBUG_ON} 2> ${CONFIG_DEBUG_ON} &
+(sleep ${CONFIG_WM_WAIT} && ${CONFIG_WM_PATH} > ${CONFIG_DEBUG_ON} 2> ${CONFIG_DEBUG_ON}) &
