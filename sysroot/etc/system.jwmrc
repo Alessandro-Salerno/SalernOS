@@ -2,7 +2,7 @@
 <JWM>
     <!-- The root menu. -->
     <RootMenu onroot="0">
-        <Program label="Terminal">xterm</Program>
+        <Program label="Terminal">xterm -bg black -fg white -e "cd /root; bash"</Program>
         <Program label="File Manager">xfe</Program>
         <Menu label="Applications">
             <Program label="xeyes">xeyes</Program>

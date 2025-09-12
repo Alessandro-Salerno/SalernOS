@@ -130,8 +130,8 @@ diff -uNr xf86-input-keyboard-clean/src/Makefile.in xf86-input-keyboard-workdir/
  	-rm -f ./$(DEPDIR)/sun_kbdMap.Plo
 diff -uNr xf86-input-keyboard-clean/src/salernos_kbd.c xf86-input-keyboard-workdir/src/salernos_kbd.c
 --- xf86-input-keyboard-clean/src/salernos_kbd.c	1970-01-01 01:00:00.000000000 +0100
-+++ xf86-input-keyboard-workdir/src/salernos_kbd.c	2025-09-11 21:49:21.034864611 +0200
-@@ -0,0 +1,128 @@
++++ xf86-input-keyboard-workdir/src/salernos_kbd.c	2025-09-12 23:03:00.764267172 +0200
+@@ -0,0 +1,166 @@
 +#ifdef HAVE_CONFIG_H
 +#include <config.h>
 +#endif
@@ -158,12 +158,45 @@ diff -uNr xf86-input-keyboard-clean/src/salernos_kbd.c xf86-input-keyboard-workd
 +#define KEYSTATE_PRESSED  1
 +#define KEYSTATE_RELEASED 2
 +
++#define KEYCODE_KEYPADENTER 96
++#define KEYCODE_RIGHTCTRL   97
++#define KEYCODE_KEYPADSLASH 98
++#define KEYCODE_SYSREQ      99
++#define KEYCODE_RIGHTALT    100
++#define KEYCODE_LINEFEED    101
++#define KEYCODE_HOME        102
++#define KEYCODE_UP          103
++#define KEYCODE_PAGEUP      104
++#define KEYCODE_LEFT        105
++#define KEYCODE_RIGHT       106
++#define KEYCODE_END         107
++#define KEYCODE_DOWN        108
++#define KEYCODE_PAGEDOWN    109
++#define KEYCODE_INSERT      110
++#define KEYCODE_DELETE      111
++
 +struct key_packet {
 +    void *reserved;
 +    int   keycode;
 +    int   keystate;
 +    char  unused;
 +};
++
++static int G_SALERNOS_KEMAPS[] = {[KEYCODE_KEYPADENTER] = KEY_KP_Enter,
++                                  [KEYCODE_RIGHTCTRL]   = KEY_RCtrl,
++                                  [KEYCODE_KEYPADSLASH] = KEY_KP_Divide,
++                                  [KEYCODE_RIGHTALT]    = KEY_AltLang,
++                                  [KEYCODE_LINEFEED]    = KEY_KP_Enter,
++                                  [KEYCODE_HOME]        = KEY_Home,
++                                  [KEYCODE_UP]          = KEY_Up,
++                                  [KEYCODE_PAGEUP]      = KEY_PgUp,
++                                  [KEYCODE_LEFT]        = KEY_Left,
++                                  [KEYCODE_RIGHT]       = KEY_Right,
++                                  [KEYCODE_END]         = KEY_End,
++                                  [KEYCODE_DOWN]        = KEY_Down,
++                                  [KEYCODE_PAGEDOWN]    = KEY_PgDown,
++                                  [KEYCODE_INSERT]      = KEY_Insert,
++                                  [KEYCODE_DELETE]      = KEY_Delete};
 +
 +static int KbdOn(InputInfoPtr pInfo, int what) {
 +    return Success;
@@ -207,8 +240,13 @@ diff -uNr xf86-input-keyboard-clean/src/salernos_kbd.c xf86-input-keyboard-workd
 +    if (result > 0) {
 +        result /= sizeof(struct key_packet);
 +        for (ssize_t i = 0; i < result; i++) {
++            int keycode = packets[i].keycode;
++            if (0 != G_SALERNOS_KEMAPS[keycode]) {
++                keycode = G_SALERNOS_KEMAPS[keycode];
++            }
++
 +            pKbd->PostEvent(pInfo,
-+                            packets[i].keycode,
++                            keycode,
 +                            KEYSTATE_RELEASED == packets[i].keystate ? FALSE
 +                                                                     : TRUE);
 +        }
