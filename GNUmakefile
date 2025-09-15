@@ -75,6 +75,7 @@ purge:
 run: salernos.iso
 	qemu-system-x86_64 \
 		-M q35 \
+		-cpu host,+invtsc \
 		-m 12000m \
 		-enable-kvm \
 		-smp cpus=8 \

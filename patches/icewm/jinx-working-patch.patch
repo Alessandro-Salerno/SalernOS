@@ -1,0 +1,811 @@
+diff -uNr icewm-clean/src/misc.cc icewm-workdir/src/misc.cc
+--- icewm-clean/src/misc.cc	2025-08-03 19:42:21.000000000 +0200
++++ icewm-workdir/src/misc.cc	2025-09-13 17:14:13.556041174 +0200
+@@ -3,21 +3,21 @@
+  *
+  * Copyright (C) 1997-2002 Marko Macek
+  */
+-#include "config.h"
+ #include "base.h"
++#include "config.h"
+ #include <errno.h>
+ #include <limits.h>
++#include <pwd.h>
+ #include <stdarg.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+-#include <time.h>
+-#include <unistd.h>
+ #include <sys/stat.h>
+ #include <sys/time.h>
+ #include <sys/types.h>
+ #include <sys/wait.h>
+-#include <pwd.h>
++#include <time.h>
++#include <unistd.h>
+ 
+ #if defined(__GXX_RTTI) && (__GXX_ABI_VERSION >= 1002)
+ #define HAVE_GCC_ABI_DEMANGLE
+@@ -29,8 +29,8 @@
+ #include <execinfo.h>
+ #endif
+ 
+-#include "intl.h"
+ #include "ascii.h"
++#include "intl.h"
+ 
+ using namespace ASCII;
+ 
+@@ -39,7 +39,7 @@
+ #endif
+ 
+ static void endMsg(const char *msg) {
+-    if (*msg == 0 || msg[strlen(msg)-1] != '\n') {
++    if (*msg == 0 || msg[strlen(msg) - 1] != '\n') {
+         fputc('\n', stderr);
+     }
+     fflush(stderr);
+@@ -105,10 +105,8 @@
+     struct tm tmbuf = {};
+     struct tm *loc = localtime_r(&now.tv_sec, &tmbuf);
+ 
+-    fprintf(stderr, "%02d:%02d:%02d.%03u: %s: ", loc->tm_hour,
+-            loc->tm_min, loc->tm_sec,
+-            (unsigned)(now.tv_usec / 1000),
+-            ApplicationName);
++    fprintf(stderr, "%02d:%02d:%02d.%03u: %s: ", loc->tm_hour, loc->tm_min,
++            loc->tm_sec, (unsigned)(now.tv_usec / 1000), ApplicationName);
+ 
+     va_list ap;
+     va_start(ap, msg);
+@@ -164,37 +162,33 @@
+ #ifdef NEED_ALLOC_OPERATORS
+ 
+ static void *MALLOC(unsigned int len) {
+-    if (len == 0) return 0;
++    if (len == 0)
++        return 0;
+     return malloc(len);
+ }
+ 
+ static void FREE(void *p) {
+-    if (p) free(p);
++    if (p)
++        free(p);
+ }
+ 
+-void *operator new(size_t len) {
+-    return MALLOC(len);
+-}
++void *operator new(size_t len) { return MALLOC(len); }
+ 
+ void *operator new[](size_t len) {
+-    if (len == 0) len = 1;
++    if (len == 0)
++        len = 1;
+     return MALLOC(len);
+ }
+ 
+-void operator delete (void *p) {
+-    FREE(p);
+-}
++void operator delete(void *p) { FREE(p); }
+ 
+-void operator delete[](void *p) {
+-    FREE(p);
+-}
++void operator delete[](void *p) { FREE(p); }
+ 
+ #endif
+ 
+ /* Prefer this as a safer alternative over strcpy. Return strlen(from). */
+ #if !defined(HAVE_STRLCPY) || !HAVE_STRLCPY
+-size_t strlcpy(char *dest, const char *from, size_t dest_size)
+-{
++size_t strlcpy(char *dest, const char *from, size_t dest_size) {
+     const char *in = from;
+     if (dest_size > 0) {
+         char *to = dest;
+@@ -203,24 +197,25 @@
+             *to++ = *in++;
+         *to = '\0';
+     }
+-    while (*in) ++in;
++    while (*in)
++        ++in;
+     return in - from;
+ }
+ #endif
+ 
+ /* Prefer this over strcat. Return strlen(dest) + strlen(from). */
+ #if !defined(HAVE_STRLCAT) || !HAVE_STRLCAT
+-size_t strlcat(char *dest, const char *from, size_t dest_size)
+-{
++size_t strlcat(char *dest, const char *from, size_t dest_size) {
+     char *to = dest;
+     char *const stop = to + dest_size - 1;
+-    while (to < stop && *to) ++to;
++    while (to < stop && *to)
++        ++to;
+     return to - dest + strlcpy(to, from, dest_size - (to - dest));
+ }
+ #endif
+ 
+-char* newstr(const char* str) {
+-    char* s = nullptr;
++char *newstr(const char *str) {
++    char *s = nullptr;
+     if (str) {
+         size_t len = strlen(str);
+         s = new char[len + 1];
+@@ -245,10 +240,10 @@
+     return s;
+ }
+ 
+-void foldspaces(char* str) {
++void foldspaces(char *str) {
+     if (str) {
+-        char* dst = str;
+-        for (const char* src = dst; *src; ++src) {
++        char *dst = str;
++        for (const char *src = dst; *src; ++src) {
+             if (*src != ' ' || (dst > str && dst[-1] != ' ')) {
+                 *dst++ = *src;
+             }
+@@ -257,10 +252,10 @@
+     }
+ }
+ 
+-char* demangle(const char* str) {
++char *demangle(const char *str) {
+ #ifdef HAVE_GCC_ABI_DEMANGLE
+     int status = 0;
+-    char* c_name = abi::__cxa_demangle(str, nullptr, nullptr, &status);
++    char *c_name = abi::__cxa_demangle(str, nullptr, nullptr, &status);
+     if (c_name)
+         return c_name;
+ #endif
+@@ -277,10 +272,10 @@
+ #endif
+ }
+ 
+-unsigned long strhash(const char* str) {
++unsigned long strhash(const char *str) {
+     unsigned long hash = 5381;
+     for (; *str; ++str)
+-        hash = 33 * hash ^ (unsigned char) *str;
++        hash = 33 * hash ^ (unsigned char)*str;
+     return hash;
+ }
+ 
+@@ -292,39 +287,34 @@
+  *
+  *              "--interface=/tmp" "--interface"
+  */
+-int strpcmp(char const * str, char const * pfx, char const * delim) {
+-    if (str == nullptr || pfx == nullptr) return -1;
+-    while (*pfx == *str && *pfx != '\0') ++str, ++pfx;
++int strpcmp(char const *str, char const *pfx, char const *delim) {
++    if (str == nullptr || pfx == nullptr)
++        return -1;
++    while (*pfx == *str && *pfx != '\0')
++        ++str, ++pfx;
+ 
+     return (*pfx == '\0' && strchr(delim, *str) ? 0 : *str - *pfx);
+ }
+ 
+ #ifndef HAVE_MEMRCHR
+-void* memrchr(const void* ptr, char chr, size_t num) {
+-    char* str = (char *) ptr;
+-    char* q = str + num;
+-    while (q > str && *--q != chr);
++void *memrchr(const void *ptr, char chr, size_t num) {
++    char *str = (char *)ptr;
++    char *q = str + num;
++    while (q > str && *--q != chr)
++        ;
+     return q >= str && *q == chr ? q : nullptr;
+ }
+ #endif
+ 
+-tokens::tokens(char* data, const char* sep)
+-    : sep(sep)
+-    , save(nullptr)
+-    , tok(strtok_r(data, sep, &save))
+-{
+-}
++tokens::tokens(char *data, const char *sep)
++    : sep(sep), save(nullptr), tok(strtok_r(data, sep, &save)) {}
+ 
+-char* tokens::operator++() {
+-    return tok = strtok_r(nullptr, sep, &save);
+-}
++char *tokens::operator++() { return tok = strtok_r(nullptr, sep, &save); }
+ 
+-bool tokens::operator==(const char* str) const {
+-    return strcmp(tok, str) == 0;
+-}
++bool tokens::operator==(const char *str) const { return strcmp(tok, str) == 0; }
+ 
+-bool GetShortArgument(char* &ret, const char *name, char** &argpp, char **endpp)
+-{
++bool GetShortArgument(char *&ret, const char *name, char **&argpp,
++                      char **endpp) {
+     unsigned int alen = strlen(name);
+     if (**argpp != '-' || strncmp((*argpp) + 1, name, alen))
+         return false;
+@@ -332,16 +322,15 @@
+     if (ch) {
+         ret = (*argpp) + 1 + alen + (ch == '=');
+         return true;
+-    }
+-    else if (argpp + 1 >= endpp)
++    } else if (argpp + 1 >= endpp)
+         return false;
+     ++argpp;
+     ret = *argpp;
+     return true;
+ }
+ 
+-bool GetLongArgument(char* &ret, const char *name, char** &argpp, char **endpp)
+-{
++bool GetLongArgument(char *&ret, const char *name, char **&argpp,
++                     char **endpp) {
+     unsigned int alen = strlen(name);
+     if (strncmp(*argpp, "--", 2) || strncmp((*argpp) + 2, name, alen))
+         return false;
+@@ -357,8 +346,8 @@
+     return true;
+ }
+ 
+-bool GetArgument(char* &ret, const char *sn, const char *ln, char** &arg, char **end)
+-{
++bool GetArgument(char *&ret, const char *sn, const char *ln, char **&arg,
++                 char **end) {
+     bool got = false;
+     if (arg && *arg && **arg == '-') {
+         if (arg[0][1] == '-') {
+@@ -370,38 +359,31 @@
+     return got;
+ }
+ 
+-bool is_short_switch(const char *arg, const char *name)
+-{
++bool is_short_switch(const char *arg, const char *name) {
+     return arg && *arg == '-' && 0 == strcmp(arg + 1, name);
+ }
+ 
+-bool is_long_switch(const char *arg, const char *name)
+-{
++bool is_long_switch(const char *arg, const char *name) {
+     return arg && *arg == '-' && arg[1] == '-' && 0 == strcmp(arg + 2, name);
+ }
+ 
+-bool is_switch(const char *arg, const char *short_name, const char *long_name)
+-{
++bool is_switch(const char *arg, const char *short_name, const char *long_name) {
+     return is_short_switch(arg, short_name) || is_long_switch(arg, long_name);
+ }
+ 
+-bool is_copying_switch(const char *arg)
+-{
++bool is_copying_switch(const char *arg) {
+     return is_switch(arg, "C", "copying");
+ }
+ 
+-bool is_help_switch(const char *arg)
+-{
++bool is_help_switch(const char *arg) {
+     return is_switch(arg, "h", "help") || is_switch(arg, "?", "?");
+ }
+ 
+-bool is_version_switch(const char *arg)
+-{
++bool is_version_switch(const char *arg) {
+     return is_switch(arg, "V", "version");
+ }
+ 
+-void print_help_exit(const char *help)
+-{
++void print_help_exit(const char *help) {
+     printf(_("Usage: %s [OPTIONS]\n"
+              "Options:\n"
+              "%s"
+@@ -410,28 +392,25 @@
+              "  -V, --version       Prints version information and exits.\n"
+              "  -h, --help          Prints this usage screen and exits.\n"
+              "\n"),
+-            ApplicationName, help);
++           ApplicationName, help);
+     exit(0);
+ }
+ 
+-void print_version_exit(const char *version)
+-{
++void print_version_exit(const char *version) {
+     printf("%s %s, %s.\n", ApplicationName, version,
+-        "Copyright 1997-2012 Marko Macek, 2001 Mathias Hasselmann");
++           "Copyright 1997-2012 Marko Macek, 2001 Mathias Hasselmann");
+     exit(0);
+ }
+ 
+-void print_copying_exit()
+-{
++void print_copying_exit() {
+     printf("%s\n",
+-    "IceWM is licensed under the GNU Library General Public License.\n"
+-    "See the file COPYING in the distribution for full details.\n"
+-    );
++           "IceWM is licensed under the GNU Library General Public License.\n"
++           "See the file COPYING in the distribution for full details.\n");
+     exit(0);
+ }
+ 
+-void check_help_version(const char *arg, help_text_fun help, const char *version)
+-{
++void check_help_version(const char *arg, help_text_fun help,
++                        const char *version) {
+     if (is_help_switch(arg)) {
+         print_help_exit(help());
+     }
+@@ -443,13 +422,12 @@
+     }
+ }
+ 
+-static const char* help_display()
+-{
++static const char *help_display() {
+     return "  -d, --display=NAME    NAME of the X server to use.\n";
+ }
+ 
+-void check_argv(int argc, char **argv, help_text_fun help, const char *version)
+-{
++void check_argv(int argc, char **argv, help_text_fun help,
++                const char *version) {
+     if (ApplicationName == nullptr) {
+         ApplicationName = my_basename(argv[0]);
+     }
+@@ -460,14 +438,10 @@
+                 if ('-' == arg[0][1]) {
+                     break;
+                 }
+-            }
+-            else if (strchr("h?vVcC", c)) {
+-                check_help_version(*arg,
+-                    help ? help : help_display,
+-                    version);
+-            }
+-            else if (c == 'd') {
+-                char* value(nullptr);
++            } else if (strchr("h?vVcC", c)) {
++                check_help_version(*arg, help ? help : help_display, version);
++            } else if (c == 'd') {
++                char *value(nullptr);
+                 if (GetArgument(value, "d", "display", arg, argv + argc)) {
+                     setenv("DISPLAY", value, 1);
+                 }
+@@ -476,48 +450,48 @@
+     }
+ }
+ 
+-const char* errno_string() {
+-    return strerror(errno);
+-}
++const char *errno_string() { return strerror(errno); }
+ 
+ const char *my_basename(const char *path) {
+     const char *base = ::strrchr(path, '/');
+     return (base ? base + 1 : path);
+ }
+ 
+-bool isFile(const char* path) {
++bool isFile(const char *path) {
+     struct stat s;
+     return stat(path, &s) == 0 && S_ISREG(s.st_mode);
+ }
+ 
+-bool isExeFile(const char* path) {
++bool isExeFile(const char *path) {
+     struct stat s;
+-    return stat(path, &s) == 0 && S_ISREG(s.st_mode)
+-        && (s.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH));
++    return stat(path, &s) == 0 && S_ISREG(s.st_mode) &&
++           (s.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH));
+ }
+ 
+ // parse a C-style identifier
+-char* identifier(const char* text) {
+-    const char* scan = text;
++char *identifier(const char *text) {
++    const char *scan = text;
+     if (*scan == '_' || isAlpha(*scan)) {
+-        while (*++scan == '_' || isAlnum(*scan)) { }
++        while (*++scan == '_' || isAlnum(*scan)) {
++        }
+     }
+     return text < scan ? newstr(text, int(scan - text)) : nullptr;
+ }
+ 
+ // free a string when out-of-scope
+ class strp {
+-public:
+-    strp(char* string = nullptr) : ptr(string) { }
++  public:
++    strp(char *string = nullptr) : ptr(string) {}
+     ~strp() { delete[] ptr; }
+-    operator char*() { return ptr; }
+-    void operator=(char* p) { ptr = p; }
+-private:
+-    char* ptr;
++    operator char *() { return ptr; }
++    void operator=(char *p) { ptr = p; }
++
++  private:
++    char *ptr;
+ };
+ 
+ // obtain the home directory for a named user
+-char* userhome(const char* username) {
++char *userhome(const char *username) {
+     const size_t buflen = 1234;
+     char buf[buflen];
+     passwd pwd, *result = nullptr;
+@@ -535,7 +509,7 @@
+ }
+ 
+ // expand a leading environment variable
+-char* dollar_expansion(const char* name) {
++char *dollar_expansion(const char *name) {
+     if (name[0] == '$') {
+         bool leftb = (name[1] == '{');
+         strp ident = identifier(name + 1 + leftb);
+@@ -543,11 +517,11 @@
+             size_t idlen = strlen(ident);
+             bool right = (name[1 + leftb + idlen] == '}');
+             if (leftb == right) {
+-                char* expand = getenv(ident);
++                char *expand = getenv(ident);
+                 if (expand) {
+                     size_t xlen = strlen(expand);
+                     size_t size = xlen + strlen(name + idlen);
+-                    char* path = new char[size];
++                    char *path = new char[size];
+                     if (path) {
+                         strlcpy(path, expand, size);
+                         strlcat(path, name + 1 + leftb + idlen + right, size);
+@@ -561,12 +535,11 @@
+ }
+ 
+ // expand a leading tilde+slash or tilde+username
+-char* tilde_expansion(const char* name) {
++char *tilde_expansion(const char *name) {
+     if (name[0] != '~') {
+         return nullptr;
+-    }
+-    else if (name[1] == '/' || name[1] == '\0') {
+-        char* home = getenv("HOME");
++    } else if (name[1] == '/' || name[1] == '\0') {
++        char *home = getenv("HOME");
+         strp user;
+         if (isEmpty(home)) {
+             user = userhome(nullptr);
+@@ -574,15 +547,14 @@
+         }
+         if (nonempty(home)) {
+             size_t size = strlen(home) + strlen(name);
+-            char* path = new char[size];
++            char *path = new char[size];
+             if (path) {
+                 strlcpy(path, home, size);
+                 strlcat(path, name + 1, size);
+                 return path;
+             }
+         }
+-    }
+-    else {
++    } else {
+         strp ident = identifier(name + 1);
+         if (ident) {
+             size_t idlen = strlen(ident);
+@@ -591,7 +563,7 @@
+                 if (home) {
+                     size_t hlen = strlen(home);
+                     size_t size = hlen + strlen(name + idlen);
+-                    char* path = new char[size];
++                    char *path = new char[size];
+                     if (path) {
+                         strlcpy(path, home, size);
+                         strlcat(path, name + 1 + idlen, size);
+@@ -605,12 +577,12 @@
+ }
+ 
+ // lookup "name" in PATH and return a new string or 0.
+-char* path_lookup(const char* name) {
++char *path_lookup(const char *name) {
+     if (isEmpty(name))
+         return nullptr;
+ 
+     if (name[0] == '~') {
+-        char* expand = tilde_expansion(name);
++        char *expand = tilde_expansion(name);
+         if (expand) {
+             if (isExeFile(expand)) {
+                 return expand;
+@@ -622,7 +594,7 @@
+     }
+ 
+     if (name[0] == '$') {
+-        char* expand = dollar_expansion(name);
++        char *expand = dollar_expansion(name);
+         if (expand) {
+             if (isExeFile(expand)) {
+                 return expand;
+@@ -637,14 +609,15 @@
+         return isExeFile(name) ? newstr(name) : nullptr;
+     }
+ 
+-    char* env = getenv("PATH");
++    char *env = getenv("PATH");
+     if (env == nullptr)
+         return nullptr;
+ 
+     const size_t namlen = strlen(name);
+ 
+-    for (char* str = env, *end; *str; str = (end + (*end == ':'))) {
+-        for (end = str; *end != ':' && *++end; );
++    for (char *str = env, *end; *str; str = (end + (*end == ':'))) {
++        for (end = str; *end != ':' && *++end;)
++            ;
+         size_t dirlen = end - str;
+         size_t length = dirlen + namlen + 3;
+         const size_t bufsize = 1234;
+@@ -664,16 +637,14 @@
+     return nullptr;
+ }
+ 
+-#ifdef __gnu_hurd__
+-const char* getprogname() {
+-    return ApplicationName;
+-}
++#ifdef __salernos__
++const char *getprogname() { return ApplicationName; }
+ #endif
+ 
+ // get path of executable.
+-char* progpath() {
++char *progpath() {
+ #if defined(__linux__) && defined(_GNU_SOURCE) && !defined(__ANDROID__)
+-    char* path = program_invocation_name;
++    char *path = program_invocation_name;
+     bool fail = (isEmpty(path) || !isExeFile(path));
+     if (fail) {
+         const size_t linksize = 123;
+@@ -684,7 +655,7 @@
+         ssize_t read = readlink(proc, link, linksize);
+         if (inrange<ssize_t>(read, 1, ssize_t(linksize - 1))) {
+             link[read] = 0;
+-            char* annotation = strstr(link, " (deleted)");
++            char *annotation = strstr(link, " (deleted)");
+             if (annotation && annotation > link) {
+                 annotation[0] = 0;
+             }
+@@ -699,29 +670,28 @@
+         INFO("2: set program_invocation_name %s", path);
+     }
+ #else
+-    static char* path;
++    static char *path;
+     if (path == 0)
+         path = path_lookup(getprogname());
+ #endif
+     return path;
+ }
+ 
+-FILE* process_open(const char* path, const char* args[], int* pid) {
+-    FILE* fp = nullptr;
++FILE *process_open(const char *path, const char *args[], int *pid) {
++    FILE *fp = nullptr;
+     int fds[2];
+     if (pipe(fds) == 0) {
+         *pid = fork();
+         if (*pid == -1) {
+-            close(fds[0]); close(fds[1]);
+-        }
+-        else if (*pid == 0) {
++            close(fds[0]);
++            close(fds[1]);
++        } else if (*pid == 0) {
+             close(fds[0]);
+             dup2(fds[1], 1);
+             close(fds[1]);
+-            execv(path, (char * const *) args);
++            execv(path, (char *const *)args);
+             _exit(1);
+-        }
+-        else {
++        } else {
+             close(fds[1]);
+             fp = fdopen(fds[0], "r");
+             if (fp == nullptr)
+@@ -731,7 +701,7 @@
+     return fp;
+ }
+ 
+-int process_close(FILE* fp, int pid) {
++int process_close(FILE *fp, int pid) {
+     if (fp)
+         fclose(fp);
+     int xit = -1;
+@@ -751,8 +721,8 @@
+     void *array[fixed];
+     const int count = backtrace(array, asize);
+     const char tool[] = "/usr/bin/addr2line";
+-    char* prog = progpath();
+-    char* path = prog ? prog : path_lookup("icewm");
++    char *prog = progpath();
++    char *path = prog ? prog : path_lookup("icewm");
+ 
+     timeval now;
+     gettimeofday(&now, nullptr);
+@@ -760,11 +730,14 @@
+     unsigned msec = unsigned(now.tv_usec / 1000);
+ 
+     fprintf(stderr, "%02d:%02d:%02d.%03u: %s:\n", loc->tm_hour, loc->tm_min,
+-            loc->tm_sec, msec, "backtrace"); fflush(stderr);
++            loc->tm_sec, msec, "backtrace");
++    fflush(stderr);
+ 
+     int status(1);
+     if (path && access(tool, X_OK) == 0) {
+-        const char* args[30] = { tool, "-C", "-f", "-p", "-s", "-e", path, };
++        const char *args[30] = {
++            tool, "-C", "-f", "-p", "-s", "-e", path,
++        };
+         char strings[20][32];
+         for (int i = 0; i < count; ++i) {
+             sprintf(strings[i], "%p", array[i]);
+@@ -772,7 +745,7 @@
+         }
+         args[7 + count] = nullptr;
+         int pid = 0;
+-        FILE* fp = process_open(tool, args, &pid);
++        FILE *fp = process_open(tool, args, &pid);
+         if (fp) {
+             const int linesize(256);
+             char line[linesize];
+@@ -792,7 +765,8 @@
+     if (status) {
+         backtrace_symbols_fd(array, count, 2);
+     }
+-    fputs("end\n\n", stderr); fflush(stderr);
++    fputs("end\n\n", stderr);
++    fflush(stderr);
+ #endif
+ }
+ 
+diff -uNr icewm-clean/src/yfileio.cc icewm-workdir/src/yfileio.cc
+--- icewm-clean/src/yfileio.cc	2025-08-03 19:42:21.000000000 +0200
++++ icewm-workdir/src/yfileio.cc	2025-08-03 19:42:21.000000000 +0200
+@@ -1,20 +1,18 @@
+-#include "config.h"
+ #include "yfileio.h"
+-#include "ytime.h"
+ #include "base.h"
++#include "config.h"
+ #include "sysdep.h"
++#include "ytime.h"
+ 
+-filereader::filereader(const char* filename) :
+-    nFd(open(filename, O_RDONLY | O_NOCTTY))
+-{
+-}
++filereader::filereader(const char *filename)
++    : nFd(open(filename, O_RDONLY | O_NOCTTY)) {}
+ 
+ filereader::~filereader() {
+     if (nFd != -1)
+         close(nFd);
+ }
+ 
+-int filereader::read_all(char* buf, size_t buflen) {
++int filereader::read_all(char *buf, size_t buflen) {
+     ssize_t len = -1;
+     if (nFd >= 0 && (len = read(nFd, buf, buflen - 1)) >= 0) {
+         buf[len] = '\0';
+@@ -45,8 +43,7 @@
+                 size += size / 2;
+                 buf.resize(size + 1);
+             }
+-        }
+-        else if (errno != EINTR) {
++        } else if (errno != EINTR) {
+             buf = nullptr;
+             break;
+         }
+@@ -54,7 +51,7 @@
+     return buf;
+ }
+ 
+-fcsmart filereader::read_pipe(long timeout, bool* expired) {
++fcsmart filereader::read_pipe(long timeout, bool *expired) {
+     if (expired) {
+         *expired = false;
+     }
+@@ -62,8 +59,7 @@
+     if (nFd < 0 || fcntl(nFd, F_SETFL, 0 <= timeout ? O_NONBLOCK : 0) == -1) {
+         return nothing;
+     }
+-    long pipe_size = clamp<long>(fpathconf(nFd, _PC_PIPE_BUF),
+-                                 _POSIX_PIPE_BUF, BUFSIZ);
++    long pipe_size = clamp<long>(fpathconf(nFd, _PC_PIPE_BUF), 512, BUFSIZ);
+     size_t offset = 0;
+     size_t bufsiz = size_t(pipe_size);
+     fcsmart ret(fcsmart::create(bufsiz + 1));
+@@ -72,16 +68,14 @@
+         ssize_t len = read(nFd, &ret[offset], bufsiz - offset);
+         if (len == 0) {
+             break;
+-        }
+-        else if (0 < len) {
++        } else if (0 < len) {
+             offset += len;
+             ret[offset] = '\0';
+             if (bufsiz < offset + 512) {
+                 bufsiz += pipe_size;
+                 ret.resize(bufsiz + 1);
+             }
+-        }
+-        else if (len == -1) {
++        } else if (len == -1) {
+             if ((errno == EAGAIN || errno == EINTR) && timeout >= 0) {
+                 timeval elapsed(monotime() - start);
+                 timeval remains(millitime(timeout) - elapsed);
+@@ -101,21 +95,16 @@
+                         *expired = true;
+                     }
+                     break;
+-                }
+-                else if (nRes == 1) {
++                } else if (nRes == 1) {
+                     continue;
+-                }
+-                else if (nRes == -1 && errno == EINTR) {
++                } else if (nRes == -1 && errno == EINTR) {
+                     continue;
+-                }
+-                else {
++                } else {
+                     return nothing;
+                 }
+-            }
+-            else if (errno == EINTR) {
++            } else if (errno == EINTR) {
+                 continue;
+-            }
+-            else {
++            } else {
+                 return nothing;
+             }
+         }
+@@ -128,7 +117,7 @@
+     }
+ }
+ 
+-fcsmart filereader::read_path(const char* filename) {
++fcsmart filereader::read_path(const char *filename) {
+     struct stat st;
+     if (::stat(filename, &st) == 0) {
+         if (S_ISREG(st.st_mode)) {
+@@ -136,10 +125,8 @@
+                 return filereader(filename).read_size(st.st_size);
+             else
+                 return filereader(filename).read_loop();
+-        }
+-        else if (S_ISFIFO(st.st_mode) || S_ISSOCK(st.st_mode))
++        } else if (S_ISFIFO(st.st_mode) || S_ISSOCK(st.st_mode))
+             return filereader(filename).read_pipe();
+     }
+     return fcsmart();
+ }
+-
