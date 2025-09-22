@@ -53,8 +53,10 @@ int sys_write(int fd, const void *buf, size_t count, ssize_t *bytes_written) {
     iov.iov_base = (void *)buf;
     iov.iov_len  = count;
 
-    struct __syscall_ret ret =
-        __syscall(__SALERNOS_SYSCALL_WRITEV, fd, &iov, 1);
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_WRITEV,
+                                         fd,
+                                         &iov,
+                                         1);
 
     if (ret.errno != 0) {
         return ret.errno;
@@ -81,8 +83,10 @@ int sys_read(int fd, void *buf, size_t count, ssize_t *bytes_read) {
 }
 
 int sys_execve(const char *path, char *const argv[], char *const envp[]) {
-    struct __syscall_ret ret =
-        __syscall(__SALERNOS_SYSCALL_EXECVE, path, argv, envp);
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_EXECVE,
+                                         path,
+                                         argv,
+                                         envp);
     return ret.errno;
 }
 
@@ -110,8 +114,10 @@ int sys_waitpid(pid_t          pid,
     }
 
 again:
-    struct __syscall_ret ret =
-        __syscall(__SALERNOS_SYSCALL_WAITPID, pid, status, flags);
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_WAITPID,
+                                         pid,
+                                         status,
+                                         flags);
 
     if (ret.errno != 0) {
         if (ret.errno == EINTR) {
@@ -128,8 +134,10 @@ again:
 #ifndef MLIBC_BUILDING_RTLD
 
 int sys_ioctl(int fd, unsigned long request, void *arg, int *result) {
-    struct __syscall_ret ret =
-        __syscall(__SALERNOS_SYSCALL_IOCTL, fd, request, arg);
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_IOCTL,
+                                         fd,
+                                         request,
+                                         arg);
 
     if (0 != ret.errno) {
         return ret.errno;
@@ -147,27 +155,34 @@ int sys_stat(fsfd_target  fsfdt,
     struct __syscall_ret ret;
 
     switch (fsfdt) {
-    case fsfd_target::fd: {
-        ret = __syscall(__SALERNOS_SYSCALL_FSTATAT,
-                        fd,
-                        path,
-                        statbuf,
-                        flags | AT_EMPTY_PATH);
-        break;
-    }
-    case fsfd_target::path: {
-        ret = __syscall(
-            __SALERNOS_SYSCALL_FSTATAT, AT_FDCWD, path, statbuf, flags);
-        break;
-    }
-    case fsfd_target::fd_path: {
-        ret = __syscall(__SALERNOS_SYSCALL_FSTATAT, fd, path, statbuf, flags);
-        break;
-    }
-    default: {
-        __ensure(!"stat: Invalid fsfdt");
-        __builtin_unreachable();
-    }
+        case fsfd_target::fd: {
+            ret = __syscall(__SALERNOS_SYSCALL_FSTATAT,
+                            fd,
+                            path,
+                            statbuf,
+                            flags | AT_EMPTY_PATH);
+            break;
+        }
+        case fsfd_target::path: {
+            ret = __syscall(__SALERNOS_SYSCALL_FSTATAT,
+                            AT_FDCWD,
+                            path,
+                            statbuf,
+                            flags);
+            break;
+        }
+        case fsfd_target::fd_path: {
+            ret = __syscall(__SALERNOS_SYSCALL_FSTATAT,
+                            fd,
+                            path,
+                            statbuf,
+                            flags);
+            break;
+        }
+        default: {
+            __ensure(!"stat: Invalid fsfdt");
+            __builtin_unreachable();
+        }
     }
     if (ret.errno != 0)
         return ret.errno;
@@ -177,8 +192,11 @@ int sys_stat(fsfd_target  fsfdt,
 #endif
 
 int sys_openat(int dirfd, const char *path, int flags, mode_t mode, int *fd) {
-    struct __syscall_ret ret =
-        __syscall(__SALERNOS_SYSCALL_OPENAT, dirfd, path, flags, mode);
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_OPENAT,
+                                         dirfd,
+                                         path,
+                                         flags,
+                                         mode);
 
     if (0 != ret.errno) {
         return ret.errno;
@@ -229,8 +247,10 @@ int sys_tcb_set(void *pointer) {
 }
 
 int sys_seek(int fd, off_t offset, int whence, off_t *new_offset) {
-    struct __syscall_ret ret =
-        __syscall(__SALERNOS_SYSCALL_SEEK, fd, offset, whence);
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_SEEK,
+                                         fd,
+                                         offset,
+                                         whence);
 
     if (0 != ret.errno) {
         return ret.errno;
@@ -394,8 +414,10 @@ int sys_setsid(pid_t *sid) {
 int sys_sigprocmask(int how,
                     const sigset_t *__restrict set,
                     sigset_t *__restrict retrieve) {
-    struct __syscall_ret ret =
-        __syscall(__SALERNOS_SYSCALL_SIGPROCMASK, how, set, retrieve);
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_SIGPROCMASK,
+                                         how,
+                                         set,
+                                         retrieve);
 
     if (0 != ret.errno) {
         return ret.errno;
@@ -407,8 +429,12 @@ int sys_sigprocmask(int how,
 int sys_thread_sigmask(int how,
                        const sigset_t *__restrict set,
                        sigset_t *__restrict retrieve) {
-    struct __syscall_ret ret =
-        __syscall(__SALERNOS_SYSCALL_SIGTHREADMASK, how, set, retrieve);
+    // NOTE: __SALERNOS_SYSCALL_SIGTHREADMASK is now deprecated (kernel 0.2.4
+    // indev)
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_SIGPROCMASK,
+                                         how,
+                                         set,
+                                         retrieve);
 
     if (0 != ret.errno) {
         return ret.errno;
@@ -445,8 +471,10 @@ int sys_sigaction(int                     signum,
         new_action.sa_flags |= SA_RESTORER;
     }
 
-    struct __syscall_ret ret =
-        __syscall(__SALERNOS_SYSCALL_SIGACTION, signum, call_action, oldact);
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_SIGACTION,
+                                         signum,
+                                         call_action,
+                                         oldact);
 
     if (0 != ret.errno) {
         return ret.errno;
@@ -475,8 +503,9 @@ int sys_tgkill(int tgid, int tid, int sig) {
         return ENOSYS;
     }
 
-    struct __syscall_ret ret =
-        __syscall(__SALERNOS_SYSCALL_KILL_THREAD, tid, sig);
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_KILL_THREAD,
+                                         tid,
+                                         sig);
 
     if (0 != ret.errno) {
         return ret.errno;
@@ -488,8 +517,10 @@ int sys_tgkill(int tgid, int tid, int sig) {
 #ifndef MLIBC_BUILDING_RTLD
 
 int sys_dup2(int fd, int flags, int newfd) {
-    struct __syscall_ret ret =
-        __syscall(__SALERNOS_SYSCALL_DUP3, fd, newfd, flags);
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_DUP3,
+                                         fd,
+                                         newfd,
+                                         flags);
 
     if (0 != ret.errno) {
         return ret.errno;
@@ -511,8 +542,9 @@ int sys_dup(int fd, int flags, int *newfd) {
 }
 
 int sys_getcwd(char *buffer, size_t size) {
-    struct __syscall_ret ret =
-        __syscall(__SALERNOS_SYSCALL_GETCWD, buffer, size);
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_GETCWD,
+                                         buffer,
+                                         size);
 
     if (0 != ret.errno) {
         return ret.errno;
@@ -522,8 +554,10 @@ int sys_getcwd(char *buffer, size_t size) {
 }
 
 int sys_fcntl(int fd, int request, va_list args, int *result) {
-    struct __syscall_ret ret = __syscall(
-        __SALERNOS_SYSCALL_FCNTL, fd, request, va_arg(args, uint64_t));
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_FCNTL,
+                                         fd,
+                                         request,
+                                         va_arg(args, uint64_t));
 
     if (0 != ret.errno) {
         return ret.errno;
@@ -563,8 +597,10 @@ int sys_read_entries(int     fd,
                      void   *buffer,
                      size_t  max_size,
                      size_t *bytes_read) {
-    struct __syscall_ret ret =
-        __syscall(__SALERNOS_SYSCALL_READDIR, fd, buffer, max_size);
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_READDIR,
+                                         fd,
+                                         buffer,
+                                         max_size);
 
     if (0 != ret.errno) {
         return ret.errno;
@@ -585,8 +621,11 @@ int sys_chdir(const char *path) {
 }
 
 int sys_faccessat(int dirfd, const char *pathname, int mode, int flags) {
-    struct __syscall_ret ret =
-        __syscall(__SALERNOS_SYSCALL_FACCESSAT, dirfd, pathname, mode, flags);
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_FACCESSAT,
+                                         dirfd,
+                                         pathname,
+                                         mode,
+                                         flags);
 
     if (0 != ret.errno) {
         return ret.errno;
@@ -603,8 +642,9 @@ int sys_access(const char *path, int mode) {
 
 int sys_clock_get(int clock, time_t *secs, long *nanos) {
     struct timespec      ts;
-    struct __syscall_ret ret =
-        __syscall(__SALERNOS_SYSCALL_CLOCK_GET, clock, &ts);
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_CLOCK_GET,
+                                         clock,
+                                         &ts);
 
     if (0 != ret.errno) {
         return ret.errno;
@@ -747,8 +787,11 @@ int sys_readlinkat(int         dirfd,
                    void       *buffer,
                    size_t      max_size,
                    ssize_t    *length) {
-    struct __syscall_ret ret =
-        __syscall(__SALERNOS_SYSCALL_READLINKAT, dirfd, path, buffer, max_size);
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_READLINKAT,
+                                         dirfd,
+                                         path,
+                                         buffer,
+                                         max_size);
 
     if (0 != ret.errno) {
         return ret.errno;
@@ -766,8 +809,10 @@ int sys_readlink(const char *path,
 }
 
 int sys_symlinkat(const char *target_path, int dirfd, const char *link_path) {
-    struct __syscall_ret ret =
-        __syscall(__SALERNOS_SYSCALL_SYMLINKAT, target_path, dirfd, link_path);
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_SYMLINKAT,
+                                         target_path,
+                                         dirfd,
+                                         link_path);
 
     if (0 != ret.errno) {
         return ret.errno;
@@ -781,8 +826,10 @@ int sys_symlink(const char *target_path, const char *link_path) {
 }
 
 int sys_unlinkat(int fd, const char *path, int flags) {
-    struct __syscall_ret ret =
-        __syscall(__SALERNOS_SYSCALL_UNLINKAT, fd, path, flags);
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_UNLINKAT,
+                                         fd,
+                                         path,
+                                         flags);
 
     if (0 != ret.errno) {
         return ret.errno;
@@ -796,8 +843,10 @@ int sys_rmdir(const char *path) {
 }
 
 int sys_socket(int domain, int type_and_flags, int proto, int *fd) {
-    struct __syscall_ret ret =
-        __syscall(__SALERNOS_SYSCALL_SOCKET, domain, type_and_flags, proto);
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_SOCKET,
+                                         domain,
+                                         type_and_flags,
+                                         proto);
 
     if (0 != ret.errno) {
         return ret.errno;
@@ -808,8 +857,10 @@ int sys_socket(int domain, int type_and_flags, int proto, int *fd) {
 }
 
 int sys_bind(int fd, const struct sockaddr *addr_ptr, socklen_t addr_length) {
-    struct __syscall_ret ret =
-        __syscall(__SALERNOS_SYSCALL_BIND, fd, addr_ptr, addr_length);
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_BIND,
+                                         fd,
+                                         addr_ptr,
+                                         addr_length);
 
     if (0 != ret.errno) {
         return ret.errno;
@@ -819,8 +870,9 @@ int sys_bind(int fd, const struct sockaddr *addr_ptr, socklen_t addr_length) {
 }
 
 int sys_listen(int fd, int backlog) {
-    struct __syscall_ret ret =
-        __syscall(__SALERNOS_SYSCALL_LISTEN, fd, backlog);
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_LISTEN,
+                                         fd,
+                                         backlog);
 
     if (0 != ret.errno) {
         return ret.errno;
@@ -846,8 +898,10 @@ int sys_accept(int              fd,
                socklen_t       *addr_length,
                int              flags) {
     (void)flags;
-    struct __syscall_ret ret =
-        __syscall(__SALERNOS_SYSCALL_ACCEPT, fd, addr_ptr, addr_length);
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_ACCEPT,
+                                         fd,
+                                         addr_ptr,
+                                         addr_length);
 
     if (0 != ret.errno) {
         return ret.errno;
@@ -873,8 +927,10 @@ int sys_accept(int              fd,
 int sys_connect(int                    fd,
                 const struct sockaddr *addr_ptr,
                 socklen_t              addr_length) {
-    struct __syscall_ret ret =
-        __syscall(__SALERNOS_SYSCALL_CONNECT, fd, addr_ptr, addr_length);
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_CONNECT,
+                                         fd,
+                                         addr_ptr,
+                                         addr_length);
 
     if (0 != ret.errno) {
         return ret.errno;
@@ -886,8 +942,10 @@ int sys_connect(int                    fd,
 int sys_setitimer(int                     which,
                   const struct itimerval *new_value,
                   struct itimerval       *old_value) {
-    struct __syscall_ret ret =
-        __syscall(__SALERNOS_SYSCALL_SETITIMER, which, new_value, old_value);
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_SETITIMER,
+                                         which,
+                                         new_value,
+                                         old_value);
 
     if (0 != ret.errno) {
         return ret.errno;
@@ -897,8 +955,10 @@ int sys_setitimer(int                     which,
 }
 
 int sys_mkdirat(int dirfd, const char *path, mode_t mode) {
-    struct __syscall_ret ret =
-        __syscall(__SALERNOS_SYSCALL_MKDIRAT, dirfd, path, mode);
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_MKDIRAT,
+                                         dirfd,
+                                         path,
+                                         mode);
 
     if (0 != ret.errno) {
         return ret.errno;
@@ -928,8 +988,10 @@ int sys_peername(int              fd,
                  struct sockaddr *addr_ptr,
                  socklen_t        max_addr_length,
                  socklen_t       *actual_length) {
-    struct __syscall_ret ret = __syscall(
-        __SALERNOS_SYSCALL_GETPEERNAME, fd, addr_ptr, max_addr_length);
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_GETPEERNAME,
+                                         fd,
+                                         addr_ptr,
+                                         max_addr_length);
 
     if (0 != ret.errno) {
         return ret.errno;
@@ -945,8 +1007,10 @@ int sys_msg_send(int                  sockfd,
                  const struct msghdr *hdr,
                  int                  flags,
                  ssize_t             *length) {
-    struct __syscall_ret ret =
-        __syscall(__SALERNOS_SYSCALL_SENDMSG, sockfd, hdr, flags);
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_SENDMSG,
+                                         sockfd,
+                                         hdr,
+                                         flags);
 
     if (0 != ret.errno) {
         return ret.errno;
@@ -957,8 +1021,10 @@ int sys_msg_send(int                  sockfd,
 }
 
 int sys_msg_recv(int sockfd, struct msghdr *hdr, int flags, ssize_t *length) {
-    struct __syscall_ret ret =
-        __syscall(__SALERNOS_SYSCALL_RECVMSG, sockfd, hdr, flags);
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_RECVMSG,
+                                         sockfd,
+                                         hdr,
+                                         flags);
 
     if (0 != ret.errno) {
         return ret.errno;

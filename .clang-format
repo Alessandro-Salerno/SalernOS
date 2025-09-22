@@ -3,7 +3,7 @@ UseTab: Never
 AccessModifierOffset: '0'
 AlignConsecutiveMacros: 'true'
 AlignEscapedNewlines: Left
-AlignOperands: 'true'
+AlignOperands: Align
 AlignTrailingComments: 'true'
 AlignAfterOpenBracket: 'true'
 AlignConsecutiveAssignments: 'Consecutive'
