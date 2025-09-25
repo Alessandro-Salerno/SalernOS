@@ -11,9 +11,9 @@ hostdeps="gcc autoconf automake libtool pkg-config"
 deps="core-libs libx11 fribidi libxpm libxft libxres fontconfig libxinerama libxcomposite libxdamage imlib2"
 
 configure() {
-	cmake_configure \
-	-DCFGFIR=/etc -DBUILD_TESTING=off \
-	${source_dir}
+    cmake_configure \
+        -DCFGFIR=/etc -DBUILD_TESTING=off \
+        ${source_dir}
 }
 
 build() {

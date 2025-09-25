@@ -1,10 +1,10 @@
 #!/bin/sh
 
-name=benchmarks
+name=tests
 version=0.0.1
 skip_pkg_check=yes
 revision=1
-source_dir="benchmarks"
+source_dir="tests"
 imagedeps="git build-essential"
 hostdeps="gcc binutils libgcc-binaries"
 deps="mlibc-headers mlibc freestnd-c-hdrs freestnd-cxx-hdrs libgcc"
@@ -35,26 +35,27 @@ build() {
 }
 
 package() {
-    mkdir -p "${dest_dir}"
-    cp ./runmany "${dest_dir}"
-    cp ./testpipe "${dest_dir}"
-    cp ./loop "${dest_dir}"
-    cp ./testclone "${dest_dir}"
-    cp ./testthreads "${dest_dir}"
-    cp ./testjoin "${dest_dir}"
-    cp ./testprocs "${dest_dir}"
-    cp ./testalloc "${dest_dir}"
-    cp ./testnull "${dest_dir}"
-    cp ./testsig "${dest_dir}"
-    cp ./testfork "${dest_dir}"
-    cp ./testsigheavy "${dest_dir}"
-    cp ./testcwd "${dest_dir}"
-    cp ./testpty "${dest_dir}"
-    cp ./testsockbase "${dest_dir}"
-    cp ./testsock "${dest_dir}"
-    cp ./testalarm "${dest_dir}"
-    cp ./testfb "${dest_dir}"
-    cp ./testlibfbdevhw "${dest_dir}"
-    cp ./testmouse "${dest_dir}"
-    cp ./testkbd "${dest_dir}"
+    install_dir="${dest_dir}/root/tests"
+    mkdir -p "${install_dir}"
+    cp ./runmany "${install_dir}"
+    cp ./testpipe "${install_dir}"
+    cp ./loop "${install_dir}"
+    cp ./testclone "${install_dir}"
+    cp ./testthreads "${install_dir}"
+    cp ./testjoin "${install_dir}"
+    cp ./testprocs "${install_dir}"
+    cp ./testalloc "${install_dir}"
+    cp ./testnull "${install_dir}"
+    cp ./testsig "${install_dir}"
+    cp ./testfork "${install_dir}"
+    cp ./testsigheavy "${install_dir}"
+    cp ./testcwd "${install_dir}"
+    cp ./testpty "${install_dir}"
+    cp ./testsockbase "${install_dir}"
+    cp ./testsock "${install_dir}"
+    cp ./testalarm "${install_dir}"
+    cp ./testfb "${install_dir}"
+    cp ./testlibfbdevhw "${install_dir}"
+    cp ./testmouse "${install_dir}"
+    cp ./testkbd "${install_dir}"
 }
