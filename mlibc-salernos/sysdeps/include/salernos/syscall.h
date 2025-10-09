@@ -56,6 +56,7 @@
 #define __SALERNOS_SYSCALL_SETITIMER     52
 #define __SALERNOS_SYSCALL_MKDIRAT       53
 #define __SALERNOS_SYSCALL_GETPEERNAME   54
+#define __SALERNOS_SYSCALL_MUNMAP        55
 
 struct __syscall_ret {
     uint64_t ret;
@@ -68,12 +69,15 @@ static struct __syscall_ret __syscall(int number, ...) {
     register uint64_t    a1 asm("rdi") = va_arg(args, uint64_t);
     register uint64_t    a2 asm("rsi") = va_arg(args, uint64_t);
     register uint64_t    a3 asm("rdx") = va_arg(args, uint64_t);
-    register uint64_t    a4 asm("rcx") = va_arg(args, uint64_t);
+    register uint64_t    a4 asm("r10") = va_arg(args, uint64_t);
+    register uint64_t    a5 asm("r8")  = va_arg(args, uint64_t);
+    register uint64_t    a6 asm("r9")  = va_arg(args, uint64_t);
     struct __syscall_ret s;
-    asm volatile("int $0x80"
-                 : "=a"(s.ret), "=d"(s.errno)
-                 : "a"(number), "r"(a1), "r"(a2), "r"(a3), "r"(a4)
-                 : "r11", "memory");
+    asm volatile(
+        "syscall"
+        : "=a"(s.ret), "=d"(s.errno)
+        : "a"(number), "r"(a1), "r"(a2), "r"(a3), "r"(a4), "r"(a5), "r"(a6)
+        : "rcx", "r11", "memory");
     va_end(args);
     return s;
 }

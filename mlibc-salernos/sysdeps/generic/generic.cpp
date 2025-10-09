@@ -220,7 +220,8 @@ int sys_vm_map(void  *hint,
     __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_MMAP,
                                   hint,
                                   size,
-                                  (uint64_t)prot << 32 | (uint64_t)flags,
+                                  flags,
+                                  prot,
                                   fd,
                                   offset);
     if (0 != ret.errno) {
@@ -1032,6 +1033,22 @@ int sys_msg_recv(int sockfd, struct msghdr *hdr, int flags, ssize_t *length) {
 
     *length = (ssize_t)ret.ret;
     return 0;
+}
+
+int sys_vm_unmap(void *pointer, size_t size) {
+    struct __syscall_ret ret = __syscall(__SALERNOS_SYSCALL_MUNMAP,
+                                         pointer,
+                                         size);
+
+    if (0 != ret.errno) {
+        return ret.errno;
+    }
+
+    return 0;
+}
+
+int sys_anon_free(void *pointer, size_t size) {
+    return sys_vm_unmap(pointer, size);
 }
 
 } // namespace mlibc

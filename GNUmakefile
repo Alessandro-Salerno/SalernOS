@@ -76,7 +76,7 @@ run: salernos.iso
 	qemu-system-x86_64 \
 		-M q35 \
 		-cpu host,+invtsc \
-		-m 12000m \
+		-m 16000m \
 		-enable-kvm \
 		-smp cpus=8 \
 		-no-shutdown \
@@ -94,7 +94,7 @@ debug: salernos.iso
 	qemu-system-x86_64 \
 		-M q35 \
 		-cpu host,+invtsc \
-		-m 12000m \
+		-m 16000m \
 		-enable-kvm \
 		-smp cpus=8 \
 		-no-shutdown \
@@ -105,5 +105,6 @@ debug: salernos.iso
 		-device virtio-net,netdev=net0 \
 		-object filter-dump,id=f1,netdev=net0,file=netdump.dat \
 		-cdrom salernos.iso \
+		-display sdl,gl=on \
 		-S -s
 

@@ -66,3 +66,4 @@ fi
 alias ls="ls --color=auto"
 alias python="PYTHONHASHSEED=0 python"
 alias xeyes="DISPLAY=:0 xeyes"
+alias perf="time /root/tests/runmany 500 /root/tests/testpipe 2048"

@@ -83,17 +83,7 @@ int sys_fsync(int) {
 
 #endif
 
-int sys_vm_unmap(void *pointer, size_t size) {
-    STUB_OK
-}
-
-int sys_vm_protect(void *pointer, size_t size, int prot) {
-    STUB_OK
-}
-
-int sys_anon_free(void *pointer, size_t size) {
-    return sys_vm_unmap(pointer, size);
-}
+int sys_vm_protect(void *pointer, size_t size, int prot){STUB_OK}
 
 #ifndef MLIBC_BUILDING_RTLD
 
