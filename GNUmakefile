@@ -87,7 +87,7 @@ run: salernos.iso
 		-device virtio-net,netdev=net0 \
 		-object filter-dump,id=f1,netdev=net0,file=netdump.dat \
 		-cdrom salernos.iso  \
-		-device nvme,serial=phantom-nvme0 \
+		-drive file=ext2test.disk,if=none,id=nvme0,format=raw -device nvme,drive=nvme0,serial=deadbeef \
 		-display sdl,gl=on
 
 debug: salernos.iso
@@ -106,5 +106,6 @@ debug: salernos.iso
 		-object filter-dump,id=f1,netdev=net0,file=netdump.dat \
 		-cdrom salernos.iso \
 		-display sdl,gl=on \
+		-device nvme,serial=phantom-nvme0 \
 		-S -s
 
