@@ -21,11 +21,11 @@
     </Group>
 
     <!-- Tray at the top. -->
-    <Tray x="0" y="0" autohide="off" delay="1000">
-        <TrayButton label="Applications">root:0</TrayButton>
+    <Tray x="0" y="-1" autohide="off" delay="1000">
+        <TrayButton label="SalernOS">root:0</TrayButton>
         <Spacer width="2"/>
         <TaskList maxwidth="256"/>
-        <Pager labeled="true"/>
+        <Pager labeled="false"/>
         <Dock/>
         <Clock format="%l:%M %p" />
     </Tray>
@@ -36,11 +36,11 @@
         <Width>4</Width>
         <Corner>2</Corner>
         <Foreground>#000000</Foreground>
-        <Background>#FFFFFF</Background>
+        <Background>#AAAAAA</Background>
         <Opacity>0.5</Opacity>
         <Active>
-            <Foreground>#000000</Foreground>
-            <Background>#D0DEE5</Background>
+            <Foreground>#FFFFFF</Foreground>
+            <Background>#5095BF</Background>
             <Opacity>1.0</Opacity>
         </Active>
     </WindowStyle>
@@ -86,7 +86,7 @@
 
     <!-- Virtual Desktops -->
     <Desktops width="4" height="1">
-        <Background type="image">/etc/background.jpg</Background>
+        <Background type="image">/etc/background.png</Background>
     </Desktops>
 
     <!-- Double click speed (in milliseconds) -->
