@@ -7,5 +7,5 @@ tarball_blake2b="cca3476df0b79cdbca798ed3a067611414e9b422e8347d0f490e7c4d0c43cdd
 hostdeps="autoconf automake libtool"
 
 prepare() {
-    autotools_recursive_regen
+    autotools_recursive_regen_old
 }

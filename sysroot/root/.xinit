@@ -1,5 +1,7 @@
 #!/bin/sh
 
+mkdir -p /var/log
+
 # Configuration
 CONFIG_DEBUG_ON=/dev/tty6
 CONFIG_WM_WAIT=1

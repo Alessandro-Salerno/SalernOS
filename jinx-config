@@ -134,6 +134,19 @@ autotools_recursive_regen() {
     fi
 }
 
+# FOR PRE 0.2.4 RECIPES
+autotools_recursive_regen_old() {
+    ACLOCAL_INCLUDE=""
+    if [ -d ${sysroot_dir}/usr/share/aclocal ]; then
+        ACLOCAL_INCLUDE="-I${sysroot_dir}/usr/share/aclocal"
+    fi
+
+    for f in $(find . -name configure.ac -o -name configure.in -type f | sort); do
+        echo "* autotools regen in '$(dirname $f)'..."
+        ( cd "$(dirname "$f")" && autoreconf -fvi "$@" $ACLOCAL_INCLUDE )
+    done
+}
+
 meson_configure() {
         CFLAGS="$TARGET_CFLAGS" \
         CXXFLAGS="$TARGET_CXXFLAGS" \

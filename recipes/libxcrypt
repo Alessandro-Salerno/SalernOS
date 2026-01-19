@@ -11,7 +11,7 @@ hostdeps="gcc automake autoconf libtool pkg-config"
 deps="mlibc libgcc libstdc++"
 
 prepare() {
-    autotools_recursive_regen
+    autotools_recursive_regen_old
 }
 
 configure() {

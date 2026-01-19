@@ -10,7 +10,7 @@ hostdeps="gcc automake autoconf libtool pkg-config"
 deps="core-libs"
 
 prepare() {
-    autotools_recursive_regen
+    autotools_recursive_regen_old
 }
 
 configure() {
@@ -19,7 +19,11 @@ configure() {
         configure_script_path=./configure \
     autotools_configure \
         CFLAGS="$TARGET_CFLAGS -DSLOW_BUT_NO_HACKS" \
-        --enable-no-install-program="mkfifo,runcon,chroot"
+        --enable-no-install-program="mkfifo,runcon,chroot" \
+        ac_cv_header_utmp_h=no \
+        ac_cv_header_utmpx_h=no \
+        ac_cv_func_getutxent=no \
+        ac_cv_func_getutent=no
 }
 
 build() {
