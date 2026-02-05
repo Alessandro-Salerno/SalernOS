@@ -102,6 +102,8 @@ if not no_headers
 
     install_headers(
 		'include/salernos/ktty.h',
+		'include/salernos/kbd.h',
+		'include/salernos/mouse.h',
 		subdir: 'salernos',
 	)
 

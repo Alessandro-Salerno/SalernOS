@@ -2,10 +2,12 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <poll.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <unistd.h>
 
 #define NUM_CHILDREN 5
@@ -17,6 +19,11 @@ volatile sig_atomic_t signal_count = 0;
 // Signal handler
 void handler(int sig) {
     signal_count++;
+}
+
+double elapsed_time(struct timespec start, struct timespec end) {
+    return (end.tv_sec - start.tv_sec) * 1000 +
+           (end.tv_nsec - start.tv_nsec) / 1e6;
 }
 
 int main() {
@@ -74,11 +81,16 @@ int main() {
     sigprocmask(SIG_SETMASK, &old_set, NULL);
 
     // Spin until we have received all expected signals
-    int expected        = NUM_CHILDREN * NUM_SIGNALS;
-    int num_secs_waited = 0;
-    while (signal_count < expected && num_secs_waited < 5) {
-        sleep(1);
-        num_secs_waited++;
+    int expected = NUM_CHILDREN * NUM_SIGNALS;
+    int mills    = 0;
+    while (signal_count < expected && mills < 5000) {
+        struct timespec start, end;
+        clock_gettime(CLOCK_MONOTONIC, &start);
+        poll(NULL, 0, 100);
+        for (int j = 0; j < 100000; j++)
+            ;
+        clock_gettime(CLOCK_MONOTONIC, &end);
+        mills += elapsed_time(start, end);
     }
 
     printf("Received %d/%d signals.\n", signal_count, expected);

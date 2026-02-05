@@ -3,7 +3,7 @@
 mkdir -p /var/log
 
 # Configuration
-CONFIG_DEBUG_ON=/dev/tty6
+CONFIG_DEBUG_ON=/dev/null
 CONFIG_WM_WAIT=1
 CONFIG_WM_PATH=jwm
 
