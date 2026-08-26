@@ -14,3 +14,109 @@ diff -urN --no-dereference mlibc-clean/meson.build mlibc-workdir/meson.build
  elif host_machine.system() == 'menix'
  	rtld_include_dirs += include_directories('sysdeps/menix/include')
  	libc_include_dirs += include_directories('sysdeps/menix/include')
+diff -urN --no-dereference mlibc-clean/options/ansi/generic/stdio.cpp mlibc-workdir/options/ansi/generic/stdio.cpp
+--- mlibc-clean/options/ansi/generic/stdio.cpp
++++ mlibc-workdir/options/ansi/generic/stdio.cpp
+@@ -731,6 +731,80 @@
+ 				*typed_dest = (void *)(uintptr_t)res;
+ 				break;
+ 			}
++			case 'a': case 'A':
++			case 'e': case 'E':
++			case 'f': case 'F':
++			case 'g': case 'G': {
++				auto fbuf = frg::string<MemoryAllocator>{getAllocator()};
++				bool is_hex = false;
++				char c = handler.look_ahead();
++				EOF_CHECK(c == '\0');
++
++				auto take = [&]() {
++					fbuf += handler.consume();
++					count++;
++				};
++				auto room = [&]() {
++					return !width || count < width;
++				};
++
++				if ((c == '+' || c == '-') && room()) {
++					take();
++					c = handler.look_ahead();
++				}
++
++				if (c == '0' && room()) {
++					take();
++					c = handler.look_ahead();
++					if ((c == 'x' || c == 'X') && room()) {
++						is_hex = true;
++						take();
++						c = handler.look_ahead();
++					}
++				}
++
++				while (room() && (c == '.' ||
++						(is_hex ? isxdigit(c) : isdigit(c)))) {
++					take();
++					c = handler.look_ahead();
++				}
++
++				if (room() && ((is_hex && (c == 'p' || c == 'P')) ||
++						(!is_hex && (c == 'e' || c == 'E')))) {
++					take();
++					c = handler.look_ahead();
++					if ((c == '+' || c == '-') && room()) {
++						take();
++						c = handler.look_ahead();
++					}
++					while (room() && isdigit(c)) {
++						take();
++						c = handler.look_ahead();
++					}
++				}
++
++				NOMATCH_CHECK(count == 0);
++				fbuf += '\0';
++
++				char *fend = nullptr;
++				if (type == SCANF_TYPE_LL) {
++					long double v = strtold(fbuf.data(), &fend);
++					NOMATCH_CHECK(fend == fbuf.data());
++					if (dest)
++						*(long double *)dest = v;
++				} else if (type == SCANF_TYPE_L) {
++					double v = strtod(fbuf.data(), &fend);
++					NOMATCH_CHECK(fend == fbuf.data());
++					if (dest)
++						*(double *)dest = v;
++				} else {
++					float v = strtof(fbuf.data(), &fend);
++					NOMATCH_CHECK(fend == fbuf.data());
++					if (dest)
++						*(float *)dest = v;
++				}
++				break;
++			}
+ 			case 'n': {
+ 				int *typed_dest = (int *)dest;
+ 				if (typed_dest)
+diff -urN --no-dereference mlibc-clean/options/posix/generic/posix_string.cpp mlibc-workdir/options/posix/generic/posix_string.cpp
+--- mlibc-clean/options/posix/generic/posix_string.cpp
++++ mlibc-workdir/options/posix/generic/posix_string.cpp
+@@ -136,9 +136,15 @@
+ 	return nullptr;
+ }
+ 
+-void *memccpy(void *__restrict, const void *__restrict, int, size_t) {
+-	__ensure(!"Not implemented");
+-	__builtin_unreachable();
++void *memccpy(void *__restrict dest, const void *__restrict src, int c, size_t n) {
++	unsigned char *d = (unsigned char *)dest;
++	const unsigned char *s = (const unsigned char *)src;
++	unsigned char t = (unsigned char)c;
++	while(n--) {
++		if((*d++ = *s++) == t)
++			return (void *)d;
++	}
++	return nullptr;
+ }
+ 
+ // This implementation was taken from musl

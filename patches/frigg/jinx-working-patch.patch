@@ -1,0 +1,31 @@
+diff -urN --no-dereference frigg-clean/include/frg/printf.hpp frigg-workdir/include/frg/printf.hpp
+--- frigg-clean/include/frg/printf.hpp
++++ frigg-workdir/include/frg/printf.hpp
+@@ -505,10 +505,25 @@
+ 				opts.group_thousands, locale_opts);
+ 		break;
+ 	case 'g':
+-	case 'G':
+ 	case 'e':
++		use_capitals = false;
++		[[fallthrough]];
++	case 'G':
+ 	case 'E':
+-		sink.append("%f");
++#ifndef FRG_DONT_USE_LONG_DOUBLE
++		if (szmod == printf_size_mod::longdouble_size) {
++			_fmt_basics::print_float(sink, pop_arg<long double>(vsp, &opts),
++					opts.minimum_width, precision_or_default,
++					opts.fill_zeros ? '0' : ' ', opts.left_justify, use_capitals,
++					opts.group_thousands, locale_opts);
++			break;
++		}
++#endif
++		FRG_ASSERT(szmod == printf_size_mod::default_size || szmod == printf_size_mod::long_size);
++		_fmt_basics::print_float(sink, pop_arg<double>(vsp, &opts),
++				opts.minimum_width, precision_or_default,
++				opts.fill_zeros ? '0' : ' ', opts.left_justify, use_capitals,
++				opts.group_thousands, locale_opts);
+ 		break;
+ 	default:
+ 		FRG_ASSERT(!"Unexpected printf terminal");

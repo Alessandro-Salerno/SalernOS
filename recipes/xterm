@@ -7,13 +7,13 @@ imagedeps="build-essential"
 source_hostdeps="automake autoconf libtool pkg-config"
 source_deps="xorg-util-macros"
 hostdeps="gcc autoconf automake libtool pkg-config"
-deps="core-libs libx11 libxaw libxmu ncurses xorg-util-macros xorg-proto"
+deps="core-libs libx11 libxaw libxmu libxft libxrender freetype2 fontconfig ncurses xorg-util-macros xorg-proto"
 
 
 configure() {
     # yes, host isn't using the triplet
     # because autoconfing it breaks everything
-    CC=${OS_TRIPLET}-gcc CFLAGS="$TARGET_CFLAGS -DNO_EXECINFO" LDFLAGS="$TARGET_LDFLAGS" ${source_dir}/configure \
+    CC=${OS_TRIPLET}-gcc CFLAGS="$TARGET_CFLAGS -DNO_EXECINFO -I${sysroot_dir}/${prefix}/include/freetype2" LDFLAGS="$TARGET_LDFLAGS" LIBS="-lfreetype" ${source_dir}/configure \
         --host=x86_64-salernos \
         --with-sysroot="${sysroot_dir}" \
         --prefix=${prefix} \
@@ -22,7 +22,7 @@ configure() {
         --bindir=${prefix}/bin \
         --sbindir=${prefix}/bin \
         --libdir=${prefix}/lib \
-        --with-x --enable-ansi-color --enable-88-color --enable-256-color --disable-tcap-fkeys --disable-tcap-query --enable-i18n
+        --with-x --enable-freetype --enable-ansi-color --enable-88-color --enable-256-color --disable-tcap-fkeys --disable-tcap-query --enable-i18n
 }
 
 build() {

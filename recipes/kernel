@@ -11,7 +11,7 @@ deps="mlibc-headers"
 
 build() {
     cp -pr "${source_dir}"/* .
-    make -j${parallelism} CC=x86_64-salernos-mlibc-gcc LD=x86_64-salernos-mlibc-ld AS=x86_64-salernos-mlibc-as
+    make -j12 CC=x86_64-salernos-mlibc-gcc LD=x86_64-salernos-mlibc-ld AS=x86_64-salernos-mlibc-as
 }
 
 package() {

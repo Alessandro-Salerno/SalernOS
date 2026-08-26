@@ -1,0 +1,29 @@
+#! /bin/sh
+
+name=musl-fts
+version=1.2.7
+revision=1
+tarball_url="https://github.com/void-linux/musl-fts/archive/refs/tags/v${version}.tar.gz"
+tarball_blake2b="045cfc32dffd18b58093dfe578a029ca15083eec98812ea2849acf37fd2c8e7272840b15b4966201421624d96ba69208a36b58d5420cef2563c107cfae98ea93"
+source_hostdeps="automake autoconf libtool pkg-config"
+imagedeps="build-essential"
+hostdeps="gcc autoconf automake libtool pkg-config"
+deps="core-libs"
+
+prepare() {
+    NOCONFIGURE=1 ./bootstrap.sh
+}
+
+configure() {
+    autotools_configure
+}
+
+build() {
+    make -j${parallelism}
+}
+
+package() {
+    DESTDIR="${dest_dir}" make install
+
+    post_package_strip
+}

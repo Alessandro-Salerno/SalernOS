@@ -9,3 +9,4 @@ limine/
 *.iso
 netdump.dat
 *.disk
+.jinx-cache

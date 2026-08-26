@@ -33,32 +33,22 @@ void consumer(int fd) {
         return;
     }
 
-    char c;
-    int  sum = 0;
+    char *msg  = malloc(initbuf.len);
+    int   left = initbuf.len;
+    int   sum  = 0;
 
-    for (int i = 0; i < initbuf.len; i++) {
-        if (-1 == read(fd, &c, 1)) {
+    for (int i = 0; i < initbuf.len;) {
+        ssize_t r = read(fd, msg + i, left);
+        if (-1 == r) {
             fprintf(stderr, "CONSUMER: error reading char %d\n", i);
             return;
         }
+        left -= r;
+        i += r;
+    }
 
-        if (0 == i && initbuf.first != c) {
-            fprintf(stderr,
-                    "CONSUMER: expected %c as first character, got %c\n",
-                    initbuf.first,
-                    c);
-            return;
-        }
-
-        if (i == initbuf.len - 1 && initbuf.last != c) {
-            fprintf(stderr,
-                    "CONSUMER: expected %c as last character, got %c\n",
-                    initbuf.last,
-                    c);
-            return;
-        }
-
-        sum += (int)c;
+    for (size_t i = 0; i < initbuf.len; i++) {
+        sum += (int)msg[i];
     }
 
     if (initbuf.sum != sum) {

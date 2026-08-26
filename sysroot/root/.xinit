@@ -1,11 +1,29 @@
 #!/bin/sh
 
 mkdir -p /var/log
+mkdir -p /var/cache/fontconfig
 
 # Configuration
-CONFIG_DEBUG_ON=/dev/null
+CONFIG_DEBUG_ON=/var/log/xsession.log
 CONFIG_WM_WAIT=1
 CONFIG_WM_PATH=jwm
+CONFIG_CURSOR_SIZE=32
+CONFIG_CURSOR_THEME=Adwaita
+CONFIG_FONT_DIR=/usr/share/fonts/dejavu
+
+export FONTCONFIG_PATH=/etc/fonts
+export XCURSOR_SIZE=${CONFIG_CURSOR_SIZE}
+export XCURSOR_THEME=${CONFIG_CURSOR_THEME}
+
+if command -v fc-cache > /dev/null 2>&1; then
+    fc-cache -f > ${CONFIG_DEBUG_ON} 2>&1
+fi
+
+if command -v mkfontscale > /dev/null 2>&1; then
+    if [ ! -f ${CONFIG_FONT_DIR}/fonts.dir ]; then
+        mkfontscale -b -s -l ${CONFIG_FONT_DIR} > ${CONFIG_DEBUG_ON} 2>&1
+    fi
+fi
 
 Xorg -dumbSched > ${CONFIG_DEBUG_ON} 2> ${CONFIG_DEBUG_ON} &
 (sleep ${CONFIG_WM_WAIT} && ${CONFIG_WM_PATH} > ${CONFIG_DEBUG_ON} 2> ${CONFIG_DEBUG_ON}) &

@@ -61,9 +61,17 @@ rebuild:
 		./jinx rebuild kernel && \
 		./jinx regen init && \
 		./jinx rebuild init && \
-		rm salernos.iso && \
+		rm -f salernos.iso && \
 		rm -rf iso_root/ && \
 		./jinx install iso_root/ '*' && \
+		$(MAKE) salernos.iso
+
+testkernel:
+	rm -f iso_root/boot/vmsalernos && \
+		./jinx regen kernel && \
+		./jinx rebuild kernel && \
+		./jinx install iso_root/ 'kernel' && \
+		rm -f salernos.iso && \
 		$(MAKE) salernos.iso
 
 clean:
@@ -78,7 +86,7 @@ run: salernos.iso
 		-cpu host,+invtsc \
 		-m 16000m \
 		-enable-kvm \
-		-smp cpus=8 \
+		-smp cpus=1 \
 		-no-shutdown \
 		-no-reboot \
 		-debugcon file:/dev/stdout \
@@ -88,7 +96,9 @@ run: salernos.iso
 		-object filter-dump,id=f1,netdev=net0,file=netdump.dat \
 		-cdrom salernos.iso  \
 		-drive file=ext2test.disk,if=none,id=nvme0,format=raw -device nvme,drive=nvme0,serial=deadbeef \
-		-display sdl,gl=on
+		-vga none \
+		-device VGA,vgamem_mb=64,xres=1920,yres=1080 \
+		-display sdl,gl=on \
 
 debug: salernos.iso
 	qemu-system-x86_64 \
@@ -105,7 +115,10 @@ debug: salernos.iso
 		-device virtio-net,netdev=net0 \
 		-object filter-dump,id=f1,netdev=net0,file=netdump.dat \
 		-cdrom salernos.iso \
+		-vga none \
+		-device VGA,vgamem_mb=64,xres=1920,yres=1080 \
 		-display sdl,gl=on \
+		-full-screen \
 		-device nvme,serial=phantom-nvme0 \
 		-S -s
 

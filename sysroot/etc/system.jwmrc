@@ -2,8 +2,8 @@
 <JWM>
     <!-- The root menu. -->
     <RootMenu onroot="0">
-        <Program label="Terminal">xterm -bg black -fg white -e "cd /root; bash"</Program>
-        <Program label="File Manager">xfe</Program>
+        <Program label="Terminal">xterm -title "XTerm" -n "XTerm" -fa "DejaVu Sans Mono" -fs 12 -sl 8192 -bg "#F2ECE1" -fg "#332F2B" -cr "#C05C34" -e "cd /root; bash"</Program>
+        <Program label="File Manager">xterm -title "nnn" -n "nnn" -fa "DejaVu Sans Mono" -fs 12 -bg "#F2ECE1" -fg "#332F2B" -cr "#C05C34" -e nnn</Program>
         <Menu label="Applications">
             <Program label="xeyes">xeyes</Program>
         </Menu>
@@ -31,62 +31,70 @@
     </Tray>
 
     <!-- Visual Styles -->
-    <WindowStyle decorations="flat">
-        <Font>DejaVu Sans:bold:pixelsize=14</Font>
+    <WindowStyle decorations="motif">
+        <Font>-*-luxi sans-bold-r-normal--20-*-*-*-*-*-iso8859-1</Font>
         <Width>4</Width>
         <Corner>2</Corner>
-        <Foreground>#000000</Foreground>
-        <Background>#AAAAAA</Background>
-        <Opacity>0.5</Opacity>
+        <Foreground>#3A3733</Foreground>
+        <Background>#CFC8BE</Background>
+        <Outline>#8E867B</Outline>
+        <Opacity>1.0</Opacity>
         <Active>
-            <Foreground>#FFFFFF</Foreground>
-            <Background>#5095BF</Background>
+            <Foreground>#FFF1E3</Foreground>
+            <Background>#A9512C</Background>
+            <Outline>#7C3A20</Outline>
             <Opacity>1.0</Opacity>
         </Active>
     </WindowStyle>
-    <TrayStyle decorations="flat">
-        <Font>DejaVu Sans:pixelsize=14</Font>
-        <Foreground>#000000</Foreground>
-        <Background>#FFFFFF</Background>
-        <Opacity>0.75</Opacity>
+    <TrayStyle decorations="motif">
+        <Font>-*-luxi sans-medium-r-normal--22-*-*-*-*-*-iso8859-1</Font>
+        <Foreground>#332F2B</Foreground>
+        <Background>#DCD6CC</Background>
+        <Outline>#B3ABA0</Outline>
+        <Opacity>1.0</Opacity>
     </TrayStyle>
     <TaskListStyle list="all" group="true">
-      <Font>DejaVu Sans:pixelsize=14</Font>
+      <Font>-*-luxi sans-medium-r-normal--22-*-*-*-*-*-iso8859-1</Font>
       <Active>
-        <Foreground>#000000</Foreground>
-        <Background>#D0DEE5</Background>
+        <Foreground>#FFF6EC</Foreground>
+        <Background>#12666B</Background>
+        <Outline>#0E4A4E</Outline>
       </Active>
-      <Foreground>#000000</Foreground>
-      <Background>#FFFFFF</Background>
+      <Foreground>#332F2B</Foreground>
+      <Background>#D2CBC1</Background>
+      <Outline>#B3ABA0</Outline>
     </TaskListStyle>
     <PagerStyle>
-        <Foreground>#D0DEE5</Foreground>
-        <Background>#A7AAAC</Background>
-        <Text>#000000</Text>
+        <Foreground>#B3ABA0</Foreground>
+        <Background>#D2CBC1</Background>
+        <Outline>#8E867B</Outline>
+        <Text>#332F2B</Text>
         <Active>
-            <Foreground>#0077CC</Foreground>
-            <Background>#4376C7</Background>
+            <Foreground>#D77A3E</Foreground>
+            <Background>#E8C6A4</Background>
         </Active>
     </PagerStyle>
-    <MenuStyle decorations="flat">
-        <Font>DejaVu Sans:pixelsize=14</Font>
-        <Foreground>#000000</Foreground>
-        <Background>#FFFFFF</Background>
+    <MenuStyle decorations="motif">
+        <Font>-*-luxi sans-medium-r-normal--22-*-*-*-*-*-iso8859-1</Font>
+        <Foreground>#332F2B</Foreground>
+        <Background>#DCD6CC</Background>
+        <Outline>#B3ABA0</Outline>
         <Active>
-            <Foreground>#000000</Foreground>
-            <Background>#D0DEE5</Background>
+            <Foreground>#FFF6EC</Foreground>
+            <Background>#C05C34</Background>
         </Active>
-        <Opacity>0.85</Opacity>
+        <Opacity>1.0</Opacity>
     </MenuStyle>
     <PopupStyle>
-        <Font>DejaVu Sans:pixelsize=14</Font>
-        <Foreground>#000000</Foreground>
-        <Background>#D0DEE5</Background>
+        <Font>-*-luxi sans-medium-r-normal--22-*-*-*-*-*-iso8859-1</Font>
+        <Foreground>#332F2B</Foreground>
+        <Background>#EFE7DA</Background>
+        <Outline>#8E867B</Outline>
     </PopupStyle>
 
     <!-- Virtual Desktops -->
     <Desktops width="4" height="1">
-        <Background type="image">/etc/background.png</Background>
+        <Background type="image">/etc/background.jpg</Background>
     </Desktops>
 
     <!-- Double click speed (in milliseconds) -->
@@ -120,9 +128,9 @@
     <Key key="Escape">escape</Key>
 
     <Key mask="A" key="Tab">nextstacked</Key>
-    <Key mask="A" key="F4">close</Key>
+    <Key mask="CA" key="q">close</Key>
     <Key mask="A" key="#">desktop#</Key>
-    <Key mask="A" key="F1">root:0</Key>
+    <Key mask="C" key="Return">root:0</Key>
     <Key mask="A" key="F2">window</Key>
     <Key mask="A" key="F10">maximize</Key>
     <Key mask="A" key="Right">rdesktop</Key>

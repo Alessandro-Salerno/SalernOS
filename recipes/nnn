@@ -1,0 +1,31 @@
+#! /bin/sh
+
+name=nnn
+version=5.1
+revision=1
+tarball_url="https://github.com/jarun/nnn/releases/download/v${version}/nnn-v${version}.tar.gz"
+tarball_blake2b="8d03f78c15b577a14f110836091d61cd8eaaa95cfcef3c7a2a0838ce3cfd2b32bc746352058aad638a0cd1711fe4781538a6774602e2943dae307583c27b2e03"
+imagedeps="build-essential"
+hostdeps="gcc pkg-config"
+deps="core-libs ncurses readline musl-fts"
+
+configure() {
+    cp -rp "${source_dir}"/. ./
+}
+
+build() {
+    make -j${parallelism} \
+        CC=${OS_TRIPLET}-gcc \
+        PKG_CONFIG=${OS_TRIPLET}-pkg-config \
+        CFLAGS_CURSES="-D_GNU_SOURCE -DNCURSES_WIDECHAR -I${sysroot_dir}/${prefix}/include/ncursesw" \
+        LDLIBS_CURSES="-lncursesw -ltinfow -lfts" \
+        O_NOX11=1 \
+        O_NOFIFO=1 \
+        PREFIX=${prefix}
+}
+
+package() {
+    make install DESTDIR="${dest_dir}" PREFIX=${prefix}
+
+    post_package_strip
+}
